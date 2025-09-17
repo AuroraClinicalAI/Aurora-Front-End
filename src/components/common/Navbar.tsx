@@ -9,7 +9,7 @@ export const Navbar = () => {
   return (
     <header>
       <nav data-state="OnlyRegister" className="navbar h-20 relative bg-indigo-300 flex justify-between p-0 md:p-5 items-center flex-wrap">
-        <div className="text-white text-3xl font-bold my-5 ml-5 md:m-0">AURORA</div>
+        <a className="text-white text-3xl font-bold my-5 ml-5 md:m-0" href='/'>AURORA</a>
         {/* Botón de navegación */}
         <button
           onClick={toggleMenu}
