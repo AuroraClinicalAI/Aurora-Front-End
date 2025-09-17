@@ -2,7 +2,7 @@ import Button from "@components/common/Button";
 
 export const RegisterForm = () => {
   return (
-    <div className="max-w-[473px] w-full rounded-[5px] outline-2 outline-offset-[-2px] outline-zinc-800/20 flex flex-col items-center px-10 pt-8 pb-4 gap-10 mx-auto my-30">
+    <div className="max-w-[473px] w-full rounded-[5px] md:outline-2 md:outline-offset-[-2px] md:outline-zinc-800/20 flex flex-col items-center px-10 pt-8 pb-4 gap-10 mx-auto md:my-30">
       <div>
         <h3 className="justify-center text-black text-3xl font-bold mb-1 text-center">Registro de Usuario</h3>
         <p className="justify-center text-slate-500 text-sm font-normal text-center">Ingresa tus datos para crear una cuenta</p>
@@ -19,7 +19,7 @@ export const RegisterForm = () => {
         <div className="flex flex-col">
           <label htmlFor="nombreUsuario" className="text-black text-sm font-semibold ">NOMBRE DE USUARIO</label>
           <input type="text" name="nombreUsuario" className="rounded outline-1 outline-offset-[-1px] outline-neutral-400 px-2 py-1" placeholder="Usuario123"/>
-          <p>Este sera tu identificador único en el sistema</p>
+          <p className="text-neutral-400 text-[8px] font-normal">Este sera tu identificador único en el sistema</p>
         </div>
         <Button label="Verificar nombre de usuario" type="register" onClick={() => {}}/>
         <div className="flex flex-col">
@@ -36,7 +36,7 @@ export const RegisterForm = () => {
           <a href="/forgot-password" className="text-slate-500 text-xs font-normal">Olvide mi contraseña</a>
         </div>
         <div className="mx-auto">
-        <Button label="Iniciar Sesión" type="register" onClick={() => {}}/>
+        <Button label="Regístrate" type="register" onClick={() => {}}/>
         </div>
       </form>
     </div>

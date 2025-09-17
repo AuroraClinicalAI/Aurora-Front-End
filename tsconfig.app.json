@@ -32,6 +32,7 @@
       "@store/*": [ "src/store/*" ],
       "@styles/*": [ "src/styles/*" ],
       "@utils/*": [ "src/utils/*" ],
+      "@assets/*": [ "src/assets/*" ]
     }
   },
   "include": ["src"]
