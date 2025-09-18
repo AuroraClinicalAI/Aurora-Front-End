@@ -1,7 +1,7 @@
 import axios, {AxiosError} from 'axios';
 
 const api = axios.create({
-  baseURL: import.meta.env.API_URL,
+  baseURL: "http://localhost:8000/api/",
   withCredentials: true,
   headers: {
     "Content-Type": "application/json"
@@ -42,10 +42,7 @@ api.interceptors.response.use(
       isRefreshing = true;
       originalRequest._isRetry = true;
       try {
-        const data = {
-          "refresh": "refresh"
-        };
-        const response = await api.post("/token/refresh", data);
+        const response = await api.post("/token/refresh");
         const { accessToken } = response.data.access;
 
         originalRequest.headers.Authorization = `Bearer ${accessToken}`;
