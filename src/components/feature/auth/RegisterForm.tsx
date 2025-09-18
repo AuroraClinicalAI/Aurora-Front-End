@@ -36,7 +36,7 @@ export const RegisterForm = () => {
       [name]: value
     }))
   };
-  const handleSumbit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     setError(null);
@@ -55,7 +55,7 @@ export const RegisterForm = () => {
     };
     try {
       await register(data);
-      window.location.href = "/register-confirm"
+      window.location.href = "/register-confirm";
     } catch (err) {
       console.error('Error en el registro:', err);
       setError('Hubo un error al intentar registrarte. Inténtalo de nuevo.')
@@ -69,7 +69,7 @@ export const RegisterForm = () => {
         <h3 className="justify-center text-black text-3xl font-bold mb-1 text-center">Registro de Usuario</h3>
         <p className="justify-center text-slate-500 text-sm font-normal text-center">Ingresa tus datos para crear una cuenta</p>
       </div>
-      <form className="flex flex-col gap-8" onSubmit={handleSumbit}>
+      <form className="flex flex-col gap-8" onSubmit={handleSubmit}>
         <div className="flex flex-col">
           <label htmlFor="nombre" className="text-black text-sm font-semibold ">NOMBRE</label>
           <input type="text" name="nombre" className="rounded outline-1 outline-offset-[-1px] outline-neutral-400 px-2 py-1 self-stretch" placeholder="Cual es tu nombre?" onChange={handleChange} />
