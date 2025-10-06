@@ -19,3 +19,7 @@ export interface RegisterData {
 export interface RegisterResponse {
   usuario: User;
 }
+export interface UserState {
+  user: User | null;
+  loading: boolean;
+}

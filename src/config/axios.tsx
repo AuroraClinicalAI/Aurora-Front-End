@@ -1,4 +1,6 @@
+import { logout } from '@/store/userSlice';
 import axios, {AxiosError} from 'axios';
+import { useDispatch } from 'react-redux';
 
 const api = axios.create({
   baseURL: "http://localhost:8000/api/",
@@ -28,6 +30,7 @@ api.interceptors.response.use(
     return response;
   },
   async (error) => {
+    const dispatch = useDispatch();
     const originalRequest = error.config!;
     // error 401 y no es el refresco del token 
     if (error.response?.status === 401 && !originalRequest._isRetry){
@@ -51,6 +54,7 @@ api.interceptors.response.use(
       } catch (refreshError) {
         processQueue(refreshError as AxiosError);
         window.location.href = "/login";
+        dispatch(logout());
         return Promise.reject(refreshError);
       } finally {
         isRefreshing = false;

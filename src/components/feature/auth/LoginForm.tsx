@@ -1,15 +1,25 @@
 import { login } from "@/services/AuthService";
-import type { LoginData } from "@/types/AuthType";
+import { loginFailure, loginStart, loginSuccess } from "@/store/userSlice";
+import type { LoginData, UserState } from "@/types/AuthType";
 import Button from "@components/common/Button";
 import React, { useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
 
 export const LoginForm = () => {
+  // Definir variables para el guardado de inicio de sesión
+  const dispatch = useDispatch();
   const [formData, setFormData] = useState({
     correo: '',
     clave: ''
   });
+  const userState = useSelector((state: { user: UserState }) => state.user);
+  if (userState.user !== null && !userState.loading) {
+    window.location.href = "/";
+  }
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  // Función para guardar los cambios en el formulario
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setFormData(prevState => ({
@@ -17,7 +27,10 @@ export const LoginForm = () => {
       [name]: value
     }))
   };
+
+  // Función para hacer la consulta de inicio de sesión y guardar el usuario
   const handleSubmit = async (e: React.FormEvent) => {
+    dispatch(loginStart());
     e.preventDefault();
     setLoading(true);
     setError(null);
@@ -27,11 +40,14 @@ export const LoginForm = () => {
     };
 
     try {
-      await login(data);
+      // Guardar el usuario en el reducer
+      const usuario = await login(data);
+      dispatch(loginSuccess(usuario));
       window.location.href = "/";
     } catch (err) {
       console.error('Error en el inicio de sesión:', err);
       setError('Hubo un error al intentar iniciar sesión. Inténtalo de nuevo.');
+      dispatch(loginFailure());
     } finally {
       setLoading(false);
     }
