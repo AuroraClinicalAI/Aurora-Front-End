@@ -1,10 +1,10 @@
-import { logout } from '@/store/userSlice';
+import { logout, setAccessToken } from '@/store/userSlice';
 import axios, {AxiosError} from 'axios';
 import { useDispatch } from 'react-redux';
+import { store } from '@/store/store';
 
 const api = axios.create({
   baseURL: "http://localhost:8000/api/",
-  withCredentials: true,
   headers: {
     "Content-Type": "application/json"
   }
@@ -13,6 +13,20 @@ const api = axios.create({
 //Actualizar tokens de acceso
 let isRefreshing = false;
 let failedQueue: Array<{ resolve: (value: unknown) => void; reject: (reason?: unknown) => void; }> = [];
+
+// Interceptor de autentificación de petición antes de enviarla
+api.interceptors.request.use(
+  (config) => {
+    const accessToken = store.getState().user.accessToken;
+    if (accessToken) {
+      config.headers.Authorization = `Bearer ${accessToken}`;
+    }
+    return config;
+  },
+  (error) => {
+    return Promise.reject(error);
+  }
+)
 
 const processQueue = (error: AxiosError | null, token:string | null = null) => {
   failedQueue.forEach(prom => {
@@ -45,16 +59,19 @@ api.interceptors.response.use(
       isRefreshing = true;
       originalRequest._isRetry = true;
       try {
-        const response = await api.post("/token/refresh");
+        const refreshToken = store.getState().user.refreshToken;
+        const response = await api.post("/token/refresh", { refresh: refreshToken});
         const { accessToken } = response.data.access;
-
+        // Actualizar el access token en la consulta
+        store.dispatch(setAccessToken(accessToken));
         originalRequest.headers.Authorization = `Bearer ${accessToken}`;
         processQueue(null, accessToken);
         return api(originalRequest);
       } catch (refreshError) {
         processQueue(refreshError as AxiosError);
-        window.location.href = "/login";
+        // se realiza el logout si no funciona o esta también vencido
         dispatch(logout());
+        window.location.href = "/login";
         return Promise.reject(refreshError);
       } finally {
         isRefreshing = false;

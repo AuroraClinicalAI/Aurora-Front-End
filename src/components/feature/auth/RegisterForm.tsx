@@ -1,9 +1,7 @@
 import { register } from "@/services/AuthService";
-import { getUserTypes } from "@/services/UserTypesService";
 import type { RegisterData } from "@/types/AuthType";
-import { type UserType } from "@/types/ModelType";
 import Button from "@components/common/Button";
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 
 export const RegisterForm = () => {
   const [formData, setFormData] = useState({
@@ -14,21 +12,8 @@ export const RegisterForm = () => {
     clave: '',
     confirmarClave: ''
   });
-  const [userTypes, setUserTypes] = useState<UserType[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  useEffect(() => {
-    const fetchUserTypes = async () => {
-      try {
-        const data = await getUserTypes();
-        setUserTypes(data);
-      } catch (err) {
-        console.error("Error al obtener tipos de usuario:", err);
-      }
-    };
-
-    fetchUserTypes();
-  }, []);
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     setFormData(prevState => ({
@@ -84,22 +69,6 @@ export const RegisterForm = () => {
           <p className="text-neutral-400 text-[8px] font-normal">Este sera tu identificador único en el sistema</p>
         </div>
         <Button label="Verificar nombre de usuario" type="register" onClick={() => { }} />
-        <div className="flex flex-col">
-          <label htmlFor="tipoUsuario" className="text-black text-sm font-semibold">TIPO DE USUARIO</label>
-          <select
-            name="tipoUsuario"
-            className="rounded outline-1 outline-offset-[-1px] outline-neutral-400 px-2 py-1"
-            value={formData.tipoUsuario}
-            onChange={handleChange}
-          >
-            <option value="" disabled>Selecciona una opción</option>
-            {userTypes.map((type) => (
-              <option key={type.id_tipo_usuario} value={type.id_tipo_usuario}>
-                {type.tipo_usuario}
-              </option>
-            ))}
-          </select>
-        </div>
         <div className="flex flex-col">
           <label htmlFor="clave" className="text-black text-sm font-semibold ">CONTRASEÑA</label>
           <input type="password" name="clave" className="rounded outline-1 outline-offset-[-1px] outline-neutral-400  px-2 py-1" placeholder="************************" onChange={handleChange} />

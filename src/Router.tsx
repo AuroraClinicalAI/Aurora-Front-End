@@ -17,6 +17,7 @@ import { TestingValidation } from '@pages/TestingValidation';
 import { UserOverview } from '@pages/UserOverview';
 import { UserProfile } from '@pages/UserProfile';
 import { ForgotPassword } from '@pages/ForgotPassword';
+import { Logout } from '@pages/Logout';
 
 export const Router = () => {
   return (
@@ -25,6 +26,7 @@ export const Router = () => {
       <Route path='/*' element={ <NotFound/>}/>
       <Route path='/login' element={ <Login/>}/>
       <Route path='/register' element={ <Register/>}/>
+      <Route path='/logout' element={ <Logout/>}/>
       <Route path='/register-confirm' element={ <RegisterConfirm/>}/>
       <Route path='/forgot-password' element={ <ForgotPassword/>}/>
       <Route path='/about' element={ <About/>}/>

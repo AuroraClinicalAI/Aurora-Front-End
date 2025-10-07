@@ -4,8 +4,10 @@ export interface LoginData {
   correo: string;
   clave: string;
 }
-export interface LoginResponse {
-  usuario: User;
+export interface AuthData {
+  user: User | null;
+  accessToken: string | null;
+  refreshToken: string | null;
 }
 
 export interface RegisterData {
@@ -15,11 +17,13 @@ export interface RegisterData {
   tipo_usuario: number;
   clave: string;
   confirmar_clave: string;
+  imagen?: string;
 }
 export interface RegisterResponse {
   usuario: User;
 }
-export interface UserState {
-  user: User | null;
+export interface UserState extends AuthData {
   loading: boolean;
+  isAuthenticated: boolean;
+  error: string | null;
 }

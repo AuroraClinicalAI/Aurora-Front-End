@@ -11,4 +11,5 @@ export interface User {
   tipo_usuario_info: UserType;
   role_name: string;
   last_login: string;
+  imagen?: string;
 }

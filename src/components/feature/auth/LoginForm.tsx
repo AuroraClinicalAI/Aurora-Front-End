@@ -41,13 +41,14 @@ export const LoginForm = () => {
 
     try {
       // Guardar el usuario en el reducer
-      const usuario = await login(data);
-      dispatch(loginSuccess(usuario));
+      const authData = await login(data);
+      console.log(authData.user)
+      dispatch(loginSuccess(authData));
       window.location.href = "/";
     } catch (err) {
       console.error('Error en el inicio de sesión:', err);
       setError('Hubo un error al intentar iniciar sesión. Inténtalo de nuevo.');
-      dispatch(loginFailure());
+      dispatch(loginFailure(String(err)));
     } finally {
       setLoading(false);
     }

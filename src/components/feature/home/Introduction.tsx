@@ -1,5 +1,5 @@
 import MainIlustration from "@assets/images/main_ilustration.svg"
-import Button from "../../common/Button";
+import Button from "@components/common/Button";
 
 export const Introduction = () => {
   return (

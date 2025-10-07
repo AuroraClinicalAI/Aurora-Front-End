@@ -4,7 +4,7 @@ interface CardProps {
   icon?: React.ReactNode;
   title: string;
   subtitle?: string;
-  description: string;
+  description?: string;
   buttonText?: string;
   onButtonClick?: () => void;
   align?: "center" | "left";
