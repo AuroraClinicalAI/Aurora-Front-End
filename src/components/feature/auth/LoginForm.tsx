@@ -1,8 +1,9 @@
 import { login } from "@/services/AuthService";
 import { loginFailure, loginStart, loginSuccess } from "@/store/userSlice";
 import type { LoginData, UserState } from "@/types/AuthType";
+import { ApiError } from "@/types/ErrorType";
 import Button from "@components/common/Button";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 
 export const LoginForm = () => {
@@ -13,12 +14,14 @@ export const LoginForm = () => {
     clave: ''
   });
   const userState = useSelector((state: { user: UserState }) => state.user);
-  if (userState.user !== null && !userState.loading) {
-    window.location.href = "/";
-  }
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  useEffect(() => {
+  if (userState.user !== null && !userState.loading) {
+    window.location.href = "/";
+  }
+  }, [userState.user, userState.loading]);
   // Función para guardar los cambios en el formulario
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -42,12 +45,14 @@ export const LoginForm = () => {
     try {
       // Guardar el usuario en el reducer
       const authData = await login(data);
-      console.log(authData.user)
       dispatch(loginSuccess(authData));
-      window.location.href = "/";
     } catch (err) {
       console.error('Error en el inicio de sesión:', err);
-      setError('Hubo un error al intentar iniciar sesión. Inténtalo de nuevo.');
+      let errorMessage = "Error en la api";
+      if(err instanceof ApiError){
+        errorMessage = err.message;
+      }
+        setError(errorMessage);
       dispatch(loginFailure(String(err)));
     } finally {
       setLoading(false);

@@ -1,7 +1,7 @@
 import { logout, setAccessToken } from '@/store/userSlice';
 import axios, {AxiosError} from 'axios';
-import { useDispatch } from 'react-redux';
 import { store } from '@/store/store';
+import { ApiError } from '@/types/ErrorType';
 
 const api = axios.create({
   baseURL: "http://localhost:8000/api/",
@@ -44,7 +44,6 @@ api.interceptors.response.use(
     return response;
   },
   async (error) => {
-    const dispatch = useDispatch();
     const originalRequest = error.config!;
     // error 401 y no es el refresco del token 
     if (error.response?.status === 401 && !originalRequest._isRetry){
@@ -70,13 +69,22 @@ api.interceptors.response.use(
       } catch (refreshError) {
         processQueue(refreshError as AxiosError);
         // se realiza el logout si no funciona o esta también vencido
-        dispatch(logout());
+        store.dispatch(logout());
         window.location.href = "/login";
         return Promise.reject(refreshError);
       } finally {
         isRefreshing = false;
       }
     }
+    if (error.response){
+      const apiError: ApiError = {
+        name: "error de api",
+        message: error.response.error,
+        statusCode: error.response.statusCode
+      }
+      return Promise.reject(apiError);
+    }
+    return Promise.reject({"error": "Error de conexión hacia el servidor"})
   }
 );
 

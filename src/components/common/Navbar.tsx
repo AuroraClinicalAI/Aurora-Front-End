@@ -6,7 +6,6 @@ export const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
   const userState = useSelector((state: { user: UserState }) => state.user);
-  console.log(userState)
 
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
@@ -64,16 +63,10 @@ export const Navbar = () => {
                     </div>
                     <ul className="py-2" aria-labelledby="user-menu-button">
                       <li>
-                        <a href="#" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 dark:text-gray-200 dark:hover:text-white">Dashboard</a>
+                        <a href="/profile" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 dark:text-gray-200 dark:hover:text-white">Perfil</a>
                       </li>
                       <li>
-                        <a href="#" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 dark:text-gray-200 dark:hover:text-white">Settings</a>
-                      </li>
-                      <li>
-                        <a href="#" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 dark:text-gray-200 dark:hover:text-white">Earnings</a>
-                      </li>
-                      <li>
-                        <a href="#" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 dark:text-gray-200 dark:hover:text-white">Sign out</a>
+                        <a href="/logout" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 dark:text-gray-200 dark:hover:text-white">Cerrar Sesión</a>
                       </li>
                     </ul>
                   </div>
@@ -123,7 +116,7 @@ export const Navbar = () => {
             <ul className={`font-medium flex flex-col p-4 md:p-0 md:flex-row md:space-x-8 rtl:space-x-reverse md:mt-0 md:border-0 ${isMenuOpen ? `md:bg-white dark:bg-indigo-300 md:dark:bg-indigo-300` : ``} gap-5 `}>
               <li>
                 <a
-                  href="/login"
+                  href="/library"
                   className="block rounded-lg p-2.5 text-white text-xl font-bold hover:bg-indigo-400"
                 >
                   Recursos
@@ -131,7 +124,7 @@ export const Navbar = () => {
               </li>
               <li>
                 <a
-                  href="/register"
+                  href="/about"
                   className="block rounded-lg p-2.5 text-white text-xl font-bold hover:bg-indigo-400"
                 >
                   Acerca De

@@ -8,6 +8,7 @@ export interface AuthData {
   user: User | null;
   accessToken: string | null;
   refreshToken: string | null;
+  error: string | null;
 }
 
 export interface RegisterData {
@@ -25,5 +26,4 @@ export interface RegisterResponse {
 export interface UserState extends AuthData {
   loading: boolean;
   isAuthenticated: boolean;
-  error: string | null;
 }
