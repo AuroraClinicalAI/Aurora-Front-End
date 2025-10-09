@@ -6,6 +6,7 @@ export const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
   const userState = useSelector((state: { user: UserState }) => state.user);
+  const apiUrl = import.meta.env.VITE_BASE_URL;
 
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
@@ -53,10 +54,10 @@ export const Navbar = () => {
               <div className="flex items-center md:order-2 md:space-x-0 rtl:space-x-reverse">
                 <button type="button" className="flex text-sm bg-white rounded-full md:me-0 focus:ring-4 focus:ring-gray-300 dark:focus:ring-gray-600" id="user-menu-button" aria-expanded={isUserMenuOpen} onClick={toggleUserMenu}>
                   <span className="sr-only">Open user menu</span>
-                  <img className="w-10 h-10 rounded-full" src={`http://localhost:8000${userState.user.imagen}`} alt="user photo" />
+                  <img className="w-10 h-10 rounded-full" src={`${apiUrl}${userState.user.imagen}`} alt="user photo" />
                 </button>
                 {isUserMenuOpen &&
-                  <div className="z-50 my-4 text-base list-none bg-white divide-y divide-gray-100 rounded-lg shadow-sm dark:bg-gray-700 dark:divide-gray-600 absolute translate-y-40 translate-x-[-95px] md:translate-x-[-150px] max-w-[200px]">
+                  <div className="z-50 my-4 text-base list-none bg-white divide-y divide-gray-100 rounded-lg shadow-sm dark:bg-gray-700 dark:divide-gray-600 absolute translate-y-32 translate-x-[-95px] md:translate-x-[-150px] max-w-[200px]">
                     <div className="px-4 py-3">
                       <span className="block text-sm text-gray-900 dark:text-white">{userState.user.nombre_usuario}</span>
                       <span className="block text-sm  text-gray-500 truncate dark:text-gray-400">{userState.user.correo}</span>

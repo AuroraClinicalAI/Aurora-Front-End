@@ -1,3 +1,5 @@
+import { Subtitle } from "@/components/common/Subtitle";
+import { Title } from "@/components/common/Title";
 import Mind from "@assets/images/mind.svg";
 import Card from "@components/common/Card";
 
@@ -6,11 +8,11 @@ export const MindIcon = () => {
 };
 export const AboutMission = () => {
   return (
-    <div>
-      <div>
-        <h2>Nuestra Misión y Visión</h2>
-        <p>Guiados por el compromiso de mejorar la salud mental global</p>
-        <div>
+    <div className="bg-sky-300/20 pt-10 pb-30">
+      <div className="flex flex-col items-center gap-5 max-w-[1440px] mx-auto">
+        <Title type="secondary">Nuestra Misión y Visión</Title>
+        <Subtitle type="secondary">Guiados por el compromiso de mejorar la salud mental global</Subtitle>
+        <div className="flex justify-evenly pt-10 w-full">
           <Card 
             icon={<MindIcon/>} 
             title="Misión" 
@@ -19,7 +21,7 @@ export const AboutMission = () => {
             buttonText="" 
             onButtonClick={() => {}} 
             align="left" 
-            size="large" 
+            size="xl" 
           />
           <Card 
             icon={<MindIcon/>} 
@@ -29,7 +31,7 @@ export const AboutMission = () => {
             buttonText="" 
             onButtonClick={() => {}} 
             align="left" 
-            size="large" 
+            size="xl" 
           />
         </div>
       </div>

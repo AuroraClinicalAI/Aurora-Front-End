@@ -8,8 +8,8 @@ export const Introduction = () => {
         <h2 className="text-indigo-400 text-4xl font-bold max-w-250">Sistema de Apoyo al Diagnóstico de Trastornos Depresivos</h2>
         <p className="text-slate-500/60 text-xl font-semibold max-w-250">Herramienta avanzada que utiliza modelos de clasificación de Machine Learning para apoyar el diagnóstico de trastornos depresivos en la práctica clínica.</p>
         <div className="flex gap-5">
-          <Button label="Comenzar Diagnostico" onClick={() => {}} type="register"/>
-          <Button label="Ver Tutorial" onClick={() => {}} type="login"/>
+          <Button label="Comenzar Diagnostico" onClick={() => {window.location.href = "/case-analysis"}} type="register"/>
+          <Button label="Ver Tutorial" onClick={() => {window.location.href = "/tutorial"}} type="login"/>
         </div>
       </div>
       <img src={MainIlustration} alt="Ilustracion principal" className="max-w-[90%] md:max-w-[50%]"/>

@@ -12,7 +12,7 @@ export const AboutSystem = () => {
             Utilizando técnicas avanzadas de Machine Learning, el sistema analiza datos clínicos para identificar patrones y factores de riesgo asociados a trastornos depresivos, proporcionando una herramienta complementaria al juicio clínico profesional.
           </p>
           <div>
-            <Button label="Conocer Más sobre el Proyecto" onClick={() => {}} type="primary"/>
+            <Button label="Conocer Más sobre el Proyecto" onClick={() => {window.location.href = "/about"}} type="primary"/>
           </div>
         </div>
         <img src={AboutIllustration} alt="Illustration" className="w-full max-w-[90%] md:max-w-[50%]"/>

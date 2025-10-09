@@ -6,7 +6,7 @@ export const CallToAction = () => {
       <h3 className="text-black text-xl md:text-3xl font-bold text-center">Comienza a usar el Sistema</h3>
       <p className="text-slate-500 text-xl md:text-3xl font-semibold text-center">Regístrate para acceder a todas las funcionalidades</p>
       <div>
-        <Button label="Registrarse Ahora" onClick={() => {}} type="register"/>
+        <Button label="Registrarse Ahora" onClick={() => {window.location.href= "/register"}} type="register"/>
       </div>
     </div>
   );

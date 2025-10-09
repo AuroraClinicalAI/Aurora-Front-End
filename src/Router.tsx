@@ -23,8 +23,8 @@ export const Router = () => {
   return (
     <Routes>
       <Route path='/' element={ <HomePage/>}/>
-      <Route path='/*' element={ <NotFound/>}/>
       <Route path='/login' element={ <Login/>}/>
+      <Route path='/*' element={ <NotFound/>}/>
       <Route path='/register' element={ <Register/>}/>
       <Route path='/logout' element={ <Logout/>}/>
       <Route path='/register-confirm' element={ <RegisterConfirm/>}/>

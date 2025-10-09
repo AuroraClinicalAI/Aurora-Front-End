@@ -3,8 +3,9 @@ import axios, {AxiosError} from 'axios';
 import { store } from '@/store/store';
 import { ApiError } from '@/types/ErrorType';
 
+const apiUrl = import.meta.env.VITE_BASE_URL;
 const api = axios.create({
-  baseURL: "http://localhost:8000/api/",
+  baseURL: apiUrl + "/api/",
   headers: {
     "Content-Type": "application/json"
   }
@@ -59,7 +60,7 @@ api.interceptors.response.use(
       originalRequest._isRetry = true;
       try {
         const refreshToken = store.getState().user.refreshToken;
-        const response = await api.post("/token/refresh", { refresh: refreshToken});
+        const response = await api.post("/token/refresh/", { refresh: refreshToken});
         const { accessToken } = response.data.access;
         // Actualizar el access token en la consulta
         store.dispatch(setAccessToken(accessToken));
