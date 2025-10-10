@@ -1,4 +1,4 @@
-import { register } from "@/services/AuthService";
+import { useRegister } from "@/hooks/useAuth";
 import type { RegisterData } from "@/types/AuthType";
 import Button from "@components/common/Button";
 import React, { useState } from 'react';
@@ -12,8 +12,7 @@ export const RegisterForm = () => {
     clave: '',
     confirmarClave: ''
   });
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const { loading, error, handleRegister } = useRegister();
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     setFormData(prevState => ({
@@ -23,13 +22,6 @@ export const RegisterForm = () => {
   };
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setLoading(true);
-    setError(null);
-    if (formData.clave !== formData.confirmarClave) {
-      setError("Las contraseñas no coinciden")
-      setLoading(false);
-      return;
-    }
     const data: RegisterData = {
       nombre: formData.nombre,
       correo: formData.email,
@@ -38,14 +30,9 @@ export const RegisterForm = () => {
       clave: formData.clave,
       confirmar_clave: formData.confirmarClave
     };
-    try {
-      await register(data);
+    const success = await handleRegister(data);
+    if(success){
       window.location.href = "/register-confirm";
-    } catch (err) {
-      console.error('Error en el registro:', err);
-      setError('Hubo un error al intentar registrarte. Inténtalo de nuevo.')
-    } finally {
-      setLoading(false);
     }
   };
   return (

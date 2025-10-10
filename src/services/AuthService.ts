@@ -1,4 +1,4 @@
-import { type AuthData,type LoginData, type RegisterData, type RegisterResponse } from "@/types/AuthType";
+import { type AuthData,type LoginData, type RegisterData, type RegisterResponse, type UpdatePasswordData, type UpdateUserData } from "@/types/AuthType";
 import api from "@config/axios";
 
 export const login = async (data: LoginData) => {
@@ -12,5 +12,13 @@ export const register = async (data: RegisterData) => {
 }
 export const logout = async () => {
   const response = await api.post("/logout/");
+  return response;
+}
+export const updateName = async (data: UpdateUserData) => {
+  const response = await api.put("/user/", data);
+  return response;
+}
+export const changePassword = async (data: UpdatePasswordData) => {
+  const response = await api.put("/changepassword", data);
   return response;
 }

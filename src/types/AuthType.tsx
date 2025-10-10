@@ -20,6 +20,14 @@ export interface RegisterData {
   confirmar_clave: string;
   imagen?: string;
 }
+export interface UpdateUserData {
+  nombre: string;
+}
+export interface UpdatePasswordData {
+  clave: string;
+  nueva_clave: string;
+  confirmar_nueva_clave: string;
+}
 export interface RegisterResponse {
   usuario: User;
 }

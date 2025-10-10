@@ -1,21 +1,17 @@
-import { login } from "@/services/AuthService";
-import { loginFailure, loginStart, loginSuccess } from "@/store/userSlice";
+import { useLogin } from "@/hooks/useAuth";
 import type { LoginData, UserState } from "@/types/AuthType";
-import { ApiError } from "@/types/ErrorType";
 import Button from "@components/common/Button";
 import React, { useEffect, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { useSelector } from "react-redux";
 
 export const LoginForm = () => {
   // Definir variables para el guardado de inicio de sesión
-  const dispatch = useDispatch();
   const [formData, setFormData] = useState({
     correo: '',
     clave: ''
   });
+  const { loading, error, handleLogin} = useLogin();
   const userState = useSelector((state: { user: UserState }) => state.user);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
   if (userState.user !== null && !userState.loading) {
@@ -33,29 +29,14 @@ export const LoginForm = () => {
 
   // Función para hacer la consulta de inicio de sesión y guardar el usuario
   const handleSubmit = async (e: React.FormEvent) => {
-    dispatch(loginStart());
     e.preventDefault();
-    setLoading(true);
-    setError(null);
     const data: LoginData = {
       correo: formData.correo,
       clave: formData.clave
-    };
-
-    try {
-      // Guardar el usuario en el reducer
-      const authData = await login(data);
-      dispatch(loginSuccess(authData));
-    } catch (err) {
-      console.error('Error en el inicio de sesión:', err);
-      let errorMessage = "Error en la api";
-      if(err instanceof ApiError){
-        errorMessage = err.message;
-      }
-        setError(errorMessage);
-      dispatch(loginFailure(String(err)));
-    } finally {
-      setLoading(false);
+    }
+    const success = await handleLogin(data);
+    if(success){
+      window.location.href = "/";
     }
   }
   return (
