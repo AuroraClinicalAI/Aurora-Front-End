@@ -1,7 +1,5 @@
-import { Subtitle } from "@/components/common/Subtitle";
-import { Title } from "@/components/common/Title";
+import { Subtitle, Title, Card } from "@/components/common";
 import User from "@assets/images/user.svg";
-import Card from "@components/common/Card";
 
 export const UserIcon = () => {
   return (<img src={User} alt="User icon" />);

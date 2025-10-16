@@ -1,14 +1,15 @@
 import RegisterRocket from "@assets/images/register_rocket.svg";
 import RegisterCloud from "@assets/images/register_cloud.svg";
-import { RegisterForm } from "@components/feature/auth/RegisterForm";
+import { RegisterForm } from "@components/feature/auth";
 import { useSelector } from "react-redux";
 import type { UserState } from "@/types/AuthType";
 import { useEffect } from "react";
 
 export const Register = () => {
-  const userState = useSelector((state: { user: UserState }) => state.user);
+  const userState = useSelector((state: { usuario: UserState }) => state.usuario);
   useEffect(() => {
-    if(userState.user != null) {
+    console.log(userState);
+    if(userState.usuario != null) {
       window.location.href = "/"
     }
   }, [userState]);

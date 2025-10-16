@@ -7,16 +7,16 @@ import storage from "redux-persist/lib/storage";
 const persistConfig = {
   key: 'root',
   storage,
-  whitelist: ['user', 'accessToken', 'refreshToken', 'isAuthenticated']
+  whitelist: ['usuario', 'accessToken', 'refreshToken', 'isAuthenticated']
 }
 
 const persistedReducer = persistReducer(persistConfig, userReducer);
 
 export const store = configureStore({
   reducer: {
-    user: persistedReducer,
+    usuario: persistedReducer,
   },
-  middleware: (getDefaultMiddleware) => 
+  middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({
       serializableCheck: false
     })

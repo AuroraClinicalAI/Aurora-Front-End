@@ -5,7 +5,7 @@ export interface LoginData {
   clave: string;
 }
 export interface AuthData {
-  user: User | null;
+  usuario: User | null;
   accessToken: string | null;
   refreshToken: string | null;
   error: string | null;

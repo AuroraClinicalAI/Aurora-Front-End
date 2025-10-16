@@ -19,6 +19,7 @@ export const useLogin = () => {
       dispatch(loginSuccess(authData));
       response = true;
     } catch (err) {
+      console.error(err)
       let errorMessage = "Error en la conexión al servidor";
       if (err instanceof ApiError){
         errorMessage = err.message;

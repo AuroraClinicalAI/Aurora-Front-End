@@ -1,0 +1,5 @@
+export * from './AboutSystem'
+export * from './CallToAction'
+export * from './Caracteristics'
+export * from './Introduction'
+export * from './Resources'

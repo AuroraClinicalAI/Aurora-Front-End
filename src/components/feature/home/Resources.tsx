@@ -1,7 +1,7 @@
 import Mind from "@assets/images/mind.svg";
-import Card from "@components/common/Card";
+import { Card } from "@components/common";
 
-export const MindIcon = () => {
+const MindIcon = () => {
   return (<img src={Mind} alt="mind icon" />);
 };
 
@@ -12,7 +12,7 @@ export const Resources = () => {
         <h2 className="text-yellow-900 text-3xl font-bold text-center">Recursos Para Estudiantes</h2>
         <p className="text-slate-500 text-2xl font-semibold mb-10 text-center">Material de apoyo para complementar tu formación clínica</p>
         <div className="flex justify-around w-full flex-wrap gap-5">
-          <Card 
+          <Card
             icon={<MindIcon/>}
             title="Biblioteca de Recursos"
             subtitle="Accede a artículos científicos, guías clínicas y material de estudio."
@@ -22,7 +22,7 @@ export const Resources = () => {
             align="left"
             size="large"
             />
-          <Card 
+          <Card
             icon={<MindIcon/>}
             title="Casos de Estudio"
             subtitle="Aprende con casos prácticos y simulaciones clínicas."

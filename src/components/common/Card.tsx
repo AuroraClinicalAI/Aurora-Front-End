@@ -11,7 +11,7 @@ interface CardProps {
   size?: "small" | "medium" | "large"  | "xl";
 }
 
-const Card: React.FC<CardProps> = ({
+export const Card: React.FC<CardProps> = ({
   icon,
   title,
   subtitle,
@@ -45,7 +45,7 @@ const Card: React.FC<CardProps> = ({
         </div>
       )}
       <h4 className={`text-black font-semibold text-2xl`}>{title}</h4>
-      </div> 
+      </div>
       :
       <div className="flex flex-col gap-2">
       {icon && (
@@ -56,7 +56,7 @@ const Card: React.FC<CardProps> = ({
       <h4 className={`text-black font-semibold text-xl`}>{title}</h4>
       </div>
       }
-      {subtitle && 
+      {subtitle &&
       <h5 className={size == "small" ? `text-black font-semibold text-xl`:`text-sm font-normal text-slate-500`}>{subtitle}</h5>}
       {description &&
       <p className="text-black text-lg font-normal">{description}</p>}
@@ -68,5 +68,3 @@ const Card: React.FC<CardProps> = ({
     </div>
   );
 }
-
-export default Card

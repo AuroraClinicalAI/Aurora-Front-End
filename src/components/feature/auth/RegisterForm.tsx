@@ -1,6 +1,6 @@
 import { useRegister } from "@/hooks/useAuth";
 import type { RegisterData } from "@/types/AuthType";
-import Button from "@components/common/Button";
+import { Button } from "@components/common";
 import React, { useState } from 'react';
 
 export const RegisterForm = () => {

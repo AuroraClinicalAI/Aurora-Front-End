@@ -1,4 +1,4 @@
-import { ActivateAccount } from "@components/feature/auth/ActivateAccount";
+import { ActivateAccount } from "@components/feature/auth";
 import LoginIllustration1 from "@assets/images/login_illustration1.svg"
 import LoginIllustration2 from "@assets/images/login_illustration2.svg"
 

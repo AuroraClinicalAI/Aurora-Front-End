@@ -1,6 +1,6 @@
 import { useLogin } from "@/hooks/useAuth";
 import type { LoginData, UserState } from "@/types/AuthType";
-import Button from "@components/common/Button";
+import { Button} from "@components/common";
 import React, { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 
@@ -11,13 +11,13 @@ export const LoginForm = () => {
     clave: ''
   });
   const { loading, error, handleLogin} = useLogin();
-  const userState = useSelector((state: { user: UserState }) => state.user);
+  const userState = useSelector((state: { usuario: UserState }) => state.usuario);
 
   useEffect(() => {
-  if (userState.user !== null && !userState.loading) {
-    window.location.href = "/";
-  }
-  }, [userState.user, userState.loading]);
+    if (userState.usuario != null && !userState.loading) {
+      window.location.href = "/";
+    }
+  }, [userState]);
   // Función para guardar los cambios en el formulario
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;

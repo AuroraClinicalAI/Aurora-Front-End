@@ -1,5 +1,4 @@
-import { Subtitle } from "@/components/common/Subtitle";
-import { Title } from "@/components/common/Title";
+import { Subtitle, Title } from "@/components/common";
 
 export const AboutImpact = () => {
   return (

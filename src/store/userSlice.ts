@@ -4,7 +4,7 @@ import type { AuthData, UserState } from "@/types/AuthType";
 
 
 const initialState: UserState = {
-  user: null, 
+  usuario: null,
   loading: false,
   accessToken: null,
   refreshToken: null,
@@ -13,7 +13,7 @@ const initialState: UserState = {
 };
 
 const userSlice = createSlice({
-  name: 'user',
+  name: 'usuario',
   initialState,
   reducers: {
     loginStart: (state) => {
@@ -21,22 +21,23 @@ const userSlice = createSlice({
       state.isAuthenticated = false;
     },
     loginSuccess: (state, action: PayloadAction<AuthData>) => {
-      state.user = action.payload.user;
+      state.usuario = action.payload.usuario;
       state.accessToken = action.payload.accessToken;
       state.refreshToken = action.payload.refreshToken;
       state.isAuthenticated = true;
       state.loading = false;
+      console.log(state);
     },
     loginFailure: (state, action: PayloadAction<string>) => {
       state.loading = false;
-      state.user = null;
+      state.usuario = null;
       state.error = action.payload;
       state.isAuthenticated = false;
       state.accessToken = null;
       state.refreshToken = null;
     },
     logout: (state) => {
-      state.user = null;
+      state.usuario = null;
       state.loading = false;
       state.isAuthenticated = false;
       state.accessToken = null;

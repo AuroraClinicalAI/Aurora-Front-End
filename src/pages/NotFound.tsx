@@ -1,5 +1,5 @@
 import NotFoundIllustration from "@assets/images/not_found.svg"
-import Button from "@components/common/Button";
+import { Button } from "@components/common";
 
 export const NotFound = () => {
   return (

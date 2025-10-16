@@ -1,6 +1,4 @@
-import { MetricCard } from "@/components/common/MetricCard";
-import { Subtitle } from "@/components/common/Subtitle";
-import { Title } from "@/components/common/Title";
+import { MetricCard, Title, Subtitle } from "@/components/common";
 import People from "@assets/images/people.svg";
 
 export const RecentActivity = () => {

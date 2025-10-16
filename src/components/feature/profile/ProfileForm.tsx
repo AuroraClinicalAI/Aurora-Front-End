@@ -1,15 +1,15 @@
 import type { UserState } from "@/types/AuthType";
-import Button from "@components/common/Button";
+import { Button } from "@components/common";
 import React, { useState } from 'react';
 import { useSelector } from "react-redux";
 
 export const ProfileForm = () => {
-  const userState = useSelector((state: { user: UserState }) => state.user);
+  const userState = useSelector((state: { usuario: UserState }) => state.usuario);
   const [formData, setFormData] = useState({
-    nombre: userState.user?.nombre,
-    email: userState.user?.correo,
-    nombreUsuario: userState.user?.nombre_usuario,
-    tipoUsuario: userState.user?.tipo_usuario_info.tipo_usuario,
+    nombre: userState.usuario?.nombre,
+    email: userState.usuario?.correo,
+    nombreUsuario: userState.usuario?.nombre_usuario,
+    tipoUsuario: userState.usuario?.tipo_usuario_info.tipo_usuario,
     clave: '',
     nuevaClave: '',
     confirmarNuevaClave: ''

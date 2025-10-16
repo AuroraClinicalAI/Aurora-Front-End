@@ -18,7 +18,7 @@ let failedQueue: Array<{ resolve: (value: unknown) => void; reject: (reason?: un
 // Interceptor de autentificación de petición antes de enviarla
 api.interceptors.request.use(
   (config) => {
-    const accessToken = store.getState().user.accessToken;
+    const accessToken = store.getState().usuario.accessToken;
     if (accessToken) {
       config.headers.Authorization = `Bearer ${accessToken}`;
     }
@@ -46,7 +46,7 @@ api.interceptors.response.use(
   },
   async (error) => {
     const originalRequest = error.config!;
-    // error 401 y no es el refresco del token 
+    // error 401 y no es el refresco del token
     if (error.response?.status === 401 && !originalRequest._isRetry){
       // Evitar multiples peticiones de refresco
       if (isRefreshing){
@@ -59,7 +59,7 @@ api.interceptors.response.use(
       isRefreshing = true;
       originalRequest._isRetry = true;
       try {
-        const refreshToken = store.getState().user.refreshToken;
+        const refreshToken = store.getState().usuario.refreshToken;
         const response = await api.post("/token/refresh/", { refresh: refreshToken});
         const { accessToken } = response.data.access;
         // Actualizar el access token en la consulta

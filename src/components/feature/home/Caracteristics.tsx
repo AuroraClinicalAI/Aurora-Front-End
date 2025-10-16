@@ -1,5 +1,5 @@
 import Mind from "@assets/images/mind.svg";
-import Card from "@components/common/Card";
+import { Card } from "@components/common";
 
 export const MindIcon = () => {
   return (<img src={Mind} alt="mind icon" />);
@@ -12,7 +12,7 @@ export const Caracteristics = () => {
         <h2 className="text-yellow-900 text-3xl font-bold text-center">Características Principales</h2>
         <p className="text-slate-500 text-2xl font-semibold text-center mb-10">Herramientas avanzadas para Estudiantes y Profesionales de la Salud Mental</p>
         <div className="flex justify-around w-full flex-wrap gap-5">
-          <Card 
+          <Card
             icon={<MindIcon/>}
             title="Análisis Predictivo"
             subtitle="Modelos de Machine Learning para clasificación y apoyo al diagnostico."
@@ -20,7 +20,7 @@ export const Caracteristics = () => {
             buttonText="Explorar Modelos"
             onButtonClick={() => {}}
             />
-          <Card 
+          <Card
             icon={<MindIcon/>}
             title="Gestión de Pacientes"
             subtitle="Seguimiento integral de casos clínicos y evolución de pacientes."

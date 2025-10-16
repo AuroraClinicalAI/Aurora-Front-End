@@ -1,16 +1,14 @@
-import { Subtitle } from "@/components/common/Subtitle";
-import { Title } from "@/components/common/Title";
-import { ImageChange } from "@/components/feature/profile/ImageChange";
-import { ProfileForm } from "@/components/feature/profile/ProfileForm";
+import { Subtitle, Title } from "@/components/common";
+import { ImageChange, ProfileForm } from "@/components/feature/profile/";
 import type { UserState } from "@/types/AuthType";
 import { useEffect } from "react";
 import { useSelector } from "react-redux";
 
 export const UserProfile = () => {
 
-  const userState = useSelector((state: { user: UserState }) => state.user);
+  const userState = useSelector((state: { usuario: UserState }) => state.usuario);
   useEffect(() => {
-    if(userState.user == null) {
+    if(userState.usuario == null) {
       window.location.href = "/login"
     }
   }, [userState]);

@@ -1,9 +1,6 @@
-import { SearchBar } from "@/components/common/SearchBar";
-import { Subtitle } from "@/components/common/Subtitle";
-import { Title } from "@/components/common/Title";
+import { SearchBar, Title, Subtitle, Card } from "@/components/common/";
 import Mind from "@assets/images/mind.svg";
 import MindUpper from "@assets/images/mind_upper.svg";
-import Card from "@components/common/Card";
 
 export const MindIcon = () => {
   return (<img src={Mind} alt="mind icon" />);
@@ -20,7 +17,7 @@ export const Library = () => {
         <Subtitle type="principal">Accede a artículos científicos, guías clínicas y material de estudio.</Subtitle>
         <div>
           <div>
-            <SearchBar 
+            <SearchBar
               placeholder="Buscar Recursos..."
               onChange={() => {}}
               name="resourcesSearchBar"

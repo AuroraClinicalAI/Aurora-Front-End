@@ -1,4 +1,4 @@
-import Button from "@components/common/Button";
+import { Button } from "@components/common";
 import AboutIllustration from "@assets/images/about_ilustration.svg";
 
 export const AboutSystem = () => {
