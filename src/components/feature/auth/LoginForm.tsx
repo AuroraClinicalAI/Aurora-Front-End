@@ -1,4 +1,4 @@
-import { useLogin } from "@/hooks/useAuth";
+import { useLogin } from "@/hooks";
 import type { LoginData, UserState } from "@/types/AuthType";
 import { Button} from "@components/common";
 import React, { useEffect, useState } from "react";

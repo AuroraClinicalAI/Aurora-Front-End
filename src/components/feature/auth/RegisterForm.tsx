@@ -1,4 +1,4 @@
-import { useRegister } from "@/hooks/useAuth";
+import { useRegister } from "@/hooks";
 import type { RegisterData } from "@/types/AuthType";
 import { Button } from "@components/common";
 import React, { useState } from 'react';
