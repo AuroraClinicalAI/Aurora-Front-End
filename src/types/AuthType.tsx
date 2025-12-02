@@ -15,7 +15,6 @@ export interface RegisterData {
   nombre?: string;
   correo: string;
   nombre_usuario: string;
-  tipo_usuario: number;
   clave: string;
   confirmar_clave: string;
   imagen?: string;
