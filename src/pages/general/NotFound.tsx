@@ -1,7 +1,9 @@
+import { Button } from "@/components/ui";
 import NotFoundIllustration from "@assets/images/not_found.svg"
-import { Button } from "@components/common";
+import { useNavigate } from "react-router-dom";
 
 export const NotFound = () => {
+  const navigate = useNavigate();
   return (
     <div className="flex flex-col items-center justify-center md:my-auto gap-20 my-30 mx-5">
       <div className="flex flex-col items-center justify-center gap-10">
@@ -9,7 +11,9 @@ export const NotFound = () => {
         <p className="text-center text-xl md:text-2xl max-w-[600px] text-gray-400">Ups, Parece que hubo un error de cálculo. <br/>
           La página a la que estás intentando acceder no existe.</p>
         <div>
-          <Button label="Volver al Inicio" onClick={() => {}} type="register"/>
+          <Button onClick={() => navigate("/")} size={"xl"}>
+            Volver al Inicio
+          </Button>
         </div>
       </div>
       <img src={NotFoundIllustration} alt="Ilustracion principal" className="w-[300px] md:w-[400px]"/>

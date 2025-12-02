@@ -1,23 +1,23 @@
 import { Routes, Route } from 'react-router-dom'
-import HomePage from '@pages/HomePage';
-import { Login } from '@pages/Login';
-import { NotFound } from '@pages/NotFound';
-import { Register } from '@pages/Register';
-import { RegisterConfirm } from '@pages/RegisterConfirm';
-import { About } from '@pages/About';
-import { AdminPanel } from '@pages/AdminPanel';
-import { Analysis } from '@pages/Analysis';
-import { CaseAnalysis } from '@pages/CaseAnalysis';
-import { ClinicalDiagnostic } from '@pages/ClinicalDiagnostic';
-import { Library } from '@pages/Library';
-import { RecentActivity } from '@pages/RecentActivity';
-import { ResearchingPanel } from '@pages/ResearchingPanel';
-import { RoleGuide } from '@pages/RoleGuide';
-import { TestingValidation } from '@pages/TestingValidation';
-import { UserOverview } from '@pages/UserOverview';
-import { UserProfile } from '@pages/UserProfile';
-import { ForgotPassword } from '@pages/ForgotPassword';
-import { Logout } from '@pages/Logout';
+import HomePage from '@/pages/home/HomePage';
+import { Login } from '@/pages/auth/Login';
+import { NotFound } from '@/pages/general/NotFound';
+import { Register } from '@/pages/auth/Register';
+import { RegisterConfirm } from '@/pages/auth/RegisterConfirm';
+import { About } from '@/pages/home/About';
+import { AdminPanel } from '@/pages/dashboard/AdminPanel';
+import { Analysis } from '@/pages/clinical/Analysis';
+import { CaseAnalysis } from '@/pages/clinical/CaseAnalysis';
+import { ClinicalDiagnostic } from '@/pages/clinical/ClinicalDiagnostic';
+import { Library } from '@/pages/library/Library';
+import { RecentActivity } from '@/pages/users/RecentActivity';
+import { ResearchingPanel } from '@/pages/clinical/ResearchingPanel';
+import { RoleGuide } from '@/pages/tutorial/RoleGuide';
+import { TestingValidation } from '@/pages/clinical/TestingValidation';
+import { UserOverview } from '@/pages/users/UserOverview';
+import { UserProfile } from '@/pages/users/UserProfile';
+import { ForgotPassword } from '@/pages/auth/ForgotPassword';
+import { Logout } from '@/pages/auth/Logout';
 
 export const Router = () => {
   return (

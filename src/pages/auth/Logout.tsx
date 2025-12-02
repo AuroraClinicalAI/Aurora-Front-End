@@ -2,8 +2,10 @@ import { useEffect } from "react";
 import { logout } from "@/store/userSlice";
 import { useDispatch } from "react-redux";
 import { logout as logoutService } from "@/services/AuthService";
+import { useNavigate } from "react-router-dom";
 
 export const Logout = () => {
+  const navigate = useNavigate();
   const dispatch = useDispatch();
   useEffect(() => {
     const performLogout = async () => {
@@ -13,14 +15,14 @@ export const Logout = () => {
       } catch (err) {
         console.log("Error al cerrar sesión: ", err);
       } finally {
-        window.location.href = '/';
+        navigate('/');
       }
     };
     performLogout();
-  }, [dispatch]);
+  }, [dispatch, navigate]);
   return (
     <div>
-
+      Cerrando sesión
     </div>
   );
 }
