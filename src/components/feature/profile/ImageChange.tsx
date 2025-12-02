@@ -1,4 +1,4 @@
-import { Button } from "@/components/common";
+import { Button } from "@/components/ui";
 import type { UserState } from "@/types/AuthType";
 import { useSelector } from "react-redux";
 
@@ -12,7 +12,9 @@ export const ImageChange = () => {
         src={`${apiUrl}${userState.usuario?.imagen}`} alt={userState.usuario?.nombre_usuario} />
       </div>
       <p className="text-center justify-center text-zinc-800/30 text-md font-normal">Haz clic en la imagen o en el boton para cambiar tu foto de perfil</p>
-      <Button label="Cambiar Imagen" onClick={() => {}} type="register"/>
+      <Button onClick={() => {}} size={"lg"}>
+        Cambiar Imagen
+      </Button>
     </div>
   );
 }

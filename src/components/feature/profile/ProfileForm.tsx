@@ -1,5 +1,5 @@
+import { Button } from "@/components/ui";
 import type { UserState } from "@/types/AuthType";
-import { Button } from "@components/common";
 import React, { useState } from 'react';
 import { useSelector } from "react-redux";
 
@@ -72,8 +72,12 @@ export const ProfileForm = () => {
           {error}
         </div>
         <div className="mx-auto w-full flex justify-between border-t-1 border-t-gray-400 pt-10">
-          <Button label="Eliminar Cuenta" type="primary" onClick={() => {}} />
-          <Button label="Guardar Cambios" type="register" onClick={() => {}} buttonType="submit" disabled={loading} />
+          <Button onClick={() => {}}>
+            Eliminar Cuenta
+          </Button>
+          <Button onClick={() => {}} type="submit" disabled={loading} >
+            Guardar Cambios
+          </Button>
         </div>
       </form>
     </div>
