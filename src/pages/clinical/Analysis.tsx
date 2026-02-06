@@ -1,6 +1,11 @@
+import { DefaultLayout } from "@/layout/DefaultLayout";
+
 export const Analysis = () => {
   return (
-    <div>
-    </div>
+    <DefaultLayout>
+      <div>
+
+      </div>
+    </DefaultLayout>
   );
-}
+};
