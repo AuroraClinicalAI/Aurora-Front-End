@@ -1,82 +1,175 @@
 import { Button } from "@/components/ui";
 import type { UserState } from "@/types/AuthType";
 import React, { useState } from 'react';
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
+import * as AuthService from "@/services/AuthService";
+import { setUsuario } from "@/store/userSlice";
 
 export const ProfileForm = () => {
+  const dispatch = useDispatch();
   const userState = useSelector((state: { usuario: UserState }) => state.usuario);
   const [formData, setFormData] = useState({
-    nombre: userState.usuario?.nombre,
-    email: userState.usuario?.correo,
-    nombreUsuario: userState.usuario?.nombre_usuario,
-    tipoUsuario: userState.usuario?.tipo_usuario_info.tipo_usuario,
-    clave: '',
+    nombre: userState.usuario?.nombre || '',
+    email: userState.usuario?.correo || '',
+    nombreUsuario: userState.usuario?.nombre_usuario || '',
+    tipoUsuario: userState.usuario?.tipo_usuario || '',
+    claveActual: '',
     nuevaClave: '',
     confirmarNuevaClave: ''
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState<string | null>(null);
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     setFormData(prevState => ({
       ...prevState,
       [name]: value
-    }))
+    }));
+    setError(null);
+    setSuccess(null);
   };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     setError(null);
-    if (formData.nuevaClave !== formData.confirmarNuevaClave) {
-      setError("Las contraseñas no coinciden")
+    setSuccess(null);
+
+    try {
+      // 1. Update Name if changed
+      if (formData.nombre !== userState.usuario?.nombre) {
+        const updatedUser = await AuthService.updateProfile({ nombre: formData.nombre });
+        dispatch(setUsuario(updatedUser));
+        setSuccess("Perfil actualizado correctamente");
+      }
+
+      // 2. Update Password if fields are filled
+      if (formData.nuevaClave || formData.confirmarNuevaClave || formData.claveActual) {
+        if (!formData.claveActual || !formData.nuevaClave || !formData.confirmarNuevaClave) {
+          setError("Todos los campos de contraseña son requeridos para el cambio");
+          setLoading(false);
+          return;
+        }
+
+        if (formData.nuevaClave !== formData.confirmarNuevaClave) {
+          setError("Las nuevas contraseñas no coinciden");
+          setLoading(false);
+          return;
+        }
+
+        await AuthService.changePassword({
+          correo: formData.email,
+          clave: formData.claveActual,
+          nueva_clave: formData.nuevaClave,
+          confirmar_clave: formData.confirmarNuevaClave
+        });
+        setSuccess(prev => prev ? prev + " e contraseña actualizada" : "Contraseña actualizada correctamente");
+        setFormData(prev => ({ ...prev, claveActual: '', nuevaClave: '', confirmarNuevaClave: '' }));
+      }
+    } catch (err: unknown) {
+      console.error(err);
+      let errorMessage = "Ocurrió un error al actualizar el perfil";
+      if (err && typeof err === 'object' && 'response' in err) {
+        const response = (err as any).response;
+        errorMessage = response?.data?.detail || response?.data?.error || errorMessage;
+      }
+      setError(errorMessage);
+    } finally {
       setLoading(false);
-      return;
     }
   };
+
   return (
-    <div className="w-full">
-      <form className="flex flex-col gap-8" onSubmit={handleSubmit}>
-        <div className="flex flex-col">
-          <label htmlFor="nombre" className="text-black text-lg font-semibold">NOMBRE</label>
-          <input type="text" name="nombre" className=" text-lg rounded outline-1 outline-offset-[-1px] outline-neutral-400 px-2 py-1 self-stretch" placeholder="Cual es tu nombre?" onChange={handleChange} value={formData.nombre}/>
+    <div className="w-full bg-white p-8 rounded-2xl shadow-sm border border-zinc-100 font-poppins">
+      <form className="flex flex-col gap-6" onSubmit={handleSubmit}>
+        <div className="space-y-2">
+          <label htmlFor="nombre" className="text-xs font-bold text-indigo-400 uppercase tracking-widest">NOMBRE COMPLETO</label>
+          <input
+            type="text"
+            name="nombre"
+            className="w-full p-3 rounded-xl border border-zinc-200 bg-zinc-50 focus:ring-2 focus:ring-blue-500 outline-none transition-all text-sm font-semibold"
+            placeholder="¿Cuál es tu nombre?"
+            onChange={handleChange}
+            value={formData.nombre}
+          />
         </div>
-        <div className="flex flex-col">
-          <label htmlFor="email" className="text-black text-lg font-semibold ">CORREO ELECTRÓNICO</label>
-          <input type="text" name="email" className="text-lg rounded outline-1 outline-offset-[-1px] outline-neutral-400 px-2 py-1 disabled:text-gray-400" placeholder="tu@ejemplo.com" onChange={handleChange} disabled={true} value={formData.email} />
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="space-y-2">
+            <label htmlFor="email" className="text-xs font-bold text-indigo-400 uppercase tracking-widest">CORREO ELECTRÓNICO</label>
+            <input
+              type="text"
+              name="email"
+              className="w-full p-3 rounded-xl border border-zinc-200 bg-zinc-100 text-zinc-500 text-sm font-semibold cursor-not-allowed"
+              disabled={true}
+              value={formData.email}
+            />
+          </div>
+          <div className="space-y-2">
+            <label htmlFor="nombreUsuario" className="text-xs font-bold text-indigo-400 uppercase tracking-widest">NOMBRE DE USUARIO</label>
+            <input
+              type="text"
+              name="nombreUsuario"
+              className="w-full p-3 rounded-xl border border-zinc-200 bg-zinc-100 text-zinc-500 text-sm font-semibold cursor-not-allowed"
+              disabled={true}
+              value={formData.nombreUsuario}
+            />
+          </div>
         </div>
-        <div className="flex flex-col">
-          <label htmlFor="nombreUsuario" className="text-black text-lg font-semibold ">NOMBRE DE USUARIO</label>
-          <input type="text" name="nombreUsuario" className="text-lg rounded outline-1 outline-offset-[-1px] outline-neutral-400 px-2 py-1 disabled:text-gray-400" placeholder="Usuario123" onChange={handleChange} disabled={true} value={formData.nombreUsuario} />
-          <p className="text-neutral-400 text-md font-normal">Este es tu identificador único en el sistema</p>
+
+        <div className="pt-6 border-t border-zinc-100">
+          <h3 className="text-lg font-bold text-zinc-800 mb-4">Seguridad</h3>
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <label htmlFor="claveActual" className="text-xs font-bold text-zinc-500 uppercase tracking-widest">CONTRASEÑA ACTUAL</label>
+              <input
+                type="password"
+                name="claveActual"
+                className="w-full p-3 rounded-xl border border-zinc-200 bg-zinc-50 focus:ring-2 focus:ring-blue-500 outline-none transition-all text-sm"
+                placeholder="********"
+                onChange={handleChange}
+                value={formData.claveActual}
+              />
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <label htmlFor="nuevaClave" className="text-xs font-bold text-zinc-500 uppercase tracking-widest">NUEVA CONTRASEÑA</label>
+                <input
+                  type="password"
+                  name="nuevaClave"
+                  className="w-full p-3 rounded-xl border border-zinc-200 bg-zinc-50 focus:ring-2 focus:ring-blue-500 outline-none transition-all text-sm"
+                  placeholder="********"
+                  onChange={handleChange}
+                  value={formData.nuevaClave}
+                />
+              </div>
+              <div className="space-y-2">
+                <label htmlFor="confirmarNuevaClave" className="text-xs font-bold text-zinc-500 uppercase tracking-widest">CONFIRMAR</label>
+                <input
+                  type="password"
+                  name="confirmarNuevaClave"
+                  className="w-full p-3 rounded-xl border border-zinc-200 bg-zinc-50 focus:ring-2 focus:ring-blue-500 outline-none transition-all text-sm"
+                  placeholder="********"
+                  onChange={handleChange}
+                  value={formData.confirmarNuevaClave}
+                />
+              </div>
+            </div>
+          </div>
         </div>
-        <div className="flex flex-col">
-          <label htmlFor="tipoUsuario" className="text-black text-lg font-semibold ">TIPO DE USUARIO</label>
-          <input type="text" name="nombreUsuario" className="text-lg rounded outline-1 outline-offset-[-1px] outline-neutral-400 px-2 py-1 disabled:text-gray-400" placeholder="Tipo Usuario" onChange={handleChange} disabled={true} value={formData.tipoUsuario} />
-          <p className="text-neutral-400 text-md font-normal">El tipo de usuario no puede ser modificado</p>
-        </div>
-        <h3 className="text-black text-xl font-bold mb-1 border-t-1 border-t-gray-400 pt-5">Cambiar Contraseña</h3>
-        <div className="flex flex-col">
-          <label htmlFor="clave" className="text-black text-lg font-semibold ">CONTRASEÑA</label>
-          <input type="password" name="clave" className="text-;g rounded outline-1 outline-offset-[-1px] outline-neutral-400  px-2 py-1" placeholder="************************" onChange={handleChange} />
-          <p className="text-neutral-400 text-md font-normal">Deja en blanco si no deseas cambiar tu contraseña</p>
-        </div>
-        <div className="flex flex-col">
-          <label htmlFor="nuevaClave" className="text-black text-lg font-semibold ">NUEVA CONTRASEÑA</label>
-          <input type="password" name="nuevaClave" className="text-lg rounded outline-1 outline-offset-[-1px] outline-neutral-400  px-2 py-1" placeholder="************************" onChange={handleChange} />
-        </div>
-        <div className="flex flex-col">
-          <label htmlFor="confirmarNuevaClave" className="text-black text-lg font-semibold ">CONFIRMAR NUEVA CONTRASEÑA</label>
-          <input type="password" name="confirmarNuevaClave" className="text-lg rounded outline-1 outline-offset-[-1px] outline-neutral-400  px-2 py-1" placeholder="************************" onChange={handleChange} />
-        </div>
-        <div>
-          {error}
-        </div>
-        <div className="mx-auto w-full flex justify-between border-t-1 border-t-gray-400 pt-10">
-          <Button onClick={() => {}}>
-            Eliminar Cuenta
-          </Button>
-          <Button onClick={() => {}} type="submit" disabled={loading} >
-            Guardar Cambios
+
+        {error && <div className="p-4 bg-red-50 text-red-600 text-xs font-bold rounded-xl border border-red-100">{error}</div>}
+        {success && <div className="p-4 bg-green-50 text-green-600 text-xs font-bold rounded-xl border border-green-100">{success}</div>}
+
+        <div className="pt-6 flex justify-end gap-4 border-t border-zinc-100">
+          <Button
+            type="submit"
+            disabled={loading}
+            className="bg-indigo-400 hover:bg-indigo-500 text-white font-bold py-3 px-8 rounded-xl shadow-lg shadow-indigo-100 transition-all"
+          >
+            {loading ? "Guardando..." : "Guardar Cambios"}
           </Button>
         </div>
       </form>

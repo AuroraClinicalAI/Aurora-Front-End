@@ -1,28 +1,57 @@
-import { Subtitle, Title } from "@/components/ui";
-import { ImageChange, ProfileForm } from "@/components/feature/profile/";
-import type { UserState } from "@/types/AuthType";
 import { useEffect } from "react";
 import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
+import { DefaultLayout } from "@/layout/DefaultLayout";
+import { PersonalInformationCard } from "@/components/feature/profile/PersonalInformationCard";
+import { ActivityStatistics } from "@/components/feature/profile/ActivityStatistics";
+import { ProfileActivityList } from "@/components/feature/profile/ProfileActivityList";
+import { QuickActions } from "@/components/feature/profile/QuickActions";
+import { SystemInfoSection } from "@/components/feature/profile/SystemInfoSection";
+import { SupportSection } from "@/components/feature/profile/SupportSection";
+import type { UserState } from "@/types/AuthType";
 
 export const UserProfile = () => {
   const navigate = useNavigate();
   const userState = useSelector((state: { usuario: UserState }) => state.usuario);
+  const user = userState.usuario;
+
   useEffect(() => {
-    if(userState.usuario == null) {
+    if (!user) {
       navigate("/login");
     }
-  }, [userState, navigate]);
+  }, [user, navigate]);
+
+  if (!user) return null;
+
+  const userData = {
+    nombre: user.nombre || "Dr Santiago Naranjo",
+    email: user.correo || "snaranjoh@ucundinamarca.edu.co",
+    rol: user.tipo_usuario || "Psicólogo",
+    fechaRegistro: "Marzo 2023",
+    imagen: user.imagen
+  };
+
   return (
-    <div className="py-10">
-      <div className="max-w-[1440px] flex flex-col mx-auto gap-5 flex-wrap md:flex-nowrap px-5 2xl:px-0">
-        <Title type="principal">Perfil de Usuario</Title>
-        <Subtitle type="secondary">Visualiza y actualiza tu información personal</Subtitle>
-        <div className="flex">
-          <ImageChange/>
-          <ProfileForm/>
+    <DefaultLayout>
+      <div className="bg-[#f8faff] min-h-screen font-poppins pb-20">
+        <div className="max-w-7xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
+            {/* Main Column */}
+            <div className="lg:col-span-2 space-y-8">
+              <PersonalInformationCard user={userData} />
+              <ActivityStatistics />
+              <ProfileActivityList />
+            </div>
+
+            {/* Sidebar Column */}
+            <div className="lg:col-span-1">
+              <QuickActions />
+              <SystemInfoSection />
+              <SupportSection />
+            </div>
+          </div>
         </div>
       </div>
-    </div>
+    </DefaultLayout>
   );
 }
