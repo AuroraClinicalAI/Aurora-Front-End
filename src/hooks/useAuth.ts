@@ -1,4 +1,4 @@
-import { changePassword, login, register, updateName } from "@/services/AuthService";
+import { changePassword, login, register, updateProfile } from "@/services/AuthService";
 import { loginFailure, loginStart, loginSuccess } from "@/store/userSlice";
 import type { LoginData, RegisterData, UpdatePasswordData, UpdateUserData } from "@/types/AuthType";
 import { ApiError } from "@/types/ErrorType";
@@ -73,7 +73,7 @@ export const useUpdateUser = () => {
     setError(null);
     let response = false;
     try {
-      await updateName(data);
+      await updateProfile(data);
       response = true;
     } catch (err) {
       let errorMessage = "Error en la conexión al servidor";
@@ -91,7 +91,7 @@ export const useUpdateUser = () => {
     setError(null);
     let response = false;
     try {
-      if (data.nueva_clave !== data.confirmar_nueva_clave) {
+      if (data.nueva_clave !== data.confirmar_clave) {
         setError("Las contraseñas no coinciden")
         setLoading(false);
         return false;

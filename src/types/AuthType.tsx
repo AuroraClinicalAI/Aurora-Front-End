@@ -23,9 +23,10 @@ export interface UpdateUserData {
   nombre: string;
 }
 export interface UpdatePasswordData {
+  correo: string;
   clave: string;
   nueva_clave: string;
-  confirmar_nueva_clave: string;
+  confirmar_clave: string;
 }
 export interface RegisterResponse {
   usuario: User;

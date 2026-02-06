@@ -2,6 +2,7 @@ import { logout, setAccessToken } from '@/store/userSlice';
 import axios, {AxiosError} from 'axios';
 import { store } from '@/store/store';
 import { ApiError } from '@/types/ErrorType';
+import { Navigate } from 'react-router-dom';
 
 const apiUrl = import.meta.env.VITE_BASE_URL;
 const api = axios.create({
@@ -71,8 +72,8 @@ api.interceptors.response.use(
         processQueue(refreshError as AxiosError);
         // se realiza el logout si no funciona o esta también vencido
         store.dispatch(logout());
-        window.location.href = "/login";
-        return Promise.reject(refreshError);
+        Promise.reject(refreshError);
+        return <Navigate to="/login" />;
       } finally {
         isRefreshing = false;
       }
