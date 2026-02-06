@@ -1,7 +1,7 @@
-@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap");
 
 @plugin 'tailwindcss-animate';
-@import 'tailwindcss';
+@import "tailwindcss";
 @import "tw-animate-css";
 
 @custom-variant dark (&:is(.dark *));
@@ -9,6 +9,7 @@
   --color-neutral: #6c81b2;
   --color-accent-1: #75cbe2;
   --color-borange: #573d00;
+  --font-poppins: "Poppins", sans-serif;
 }
 
 @theme inline {
