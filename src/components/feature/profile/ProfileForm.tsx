@@ -2,11 +2,12 @@ import { Button } from "@/components/ui";
 import type { UserState } from "@/types/AuthType";
 import React, { useState } from 'react';
 import { useSelector, useDispatch } from "react-redux";
-import * as AuthService from "@/services/AuthService";
+import { useServices } from "@/context/useServices";
 import { setUsuario } from "@/store/userSlice";
 
 export const ProfileForm = () => {
   const dispatch = useDispatch();
+  const { authService } = useServices();
   const userState = useSelector((state: { usuario: UserState }) => state.usuario);
   const [formData, setFormData] = useState({
     nombre: userState.usuario?.nombre || '',
@@ -40,7 +41,7 @@ export const ProfileForm = () => {
     try {
       // 1. Update Name if changed
       if (formData.nombre !== userState.usuario?.nombre) {
-        const updatedUser = await AuthService.updateProfile({ nombre: formData.nombre });
+        const updatedUser = await authService.updateProfile({ nombre: formData.nombre });
         dispatch(setUsuario(updatedUser));
         setSuccess("Perfil actualizado correctamente");
       }
@@ -59,7 +60,7 @@ export const ProfileForm = () => {
           return;
         }
 
-        await AuthService.changePassword({
+        await authService.changePassword({
           correo: formData.email,
           clave: formData.claveActual,
           nueva_clave: formData.nuevaClave,
@@ -72,7 +73,7 @@ export const ProfileForm = () => {
       console.error(err);
       let errorMessage = "Ocurrió un error al actualizar el perfil";
       if (err && typeof err === 'object' && 'response' in err) {
-        const response = (err as any).response;
+        const response = (err as unknown as { response: { data: { detail: string; error: string } } }).response;
         errorMessage = response?.data?.detail || response?.data?.error || errorMessage;
       }
       setError(errorMessage);

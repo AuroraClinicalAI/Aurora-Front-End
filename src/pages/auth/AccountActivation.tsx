@@ -1,14 +1,16 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
-import { activateAccount } from "@/services/AuthService";
+import { useServices } from "@/context/useServices";
 import { DefaultLayout } from "@/layout/DefaultLayout";
 import { Button, Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui";
 import { CheckCircle2, XCircle, Loader2 } from "lucide-react";
 import { ApiError } from "@/types/ErrorType";
 
 export const AccountActivation = () => {
-  const { token } = useParams<{ token: string }>();
+  const { authService } = useServices();
   const navigate = useNavigate();
+
+  const { token } = useParams<{ token: string }>();
   const [status, setStatus] = useState<"loading" | "success" | "error">("loading");
   const [message, setMessage] = useState("");
 
@@ -21,7 +23,7 @@ export const AccountActivation = () => {
       }
 
       try {
-        await activateAccount(token);
+        await authService.activateAccount(token);
         setStatus("success");
         setMessage("¡Tu cuenta ha sido activada exitosamente!");
         // Redirect to login after 5 seconds
@@ -39,7 +41,7 @@ export const AccountActivation = () => {
     };
 
     performActivation();
-  }, [token, navigate]);
+  }, [token, navigate, authService]);
 
   return (
     <DefaultLayout>

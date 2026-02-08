@@ -6,7 +6,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Button, Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle, Field, FieldDescription, FieldError, FieldGroup, FieldLabel, Input } from "@/components/ui";
 import { useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
-import { checkUsername } from "@/services/AuthService";
+import { useServices } from "@/context/useServices";
 import { Check, X } from "lucide-react";
 
 const registerSchema = z.object({
@@ -44,13 +44,15 @@ export const RegisterForm = () => {
   const [isCheckingUsername, setIsCheckingUsername] = useState(false);
   const [usernameStatus, setUsernameStatus] = useState<'available' | 'taken' | null>(null);
 
+  const { authService } = useServices();
+
   const handleVerifyUsername = async () => {
     const username = form.getValues('nombreUsuario');
     if (username.length < 3) return;
 
     setIsCheckingUsername(true);
     try {
-      const { existe } = await checkUsername(username);
+      const { existe } = await authService.checkUsername(username);
       if (existe) {
         setUsernameStatus('taken');
         setIsUsernameVerified(false);
@@ -81,7 +83,7 @@ export const RegisterForm = () => {
       confirmar_clave: values.confirmarClave
     };
     const success = await handleRegister(data);
-    if(success){
+    if (success) {
       navigate("/register-confirm");
     }
   };
@@ -101,7 +103,7 @@ export const RegisterForm = () => {
             <Controller
               name="nombre"
               control={form.control}
-              render={({ field, fieldState }) =>(
+              render={({ field, fieldState }) => (
                 <Field data-invalid={fieldState.invalid}>
                   <FieldLabel htmlFor="nombre-form-field">
                     NOMBRE

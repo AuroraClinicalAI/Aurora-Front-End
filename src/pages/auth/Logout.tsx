@@ -1,17 +1,14 @@
 import { useEffect } from "react";
-import { logout } from "@/store/userSlice";
-import { useDispatch } from "react-redux";
-import { logout as logoutService } from "@/services/AuthService";
 import { useNavigate } from "react-router-dom";
+import { useLogout } from "@/hooks";
 
 export const Logout = () => {
+  const { handleLogout } = useLogout();
   const navigate = useNavigate();
-  const dispatch = useDispatch();
   useEffect(() => {
     const performLogout = async () => {
       try {
-        await logoutService();
-        dispatch(logout());
+        await handleLogout();
       } catch (err) {
         console.log("Error al cerrar sesión: ", err);
       } finally {
@@ -19,7 +16,7 @@ export const Logout = () => {
       }
     };
     performLogout();
-  }, [dispatch, navigate]);
+  }, [handleLogout, navigate]);
   return (
     <div>
       Cerrando sesión
