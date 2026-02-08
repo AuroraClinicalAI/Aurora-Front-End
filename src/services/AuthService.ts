@@ -1,41 +1,68 @@
-import {
-  type AuthData,
-  type LoginData,
-  type RegisterData,
-  type RegisterResponse,
-  type UpdatePasswordData,
-  type UpdateUserData,
+import api from "@/config/axios";
+import type {
+  AuthData,
+  LoginData,
+  RegisterData,
+  RegisterResponse,
+  UpdatePasswordData,
+  UpdateUserData,
 } from "@/types/AuthType";
-import api from "@config/axios";
+import type { UserProfile } from "@/types/BackendTypes";
+import type { IAuthService } from "./serviceInterfaces";
 
-export const login = async (data: LoginData) => {
-  const response = await api.post<AuthData>("/login/", data);
-  return response.data;
-};
-export const register = async (data: RegisterData) => {
-  const response = await api.post<RegisterResponse>("/register/", data);
-  const user = response.data.usuario;
-  return user;
-};
-export const logout = async () => {
-  const response = await api.post("/logout/");
-  return response;
-};
-export const updateProfile = async (data: Partial<UpdateUserData>) => {
-  const response = await api.patch("/me/", data);
-  return response.data;
-};
-export const changePassword = async (data: UpdatePasswordData) => {
-  const response = await api.put("/change-password/", data);
-  return response.data;
-};
-export const checkUsername = async (username: string) => {
-  const response = await api.get<{ existe: boolean }>(
-    `/check_nombre_usuario/?nombre_usuario=${username}`,
-  );
-  return response.data;
-};
-export const activateAccount = async (token: string) => {
-  const response = await api.post("/activate/", { token });
-  return response.data;
-};
+export class AuthService implements IAuthService {
+  async login(data: LoginData): Promise<AuthData> {
+    const response = await api.post<AuthData>("/login/", data);
+    return response.data;
+  }
+
+  async register(data: RegisterData): Promise<RegisterResponse> {
+    const response = await api.post<RegisterResponse>("/register/", data);
+    return response.data;
+  }
+
+  async logout(): Promise<void> {
+    try {
+      await api.post("/logout/");
+    } catch (err) {
+      console.log("Error al cerrar sesión: ", err);
+    }
+  }
+
+  async updateProfile(data: Partial<UpdateUserData>): Promise<UserProfile> {
+    const response = await api.patch("/me/", data);
+    return response.data;
+  }
+
+  async changePassword(data: UpdatePasswordData): Promise<void> {
+    await api.put("/change-password/", data);
+  }
+
+  async checkUsername(username: string): Promise<{ existe: boolean }> {
+    const response = await api.get<{ existe: boolean }>(
+      `/check_nombre_usuario/?nombre_usuario=${username}`,
+    );
+    return response.data;
+  }
+
+  async activateAccount(token: string): Promise<void> {
+    await api.post("/activate/", { token });
+  }
+
+  async resendActivation(email: string): Promise<void> {
+    await api.post("/resend-activation/", { correo: email });
+  }
+
+  async requestPasswordReset(email: string): Promise<void> {
+    await api.post("/password-reset/", { correo: email });
+  }
+
+  async confirmPasswordReset(data: any): Promise<void> {
+    await api.post("/password-reset-confirm/", data);
+  }
+
+  async getMe(): Promise<UserProfile> {
+    const response = await api.get<UserProfile>("/me/");
+    return response.data;
+  }
+}
