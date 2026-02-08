@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useServices } from "@/context/useServices";
 
 interface CaseData {
   id: string;
@@ -22,12 +23,29 @@ export const useCaseAnalysis = (caseId?: string) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
+  const { diagnosticosService } = useServices();
+
   useEffect(() => {
-    // Simulando llamada al backend
     const fetchData = async () => {
       setLoading(true);
       try {
-        // En un escenario real: const response = await api.get(`/diagnosticos/${caseId}`);
+        // Attempt to fetch real data
+        if (caseId) {
+          try {
+            // We utilize the service here. In the future, we should map the response
+            // to CaseData or update the component to use Diagnostico type.
+            const realData = await diagnosticosService.getDiagnosticoById(
+              Number(caseId),
+            );
+            console.log("Real diagnosis data:", realData);
+          } catch (e) {
+            console.warn(
+              "Could not fetch real diagnosis, falling back to dummy",
+              e,
+            );
+          }
+        }
+
         await new Promise((resolve) => setTimeout(resolve, 1000));
 
         const dummyData = {
@@ -133,7 +151,7 @@ export const useCaseAnalysis = (caseId?: string) => {
     };
 
     fetchData();
-  }, [caseId]);
+  }, [caseId, diagnosticosService]);
 
   return { data, loading, error };
 };

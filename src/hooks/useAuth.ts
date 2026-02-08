@@ -1,6 +1,11 @@
-import { changePassword, login, register, updateProfile } from "@/services/AuthService";
-import { loginFailure, loginStart, loginSuccess } from "@/store/userSlice";
-import type { LoginData, RegisterData, UpdatePasswordData, UpdateUserData } from "@/types/AuthType";
+import { useServices } from "@/context/useServices";
+import { loginFailure, loginStart, loginSuccess, logout } from "@/store/userSlice";
+import type {
+  LoginData,
+  RegisterData,
+  UpdatePasswordData,
+  UpdateUserData,
+} from "@/types/AuthType";
 import { ApiError } from "@/types/ErrorType";
 import { useState } from "react";
 import { useDispatch } from "react-redux";
@@ -9,19 +14,21 @@ export const useLogin = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const dispatch = useDispatch();
+  const { authService } = useServices();
+
   const handleLogin = async (data: LoginData) => {
     dispatch(loginStart());
     setLoading(true);
     setError(null);
     let response = false;
     try {
-      const authData = await login(data);
+      const authData = await authService.login(data);
       dispatch(loginSuccess(authData));
       response = true;
     } catch (err) {
-      console.error(err)
+      console.error(err);
       let errorMessage = "Error en la conexión al servidor";
-      if (err instanceof ApiError){
+      if (err instanceof ApiError) {
         errorMessage = err.message;
       }
       setError(errorMessage);
@@ -33,26 +40,29 @@ export const useLogin = () => {
   };
 
   return { handleLogin, loading, error };
-}
+};
 
 export const useRegister = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const { authService } = useServices();
+
   const handleRegister = async (data: RegisterData) => {
     setLoading(true);
     setError(null);
     let response = false;
     try {
       if (data.clave !== data.confirmar_clave) {
-        setError("Las contraseñas no coinciden")
+        setError("Las contraseñas no coinciden");
         setLoading(false);
         return false;
       }
-      await register(data);
+      // RegisterResponse returns { usuario: User }
+      await authService.register(data);
       response = true;
     } catch (err) {
       let errorMessage = "Error en la conexión al servidor";
-      if (err instanceof ApiError){
+      if (err instanceof ApiError) {
         errorMessage = err.message;
       }
       setError(errorMessage);
@@ -63,21 +73,52 @@ export const useRegister = () => {
   };
 
   return { handleRegister, loading, error };
-}
+};
+
+export const useLogout = () => {
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const { authService } = useServices();
+  const dispatch = useDispatch();
+
+  const handleLogout = async () => {
+    setLoading(true);
+    setError(null);
+    let response = false;
+    try {
+      await authService.logout();
+      dispatch(logout());
+      response = true;
+    } catch (err) {
+      let errorMessage = "Error en la conexión al servidor";
+      if (err instanceof ApiError) {
+        errorMessage = err.message;
+      }
+      setError(errorMessage);
+    } finally {
+      setLoading(false);
+    }
+    return response;
+  };
+
+  return { handleLogout, loading, error };
+};
 
 export const useUpdateUser = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const { authService } = useServices();
+
   const handleUpdateUsername = async (data: UpdateUserData) => {
     setLoading(true);
     setError(null);
     let response = false;
     try {
-      await updateProfile(data);
+      await authService.updateProfile(data);
       response = true;
     } catch (err) {
       let errorMessage = "Error en la conexión al servidor";
-      if (err instanceof ApiError){
+      if (err instanceof ApiError) {
         errorMessage = err.message;
       }
       setError(errorMessage);
@@ -92,15 +133,15 @@ export const useUpdateUser = () => {
     let response = false;
     try {
       if (data.nueva_clave !== data.confirmar_clave) {
-        setError("Las contraseñas no coinciden")
+        setError("Las contraseñas no coinciden");
         setLoading(false);
         return false;
       }
-      await changePassword(data);
+      await authService.changePassword(data);
       response = true;
     } catch (err) {
       let errorMessage = "Error en la conexión al servidor";
-      if (err instanceof ApiError){
+      if (err instanceof ApiError) {
         errorMessage = err.message;
       }
       setError(errorMessage);
@@ -111,4 +152,4 @@ export const useUpdateUser = () => {
   };
 
   return { handleUpdateUsername, handleUpdatePassword, loading, error };
-}
+};
