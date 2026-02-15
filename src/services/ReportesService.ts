@@ -1,5 +1,5 @@
 import api from "@/config/axios";
-import type { Reporte } from "@/types/BackendTypes";
+import type { Reporte, PQRS } from "@/types/BackendTypes";
 import type { IReportesService } from "./serviceInterfaces";
 
 export class ReportesService implements IReportesService {
@@ -22,6 +22,16 @@ export class ReportesService implements IReportesService {
     const response = await api.get(`/reporte/${id}/download/`, {
       responseType: "blob",
     });
+    return response.data;
+  }
+
+  async getAllPQRS(): Promise<PQRS[]> {
+    const response = await api.get<PQRS[]>("/pqrs/");
+    return response.data;
+  }
+
+  async createPQRS(data: Partial<PQRS>): Promise<PQRS> {
+    const response = await api.post<PQRS>("/pqrs/", data);
     return response.data;
   }
 }

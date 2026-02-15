@@ -28,17 +28,31 @@ export interface Clasificacion {
   estado: string;
 }
 
+export type JSONValue =
+  | string
+  | number
+  | boolean
+  | { [x: string]: JSONValue }
+  | JSONValue[]
+  | null;
+
+export interface SintomaIdentificado {
+  name: string;
+  intensity: number;
+}
+
 export interface Diagnostico {
   id_diagnostico: number;
   id_practicante: number;
   id_paciente: number;
   nombre: string;
   historia_clinica: string;
-  tamizaje: string;
+  tamizaje: JSONValue;
   impresion_clinica: string;
   hipotesis_diagnostica: string;
   fecha: string;
-  estado: string;
+  estado: string | number | Estado;
+  sintomas_identificados?: SintomaIdentificado[];
 }
 
 export interface EtiquetaClasificacion {
@@ -50,7 +64,7 @@ export interface EtiquetaClasificacion {
 export interface Paciente {
   id_paciente: number;
   rango_edad: number;
-  sexo: string;
+  sexo: number;
 }
 
 export interface RangoEdad {
@@ -113,4 +127,14 @@ export interface TipoInteraccion {
 export interface Grafica {
   id_grafica: number;
   nombre_grafica: string;
+}
+
+export interface PQRS {
+  id_pqrs: number;
+  usuario: number;
+  tipo: "PETICION" | "QUEJA" | "RECLAMO" | "SUGERENCIA";
+  asunto: string;
+  mensaje: string;
+  fecha_creacion: string;
+  leido: boolean;
 }

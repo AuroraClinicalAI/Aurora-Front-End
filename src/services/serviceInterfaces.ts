@@ -21,6 +21,7 @@ import type {
   RangoEdad,
   Reporte,
   UserProfile,
+  PQRS,
 } from "@/types/BackendTypes";
 
 export interface IAuthService {
@@ -33,7 +34,7 @@ export interface IAuthService {
   activateAccount(token: string): Promise<void>;
   resendActivation(email: string): Promise<void>;
   requestPasswordReset(email: string): Promise<void>;
-  confirmPasswordReset(data: any): Promise<void>;
+  confirmPasswordReset(data: Record<string, string>): Promise<void>;
   getMe(): Promise<UserProfile>;
 }
 
@@ -91,7 +92,11 @@ export interface IReportesService {
   getAllReportes(): Promise<Reporte[]>;
   getReporteById(id: number): Promise<Reporte>;
   createReporte(data: Partial<Reporte>): Promise<Reporte>;
-  downloadReporte(id: number): Promise<Blob>; // Assuming download capability
+  downloadReporte(id: number): Promise<Blob>;
+
+  // PQRS
+  getAllPQRS(): Promise<PQRS[]>;
+  createPQRS(data: Partial<PQRS>): Promise<PQRS>;
 }
 
 export interface IUsuariosService {

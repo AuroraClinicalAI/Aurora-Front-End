@@ -1,3 +1,3 @@
-export * from "./AuthService"
-export * from "./genericService"
-export * from "./UserTypesService"
+export * from "./AuthService";
+
+export * from "./UserTypesService";
