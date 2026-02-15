@@ -1,4 +1,4 @@
-import { Card, CardContent } from "@/components/ui";
+import { Card } from "@/components/ui";
 import { Users, Target, Youtube, HeartPulse } from "lucide-react";
 
 interface StatCardProps {

@@ -4,9 +4,11 @@ interface QuestionProps {
   number: number;
   question: string;
   id: string;
+  value: number;
+  onChange: (id: string, value: number) => void;
 }
 
-const Question = ({ number, question, id }: QuestionProps) => (
+const Question = ({ number, question, id, value, onChange }: QuestionProps) => (
   <div className="space-y-4">
     <p className="text-[11px] font-bold text-zinc-900 leading-relaxed">
       {number}. {question}
@@ -18,6 +20,8 @@ const Question = ({ number, question, id }: QuestionProps) => (
             <input
               type="radio"
               name={id}
+              checked={value === idx}
+              onChange={() => onChange(id, idx)}
               className="peer appearance-none w-4 h-4 border border-zinc-200 rounded-full checked:border-indigo-400 transition-all cursor-pointer"
             />
             <div className="absolute w-2 h-2 bg-indigo-400 rounded-full scale-0 peer-checked:scale-100 transition-transform pointer-events-none" />
@@ -31,7 +35,27 @@ const Question = ({ number, question, id }: QuestionProps) => (
   </div>
 );
 
-export const ScreeningScales = () => {
+export interface ScreeningData {
+  [key: string]: number;
+  q1: number;
+  q2: number;
+  q3: number;
+  q4: number;
+}
+
+interface ScreeningScalesProps {
+  value: ScreeningData;
+  onChange: (data: ScreeningData) => void;
+}
+
+export const ScreeningScales = ({ value, onChange }: ScreeningScalesProps) => {
+  const handleQuestionChange = (id: string, questionValue: number) => {
+    onChange({
+      ...value,
+      [id]: questionValue
+    });
+  };
+
   return (
     <Card className="rounded-2xl border-zinc-100 shadow-sm bg-white overflow-hidden p-8 mt-8">
       <CardHeader className="p-0 mb-8">
@@ -44,21 +68,29 @@ export const ScreeningScales = () => {
           number={1}
           question="¿Con qué frecuencia se ha sentido desanimado, deprimido o sin esperanza?*"
           id="q1"
+          value={value.q1}
+          onChange={handleQuestionChange}
         />
         <Question
           number={2}
           question="¿Con qué frecuencia ha tenido poco interés o placer en hacer cosas?*"
           id="q2"
+          value={value.q2}
+          onChange={handleQuestionChange}
         />
         <Question
           number={3}
           question="¿Ha experimentado problemas para dormir o dormir demasiado?*"
           id="q3"
+          value={value.q3}
+          onChange={handleQuestionChange}
         />
         <Question
           number={4}
           question="¿Se ha sentido cansado o con poca energía?*"
           id="q4"
+          value={value.q4}
+          onChange={handleQuestionChange}
         />
       </CardContent>
     </Card>

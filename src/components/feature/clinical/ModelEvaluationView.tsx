@@ -1,4 +1,4 @@
-import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui";
+import { Card } from "@/components/ui";
 
 const MetricBar = ({ label, percentage }: { label: string, percentage: number }) => (
   <div className="space-y-2">

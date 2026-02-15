@@ -1,4 +1,4 @@
-import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui";
+import { Card } from "@/components/ui";
 
 const CohortCard = ({ period, cases, diff }: { period: string, cases: string, diff: string }) => (
   <Card className="rounded-xl border border-zinc-100 p-6 flex flex-col items-center justify-center space-y-4 hover:shadow-md transition-all">

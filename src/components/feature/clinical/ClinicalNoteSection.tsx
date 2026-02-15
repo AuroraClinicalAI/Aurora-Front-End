@@ -1,6 +1,11 @@
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui";
 
-export const ClinicalNoteSection = () => {
+interface ClinicalNoteSectionProps {
+  value: string;
+  onChange: (value: string) => void;
+}
+
+export const ClinicalNoteSection = ({ value, onChange }: ClinicalNoteSectionProps) => {
   return (
     <Card className="rounded-2xl border-zinc-100 shadow-sm bg-white overflow-hidden p-8 mt-8">
       <CardHeader className="p-0 mb-4">
@@ -12,6 +17,8 @@ export const ClinicalNoteSection = () => {
 
       <CardContent className="p-0">
         <textarea
+          value={value}
+          onChange={(e) => onChange(e.target.value)}
           placeholder="Describa la presentación del caso, síntomas observados, contexto, antecedentes relevantes, etc..."
           className="w-full h-40 p-4 rounded-xl border border-zinc-100 bg-zinc-50/30 text-xs font-medium text-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-100 transition-all resize-none leading-relaxed"
         />

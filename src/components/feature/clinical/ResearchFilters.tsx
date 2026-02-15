@@ -1,4 +1,4 @@
-import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui";
+import { Card } from "@/components/ui";
 import { Filter } from "lucide-react";
 
 export const ResearchFilters = () => {

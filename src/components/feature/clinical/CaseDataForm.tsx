@@ -1,6 +1,44 @@
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui";
+import { useServices } from "@/context/useServices";
+import { useState, useEffect, useCallback } from "react";
+import type { RangoEdad } from "@/types/BackendTypes";
 
-export const CaseDataForm = () => {
+interface CaseData {
+  nombre: string;
+  rango_edad: number | "";
+  sexo: number | "";
+  fecha_consulta: string;
+}
+
+interface CaseDataFormProps {
+  data: CaseData;
+  onChange: (data: CaseData) => void;
+}
+
+export const CaseDataForm = ({ data, onChange }: CaseDataFormProps) => {
+  const { pacientesService } = useServices();
+  const [rangosEdad, setRangosEdad] = useState<RangoEdad[]>([]);
+
+  const loadRangosEdad = useCallback(async () => {
+    try {
+      const resp = await pacientesService.getAllRangosEdad();
+      setRangosEdad(resp);
+    } catch (err) {
+      console.error("Error loading rangos de edad", err);
+    }
+  }, [pacientesService]);
+
+  useEffect(() => {
+    loadRangosEdad();
+  }, [loadRangosEdad]);
+
+  const handleChange = (field: keyof CaseData, value: string | number | "") => {
+    onChange({
+      ...data,
+      [field]: value
+    });
+  };
+
   return (
     <Card className="rounded-2xl border-zinc-100 shadow-sm bg-white overflow-hidden p-8">
       <CardHeader className="p-0 mb-6">
@@ -15,6 +53,8 @@ export const CaseDataForm = () => {
           <label className="text-[10px] font-bold text-zinc-900 uppercase tracking-widest">NOMBRE DEL CASO</label>
           <input
             type="text"
+            value={data.nombre}
+            onChange={(e) => handleChange('nombre', e.target.value)}
             placeholder="Escriba aquí..."
             className="w-full p-3 rounded-lg border border-zinc-200 text-xs font-medium focus:outline-none focus:ring-2 focus:ring-indigo-100 transition-all"
           />
@@ -22,22 +62,30 @@ export const CaseDataForm = () => {
 
         <div className="space-y-2">
           <label className="text-[10px] font-bold text-zinc-900 uppercase tracking-widest">RANGO DE EDAD</label>
-          <select className="w-full p-3 rounded-lg border border-zinc-200 text-xs font-medium text-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-100 transition-all bg-white">
-            <option>Seleccionar una Opción</option>
-            <option>18-25 años</option>
-            <option>26-40 años</option>
-            <option>41-60 años</option>
-            <option>60+ años</option>
+          <select
+            value={data.rango_edad}
+            onChange={(e) => handleChange('rango_edad', Number(e.target.value) || "")}
+            className="w-full p-3 rounded-lg border border-zinc-200 text-xs font-medium text-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-100 transition-all bg-white"
+          >
+            <option value="">Seleccionar una Opción</option>
+            {rangosEdad.map(r => (
+              <option key={r.id_rango_edad} value={r.id_rango_edad}>
+                {r.nombre_rango} ({r.descripcion})
+              </option>
+            ))}
           </select>
         </div>
 
         <div className="space-y-2">
           <label className="text-[10px] font-bold text-zinc-900 uppercase tracking-widest">GÉNERO</label>
-          <select className="w-full p-3 rounded-lg border border-zinc-200 text-xs font-medium text-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-100 transition-all bg-white">
-            <option>Seleccionar una Opción</option>
-            <option>Masculino</option>
-            <option>Femenino</option>
-            <option>Otro</option>
+          <select
+            value={data.sexo}
+            onChange={(e) => handleChange('sexo', Number(e.target.value) || "")}
+            className="w-full p-3 rounded-lg border border-zinc-200 text-xs font-medium text-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-100 transition-all bg-white"
+          >
+            <option value="">Seleccionar una Opción</option>
+            <option value={1}>Masculino</option>
+            <option value={2}>Femenino</option>
           </select>
         </div>
 
@@ -45,6 +93,8 @@ export const CaseDataForm = () => {
           <label className="text-[10px] font-bold text-zinc-900 uppercase tracking-widest">FECHA DE CONSULTA</label>
           <input
             type="date"
+            value={data.fecha_consulta}
+            onChange={(e) => handleChange('fecha_consulta', e.target.value)}
             className="w-full p-3 rounded-lg border border-zinc-200 text-xs font-medium text-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-100 transition-all"
           />
         </div>

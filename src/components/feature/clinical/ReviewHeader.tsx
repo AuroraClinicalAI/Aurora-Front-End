@@ -1,4 +1,4 @@
-import { Card, CardContent } from "@/components/ui";
+import { Card } from "@/components/ui";
 import { User, Calendar, FileText } from "lucide-react";
 
 export const ReviewHeader = () => {

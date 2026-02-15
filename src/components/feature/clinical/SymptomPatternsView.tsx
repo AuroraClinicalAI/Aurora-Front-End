@@ -1,4 +1,4 @@
-import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui";
+import { Card } from "@/components/ui";
 
 const PatternBar = ({ label, cases, percentage }: { label: string, cases: number, percentage: number }) => (
   <div className="space-y-2">
