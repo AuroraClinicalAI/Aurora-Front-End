@@ -4,6 +4,7 @@ import { ValidationTabs } from "@/components/feature/clinical/ValidationTabs";
 import { ValidationDashboard } from "@/components/feature/clinical/ValidationDashboard";
 import { FileUploadModule } from "@/components/feature/clinical/FileUploadModule";
 import { ReportValidationView } from "@/components/feature/clinical/ReportValidationView";
+import { ModelEvaluationView } from "@/components/feature/clinical/ModelEvaluationView";
 
 type ValidationTabType = 'dashboard' | 'upload' | 'reports' | 'performance';
 
@@ -15,14 +16,7 @@ export const TestingValidation = () => {
       case 'dashboard': return <ValidationDashboard />;
       case 'upload': return <FileUploadModule />;
       case 'reports': return <ReportValidationView />;
-      case 'performance': return (
-        <div className="flex flex-col items-center justify-center min-h-[400px] text-center space-y-4 animate-in fade-in duration-700">
-          <div className="w-16 h-16 bg-zinc-50 border border-zinc-100 rounded-2xl flex items-center justify-center text-zinc-400">
-            <div className="w-8 h-1 bg-zinc-200 rounded-full" />
-          </div>
-          <p className="text-[11px] font-bold text-slate-400 uppercase tracking-widest">Módulo de Rendimiento en Desarrollo</p>
-        </div>
-      );
+      case 'performance': return <ModelEvaluationView />;
       default: return <ValidationDashboard />;
     }
   };

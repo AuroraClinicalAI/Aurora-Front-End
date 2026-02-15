@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useParams } from "react-router-dom";
+import { useSearchParams } from "react-router-dom";
 import { DefaultLayout } from "@/layout/DefaultLayout";
 import { CaseHeader } from "@/components/feature/clinical/CaseHeader";
 import { CaseInfoSection } from "@/components/feature/clinical/CaseInfoSection";
@@ -10,8 +10,9 @@ import { useCaseAnalysis } from "@/hooks/useCaseAnalysis";
 import { Loader2 } from "lucide-react";
 
 export const CaseAnalysis = () => {
-  const { id } = useParams<{ id: string }>();
-  const { data, loading, error } = useCaseAnalysis(id);
+  const [searchParams] = useSearchParams();
+  const id = searchParams.get("id");
+  const { data, loading, error } = useCaseAnalysis(id!);
   const [activeTab, setActiveTab] = useState<'analysis' | 'criteria'>('analysis');
 
   if (loading) {
