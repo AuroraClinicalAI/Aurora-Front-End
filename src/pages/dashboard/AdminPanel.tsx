@@ -1,8 +1,11 @@
 import { DefaultLayout } from "@/layout/DefaultLayout";
 import { AdminStatsSummary } from "@/components/feature/clinical/AdminStatsSummary";
 import { UserRequestGrid } from "@/components/feature/clinical/UserRequestGrid";
+import { useNavigate } from "react-router-dom";
 
 export const AdminPanel = () => {
+  const navigate = useNavigate();
+
   return (
     <DefaultLayout>
       <div className="bg-[#f8faff] min-h-screen font-poppins pb-20">
@@ -20,9 +23,17 @@ export const AdminPanel = () => {
 
             {/* Main Content Area */}
             <div className="bg-white border border-zinc-100 rounded-[2rem] p-4 sm:p-12 shadow-sm">
-              <div className="mb-12">
-                <h2 className="text-2xl font-bold text-zinc-900">Solicitudes de Usuario</h2>
-                <p className="text-[10px] text-slate-400 font-medium mt-1">Revisa y gestiona las solicitudes de bloqueo y desbloqueo de usuarios</p>
+              <div className="mb-8 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                <div>
+                  <h2 className="text-2xl font-bold text-zinc-900">Solicitudes de Usuario</h2>
+                  <p className="text-[10px] text-slate-400 font-medium mt-1">Revisa y gestiona las solicitudes de bloqueo y desbloqueo de usuarios</p>
+                </div>
+                <button
+                  onClick={() => navigate('/admin/users')}
+                  className="text-xs font-bold text-indigo-600 hover:underline flex items-center gap-1"
+                >
+                  Ver Directorio Completo de Usuarios &rarr;
+                </button>
               </div>
 
               <UserRequestGrid />
