@@ -18,7 +18,7 @@ const caracteristics = [
     subtitle: "Seguimiento integral de casos clínicos y evolución de pacientes.",
     description: "Sistema de registro y seguimiento que permite documentar la evolución de los pacientes y mantener un historial clínico organizado.",
     buttonText: "Gestionar Pacientes",
-    link: "/admin-panel"
+    link: "/clinical-diagnostic"
   }
 ]
 

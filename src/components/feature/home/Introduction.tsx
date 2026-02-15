@@ -1,11 +1,10 @@
 import { Button } from "@/components/ui";
 import MainIlustration from "@assets/images/main_ilustration.svg"
 import { useNavigate } from "react-router-dom";
-import type { UserState } from "@/types/AuthType";
-import { useSelector } from "react-redux";
+import { useUser } from "@/hooks";
 
 export const Introduction = () => {
-  const userState = useSelector((state: { usuario: UserState }) => state.usuario);
+  const userState = useUser();
   const navigate = useNavigate();
   return (
     <div className="flex py-20 justify-around max-w-[1440px] mx-auto flex-wrap md:flex-nowrap gap-10 px-5 2xl:px-0">
@@ -21,7 +20,7 @@ export const Introduction = () => {
           </Button>
         </div>
       </div>
-      <img src={MainIlustration} alt="Ilustracion principal" className="max-w-[90%] md:max-w-[50%]"/>
+      <img src={MainIlustration} alt="Ilustracion principal" className="max-w-[90%] md:max-w-[50%]" />
     </div>
   );
 }

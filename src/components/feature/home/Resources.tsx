@@ -23,7 +23,7 @@ const resources = [
     subtitle: "Aprende con casos prácticos y simulaciones clínicas para mejorar tus habilidades diagnósticas y terapéuticas.",
     description: "Analiza situaciones clínicas reales y ficticias para desarrollar un enfoque integral en el manejo de trastornos depresivos.",
     buttonText: "Ver Casos",
-    link: "/case-studies",
+    link: "/case-assistant",
     align: "left",
     size: "large",
   }
