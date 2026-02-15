@@ -1,5 +1,11 @@
 import { useServices } from "@/context/useServices";
-import { loginFailure, loginStart, loginSuccess, logout } from "@/store/userSlice";
+import {
+  loginFailure,
+  loginStart,
+  loginSuccess,
+  logout,
+  setUsuario,
+} from "@/store/userSlice";
 import type {
   LoginData,
   RegisterData,
@@ -8,7 +14,8 @@ import type {
 } from "@/types/AuthType";
 import { ApiError } from "@/types/ErrorType";
 import { useState } from "react";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
+import type { UserState } from "@/types/AuthType";
 
 export const useLogin = () => {
   const [loading, setLoading] = useState(false);
@@ -108,13 +115,15 @@ export const useUpdateUser = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const { authService } = useServices();
+  const dispatch = useDispatch();
 
   const handleUpdateUsername = async (data: UpdateUserData) => {
     setLoading(true);
     setError(null);
     let response = false;
     try {
-      await authService.updateProfile(data);
+      const updatedUser = await authService.updateProfile(data);
+      dispatch(setUsuario(updatedUser));
       response = true;
     } catch (err) {
       let errorMessage = "Error en la conexión al servidor";
@@ -152,4 +161,11 @@ export const useUpdateUser = () => {
   };
 
   return { handleUpdateUsername, handleUpdatePassword, loading, error };
+};
+
+export const useUser = () => {
+  const userState = useSelector(
+    (state: { usuario: UserState }) => state.usuario,
+  );
+  return userState;
 };

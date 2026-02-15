@@ -1,5 +1,4 @@
 import { useEffect } from "react";
-import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { DefaultLayout } from "@/layout/DefaultLayout";
 import { PersonalInformationCard } from "@/components/feature/profile/PersonalInformationCard";
@@ -8,11 +7,11 @@ import { ProfileActivityList } from "@/components/feature/profile/ProfileActivit
 import { QuickActions } from "@/components/feature/profile/QuickActions";
 import { SystemInfoSection } from "@/components/feature/profile/SystemInfoSection";
 import { SupportSection } from "@/components/feature/profile/SupportSection";
-import type { UserState } from "@/types/AuthType";
+import { useUser } from "@/hooks";
 
 export const UserProfile = () => {
   const navigate = useNavigate();
-  const userState = useSelector((state: { usuario: UserState }) => state.usuario);
+  const userState = useUser();
   const user = userState.usuario;
 
   useEffect(() => {

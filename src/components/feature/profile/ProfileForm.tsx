@@ -1,14 +1,10 @@
 import { Button } from "@/components/ui";
-import type { UserState } from "@/types/AuthType";
 import React, { useState } from 'react';
-import { useSelector, useDispatch } from "react-redux";
-import { useServices } from "@/context/useServices";
-import { setUsuario } from "@/store/userSlice";
+import { useUser, useUpdateUser } from "@/hooks";
 
 export const ProfileForm = () => {
-  const dispatch = useDispatch();
-  const { authService } = useServices();
-  const userState = useSelector((state: { usuario: UserState }) => state.usuario);
+  const userState = useUser();
+  const { handleUpdateUsername, handleUpdatePassword, loading, error: hookError } = useUpdateUser();
   const [formData, setFormData] = useState({
     nombre: userState.usuario?.nombre || '',
     email: userState.usuario?.correo || '',
@@ -18,9 +14,10 @@ export const ProfileForm = () => {
     nuevaClave: '',
     confirmarNuevaClave: ''
   });
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [localError, setLocalError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
+
+  const error = localError || hookError;
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
@@ -28,57 +25,49 @@ export const ProfileForm = () => {
       ...prevState,
       [name]: value
     }));
-    setError(null);
+    setLocalError(null);
     setSuccess(null);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setLoading(true);
-    setError(null);
+    setLocalError(null);
     setSuccess(null);
 
-    try {
-      // 1. Update Name if changed
-      if (formData.nombre !== userState.usuario?.nombre) {
-        const updatedUser = await authService.updateProfile({ nombre: formData.nombre });
-        dispatch(setUsuario(updatedUser));
+    let profileUpdated = false;
+    let passwordUpdated = false;
+
+    // 1. Update Name if changed
+    if (formData.nombre !== userState.usuario?.nombre) {
+      profileUpdated = await handleUpdateUsername({ nombre: formData.nombre });
+      if (profileUpdated) {
         setSuccess("Perfil actualizado correctamente");
       }
+    }
 
-      // 2. Update Password if fields are filled
-      if (formData.nuevaClave || formData.confirmarNuevaClave || formData.claveActual) {
-        if (!formData.claveActual || !formData.nuevaClave || !formData.confirmarNuevaClave) {
-          setError("Todos los campos de contraseña son requeridos para el cambio");
-          setLoading(false);
-          return;
-        }
+    // 2. Update Password if fields are filled
+    if (formData.nuevaClave || formData.confirmarNuevaClave || formData.claveActual) {
+      if (!formData.claveActual || !formData.nuevaClave || !formData.confirmarNuevaClave) {
+        setLocalError("Todos los campos de contraseña son requeridos para el cambio");
+        return;
+      }
 
-        if (formData.nuevaClave !== formData.confirmarNuevaClave) {
-          setError("Las nuevas contraseñas no coinciden");
-          setLoading(false);
-          return;
-        }
+      if (formData.nuevaClave !== formData.confirmarNuevaClave) {
+        setLocalError("Las nuevas contraseñas no coinciden");
+        return;
+      }
 
-        await authService.changePassword({
-          correo: formData.email,
-          clave: formData.claveActual,
-          nueva_clave: formData.nuevaClave,
-          confirmar_clave: formData.confirmarNuevaClave
-        });
+      passwordUpdated = await handleUpdatePassword({
+        correo: formData.email,
+        clave: formData.claveActual,
+        nueva_clave: formData.nuevaClave,
+        confirmar_clave: formData.confirmarNuevaClave
+      });
+
+      if (passwordUpdated) {
         setSuccess(prev => prev ? prev + " e contraseña actualizada" : "Contraseña actualizada correctamente");
         setFormData(prev => ({ ...prev, claveActual: '', nuevaClave: '', confirmarNuevaClave: '' }));
       }
-    } catch (err: unknown) {
-      console.error(err);
-      let errorMessage = "Ocurrió un error al actualizar el perfil";
-      if (err && typeof err === 'object' && 'response' in err) {
-        const response = (err as unknown as { response: { data: { detail: string; error: string } } }).response;
-        errorMessage = response?.data?.detail || response?.data?.error || errorMessage;
-      }
-      setError(errorMessage);
-    } finally {
-      setLoading(false);
     }
   };
 

@@ -1,15 +1,14 @@
 import RegisterRocket from "@assets/images/register_rocket.svg";
 import RegisterCloud from "@assets/images/register_cloud.svg";
 import { RegisterForm } from "@components/feature/auth";
-import { useSelector } from "react-redux";
-import type { UserState } from "@/types/AuthType";
+import { useUser } from "@/hooks";
 import { useEffect } from "react";
 import { DefaultLayout } from "@/layout/DefaultLayout";
 import { useNavigate } from "react-router-dom";
 
 export const Register = () => {
   const navigate = useNavigate();
-  const userState = useSelector((state: { usuario: UserState }) => state.usuario);
+  const userState = useUser();
   useEffect(() => {
     if(userState.usuario != null) {
       navigate("/");
