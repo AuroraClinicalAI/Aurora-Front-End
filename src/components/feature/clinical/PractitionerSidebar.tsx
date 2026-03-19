@@ -1,8 +1,11 @@
+import { useState, useEffect } from "react";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui";
 import { Eye } from "lucide-react";
 import { ModelResultMiniCard } from "./ModelResultMiniCard";
 import { AnalysisComparison } from "./AnalysisComparison";
 import { SupervisorFeedback } from "./SupervisorFeedback";
+import { useServices } from "@/context/useServices";
+import type { Clasificacion, SintomaIdentificado, Modelo, Retroalimentacion } from "@/types/BackendTypes";
 
 interface GuidedCommentProps {
   question: string;
@@ -18,15 +21,57 @@ const GuidedComment = ({ question }: GuidedCommentProps) => (
 interface PractitionerSidebarProps {
   phase: 'input' | 'results';
   onExecute: () => void;
+  onReprocess?: () => void;
+  onViewDetails?: () => void;
+  onDownloadPDF?: () => void;
+  onViewModelComparison?: () => void;
+  clasificacion?: Clasificacion;
+  userSymptoms?: SintomaIdentificado[];
+  retroalimentaciones?: Retroalimentacion[];
+  isLoading?: boolean;
 }
 
-export const PractitionerSidebar = ({ phase, onExecute }: PractitionerSidebarProps) => {
-  if (phase === 'results') {
+export const PractitionerSidebar = ({
+  phase,
+  onExecute,
+  onReprocess,
+  onViewDetails,
+  onDownloadPDF,
+  clasificacion,
+  userSymptoms,
+  retroalimentaciones,
+  isLoading
+}: PractitionerSidebarProps) => {
+  const { diagnosticosService } = useServices();
+  const [modelos, setModelos] = useState<Modelo[]>([]);
+
+  useEffect(() => {
+    const fetchModelos = async () => {
+      try {
+        const data = await diagnosticosService.getAllModelos();
+        setModelos(data);
+      } catch (err) {
+        console.error("Error fetching models:", err);
+      }
+    };
+    fetchModelos();
+  }, [diagnosticosService]);
+
+  if (phase === 'results' || isLoading) {
     return (
       <div className="space-y-8 animate-in fade-in slide-in-from-right-4 duration-700">
-        <ModelResultMiniCard />
-        <AnalysisComparison />
-        <SupervisorFeedback />
+        <ModelResultMiniCard
+          clasificacion={clasificacion}
+          onReprocess={onReprocess}
+          onViewDetails={onViewDetails}
+          isLoading={isLoading}
+        />
+        {phase === 'results' && (
+          <>
+            <AnalysisComparison clasificacion={clasificacion} userSymptoms={userSymptoms} />
+            <SupervisorFeedback retroalimentaciones={retroalimentaciones} />
+          </>
+        )}
       </div>
     );
   }
@@ -47,16 +92,13 @@ export const PractitionerSidebar = ({ phase, onExecute }: PractitionerSidebarPro
               <div className="space-y-2">
                 <label className="text-[9px] font-bold text-zinc-900 uppercase tracking-wider">SELECCIONAR MODELO</label>
                 <select className="w-full p-2.5 rounded-lg border border-zinc-200 text-xs font-medium text-slate-400 bg-white focus:outline-none focus:ring-1 focus:ring-indigo-100 transition-all">
-                  <option>Seleccionar una Opción</option>
-                  <option>Random Forest (Recomendado)</option>
-                  <option>Neural Network</option>
+                  <option value="">Seleccionar una Opción</option>
+                  {modelos.map((m) => (
+                    <option key={m.id_modelo} value={m.nombre_modelo}>
+                      {m.nombre_modelo} {m.precision ? `(${(m.precision * 100).toFixed(0)}%)` : ''}
+                    </option>
+                  ))}
                 </select>
-              </div>
-
-              <div className="bg-yellow-50/50 border border-yellow-100 rounded-lg p-3">
-                <p className="text-[9px] font-medium text-zinc-800 leading-relaxed">
-                  <span className="font-bold">💡 Recomendación:</span> Random Forest ofrece el mejor equilibrio entre precisión y velocidad para casos generales.
-                </p>
               </div>
 
               <button
@@ -65,12 +107,14 @@ export const PractitionerSidebar = ({ phase, onExecute }: PractitionerSidebarPro
               >
                 Ejecutar Análisis
               </button>
-              <p className="text-[9px] text-indigo-400 font-bold text-center cursor-pointer hover:underline">Ver Comparación de Modelos</p>
             </div>
           </div>
 
           <div className="space-y-4 pt-6 border-t border-zinc-100">
-            <button className="w-full py-2.5 bg-[#7693cc] hover:bg-indigo-400 text-white rounded-lg text-[10px] font-bold transition-all shadow-md shadow-indigo-100">
+            <button
+              onClick={onDownloadPDF}
+              className="w-full py-2.5 bg-[#7693cc] hover:bg-indigo-400 text-white rounded-lg text-[10px] font-bold transition-all shadow-md shadow-indigo-100"
+            >
               Generar Informe PDF
             </button>
           </div>
@@ -91,6 +135,11 @@ export const PractitionerSidebar = ({ phase, onExecute }: PractitionerSidebarPro
           <GuidedComment question="¿Qué aspectos del caso requieren mayor exploración?" />
         </CardContent>
       </Card>
+
+      {/* Supervisor Feedback for Practitioner */}
+      {retroalimentaciones && retroalimentaciones.length > 0 && (
+        <SupervisorFeedback retroalimentaciones={retroalimentaciones} />
+      )}
     </div>
   );
 };

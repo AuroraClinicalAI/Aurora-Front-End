@@ -1,4 +1,5 @@
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui";
+import type { AnalysisData } from "./PractitionerAnalysis";
 
 interface AnalysisDisplayProps {
   label: string;
@@ -9,12 +10,19 @@ const AnalysisDisplay = ({ label, content }: AnalysisDisplayProps) => (
   <div className="space-y-3">
     <h4 className="text-[12px] font-bold text-zinc-900">{label}</h4>
     <p className="text-[11px] text-slate-500 font-medium leading-relaxed">
-      {content}
+      {content || "---"}
     </p>
   </div>
 );
+interface ReadOnlyAnalysisProps {
+  analysisData: AnalysisData;
+}
 
-export const ReadOnlyAnalysis = () => {
+export const ReadOnlyAnalysis = ({ analysisData }: ReadOnlyAnalysisProps) => {
+  const symptoms = analysisData.sintomas
+    .filter(s => s.intensity > 0)
+    .map(s => `${s.name} (${s.intensity * 100}%)`)
+    .join(', ');
   return (
     <Card className="rounded-2xl border-zinc-100 shadow-sm bg-white overflow-hidden p-8 mt-8">
       <CardHeader className="p-0 mb-8">
@@ -25,19 +33,19 @@ export const ReadOnlyAnalysis = () => {
       <CardContent className="p-0 space-y-8">
         <AnalysisDisplay
           label="Impresión Clínica General"
-          content="La paciente presenta un cuadro compatible con episodio depresivo mayor de intensidad moderada, con síntomas neurovegetativos prominentes y deterioro funcional significativo."
+          content={analysisData.impresion}
         />
         <AnalysisDisplay
           label="Síntomas Identificados"
-          content="Estado de ánimo deprimido, anhedonia, insomnio de conciliación, fatiga, dificultades de concentración, episodios de llanto, pérdida de interés en actividades placenteras."
+          content={symptoms}
         />
         <AnalysisDisplay
           label="Factores de Riesgo Observados"
-          content="Evento estresante reciente (ruptura sentimental), ausencia de red de apoyo mencionada, síntomas con duración superior a 2 semanas."
+          content={analysisData.factoresRiesgo}
         />
         <AnalysisDisplay
           label="Hipótesis Diagnóstica"
-          content="F32.1 - Episodio depresivo moderado (CIE-10). Se recomienda evaluación adicional para descartar trastornos de adaptación y considerar intervención psicoterapéutica."
+          content={analysisData.hipotesis}
         />
       </CardContent>
     </Card>

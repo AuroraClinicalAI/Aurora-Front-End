@@ -1,23 +1,32 @@
 import { Card } from "@/components/ui";
-import { Clock, CheckCircle, ShieldAlert, Eye } from "lucide-react";
+import { Clock, CheckCircle, ShieldAlert, Lock, Unlock } from "lucide-react";
+import type { Solicitud } from "@/types/BackendTypes";
 
 interface UserRequestCardProps {
-  name: string;
-  email: string;
-  date: string;
-  type: 'Bloqueo' | 'Desbloqueo';
-  status: 'Pendiente' | 'Activo' | 'Bloqueado';
-  reason: string;
+  solicitud: Solicitud;
+  onResolver: (id: number) => void;
+  resolving: boolean;
 }
 
-export const UserRequestCard = ({ name, email, date, type, status, reason }: UserRequestCardProps) => {
+export const UserRequestCard = ({ solicitud, onResolver, resolving }: UserRequestCardProps) => {
+  const { usuario_objetivo, fecha_creacion, tipo, estado, motivo } = solicitud;
+
   const getStatusBadge = () => {
-    switch (status) {
-      case 'Pendiente': return <span className="flex items-center gap-1.5 px-3 py-1 bg-zinc-50 border border-zinc-100 rounded-full text-[9px] font-bold text-zinc-900 uppercase tracking-widest leading-none"><Clock className="w-3 h-3" /> Pendiente</span>;
-      case 'Activo': return <span className="flex items-center gap-1.5 px-3 py-1 bg-zinc-50 border border-zinc-100 rounded-full text-[9px] font-bold text-zinc-900 uppercase tracking-widest leading-none"><CheckCircle className="w-3 h-3" /> Activo</span>;
-      case 'Bloqueado': return <span className="flex items-center gap-1.5 px-3 py-1 bg-zinc-50 border border-zinc-100 rounded-full text-[9px] font-bold text-zinc-900 uppercase tracking-widest leading-none"><ShieldAlert className="w-3 h-3" /> Bloqueado</span>;
+    switch (estado) {
+      case 'PENDIENTE': return <span className="flex items-center gap-1.5 px-3 py-1 bg-amber-50 border border-amber-100 rounded-full text-[9px] font-bold text-amber-700 uppercase tracking-widest leading-none"><Clock className="w-3 h-3" /> Pendiente</span>;
+      case 'RESUELTA': return <span className="flex items-center gap-1.5 px-3 py-1 bg-emerald-50 border border-emerald-100 rounded-full text-[9px] font-bold text-emerald-700 uppercase tracking-widest leading-none"><CheckCircle className="w-3 h-3" /> Resuelta</span>;
+      case 'RECHAZADA': return <span className="flex items-center gap-1.5 px-3 py-1 bg-red-50 border border-red-100 rounded-full text-[9px] font-bold text-red-700 uppercase tracking-widest leading-none"><ShieldAlert className="w-3 h-3" /> Rechazada</span>;
     }
   };
+
+  const fechaFormateada = new Date(fecha_creacion).toLocaleDateString('es-CO', {
+    day: '2-digit',
+    month: '2-digit',
+    year: 'numeric',
+  });
+
+  const isBloqueo = tipo === 'BLOQUEAR';
+  const isPendiente = estado === 'PENDIENTE';
 
   return (
     <Card className="rounded-2xl border-zinc-100 shadow-sm bg-white overflow-hidden p-8 hover:shadow-md transition-all">
@@ -25,8 +34,8 @@ export const UserRequestCard = ({ name, email, date, type, status, reason }: Use
         {/* Header */}
         <div className="flex justify-between items-start mb-6">
           <div className="space-y-1">
-            <h4 className="text-sm font-bold text-zinc-900">{name}</h4>
-            <p className="text-[10px] font-medium text-slate-400">{email}</p>
+            <h4 className="text-sm font-bold text-zinc-900">{usuario_objetivo.nombre}</h4>
+            <p className="text-[10px] font-medium text-slate-400">{usuario_objetivo.correo}</p>
           </div>
           {getStatusBadge()}
         </div>
@@ -35,32 +44,37 @@ export const UserRequestCard = ({ name, email, date, type, status, reason }: Use
         <div className="space-y-3 mb-8 flex-grow">
           <div className="flex justify-between items-center text-[10px]">
             <span className="font-bold text-slate-400 uppercase tracking-widest">Fecha Solicitud:</span>
-            <span className="font-bold text-zinc-900">{date}</span>
+            <span className="font-bold text-zinc-900">{fechaFormateada}</span>
           </div>
           <div className="flex justify-between items-center text-[10px]">
             <span className="font-bold text-slate-400 uppercase tracking-widest">Tipo:</span>
-            <span className="font-bold text-zinc-900">{type}</span>
+            <span className="font-bold text-zinc-900">{isBloqueo ? 'Bloqueo' : 'Desbloqueo'}</span>
           </div>
           <div className="space-y-1 pt-2">
             <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Motivo:</p>
-            <p className="text-[10px] font-medium text-zinc-900 leading-relaxed italic">{reason}</p>
+            <p className="text-[10px] font-medium text-zinc-900 leading-relaxed italic">{motivo}</p>
           </div>
         </div>
 
         {/* Actions */}
-        <div className="space-y-3">
-          <div className="grid grid-cols-2 gap-3">
-            <button className="flex items-center justify-center gap-2 py-2 border border-zinc-100 rounded-lg text-zinc-900 text-[10px] font-bold hover:bg-zinc-50 transition-all">
-              <Eye className="w-3.5 h-3.5" /> Ver
-            </button>
-            <button className="flex items-center justify-center gap-2 py-2 bg-black text-white rounded-lg text-[10px] font-bold hover:bg-zinc-800 transition-all">
-              <CheckCircle className="w-3.5 h-3.5" /> Activar
+        {isPendiente && (
+          <div className="space-y-3">
+            <button
+              onClick={() => onResolver(solicitud.id)}
+              disabled={resolving}
+              className={`w-full flex items-center justify-center gap-2 py-2.5 rounded-lg text-[10px] font-bold transition-all shadow-sm disabled:opacity-50 disabled:cursor-not-allowed ${isBloqueo
+                  ? 'bg-red-600 hover:bg-red-700 text-white shadow-red-100'
+                  : 'bg-emerald-600 hover:bg-emerald-700 text-white shadow-emerald-100'
+                }`}
+            >
+              {isBloqueo ? (
+                <><Lock className="w-3.5 h-3.5" /> Bloquear Usuario</>
+              ) : (
+                <><Unlock className="w-3.5 h-3.5" /> Desbloquear Usuario</>
+              )}
             </button>
           </div>
-          <button className="w-full py-2 bg-[#637bc4] hover:bg-indigo-500 text-white rounded-lg text-[10px] font-bold transition-all shadow-sm shadow-indigo-100">
-            Bloquear
-          </button>
-        </div>
+        )}
       </div>
     </Card>
   );

@@ -36,7 +36,7 @@ export const useCaseAnalysis = (caseId?: string) => {
         );
 
         // Map backend Diagnostico to frontend CaseData
-        const diagnosis = realData as any; // Cast for nested fields from DetailSerializer
+        const diagnosis = realData;
         const mappedData: CaseData = {
           id: String(realData.id_diagnostico),
           lastConsultation: new Date(realData.fecha).toLocaleDateString(),
@@ -50,7 +50,7 @@ export const useCaseAnalysis = (caseId?: string) => {
           clinicalVignette: realData.historia_clinica,
           analysis: {
             globalScore:
-              diagnosis.clasificacion?.probabilidad_certeza * 100 || 0,
+              (diagnosis.clasificacion?.probabilidad_certeza || 0) * 100,
             maxScore: 100,
             symptoms: (realData.sintomas_identificados || []).map((s) => ({
               name: s.name,
@@ -58,7 +58,23 @@ export const useCaseAnalysis = (caseId?: string) => {
             })),
           },
           criteria: {
-            dsm5: [], // This could be populated from a service if metadata exists
+            dsm5:
+              diagnosis.clasificacion?.ml_dsm5_evaluacion &&
+              typeof diagnosis.clasificacion.ml_dsm5_evaluacion === "object" &&
+              "major_criteria_details" in
+                diagnosis.clasificacion.ml_dsm5_evaluacion
+                ? Object.entries(
+                    diagnosis.clasificacion.ml_dsm5_evaluacion
+                      .major_criteria_details as Record<
+                      string,
+                      { status: string }
+                    >,
+                  ).map(([key, value]) => ({
+                    id: key,
+                    title: key.replace(/_/g, " ").toUpperCase(),
+                    description: `Estado detectado: ${value.status === "detected" ? "PRESENTE" : "AUSENTE"}`,
+                  }))
+                : [],
             cie11: [],
           },
         };

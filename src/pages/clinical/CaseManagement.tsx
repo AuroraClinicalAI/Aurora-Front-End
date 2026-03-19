@@ -31,7 +31,7 @@ export const CaseManagement = () => {
   const filteredCases = cases.filter(c => {
     const matchesSearch = c.nombre?.toLowerCase().includes(searchTerm.toLowerCase()) ||
       c.id_paciente.toString().includes(searchTerm);
-    const matchesStatus = filterStatus === "Todos" || c.estado === filterStatus;
+    const matchesStatus = filterStatus === "Todos" || (typeof c.estado === "object" && 'nombre' in c.estado ? c.estado.nombre : c.estado) === filterStatus;
     return matchesSearch && matchesStatus;
   });
 
@@ -48,7 +48,7 @@ export const CaseManagement = () => {
             </div>
             <button
               onClick={() => navigate("/clinical-diagnostic")}
-              className="flex items-center gap-2 px-6 py-3 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-sm font-bold transition-all shadow-lg shadow-indigo-100"
+              className="flex items-center gap-2 px-6 py-3 bg-indigo-300 hover:bg-indigo-400 text-white rounded-xl text-sm font-bold transition-all shadow-lg shadow-indigo-100"
             >
               <Plus className="w-4 h-4" /> Nuevo Diagnóstico
             </button>
@@ -76,9 +76,11 @@ export const CaseManagement = () => {
                   className="w-full pl-12 pr-4 py-3 rounded-xl border border-zinc-200 text-sm font-medium text-slate-600 bg-slate-50/50 appearance-none focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
                 >
                   <option value="Todos">Todos los estados</option>
-                  <option value="Completado">Completado</option>
+                  <option value="Registrada">Registradas</option>
                   <option value="En Revisión">En Revisión</option>
-                  <option value="Borrador">Borrador</option>
+                  <option value="Clasificada">Clasificadas</option>
+                  <option value="Archivada">Archivada</option>
+                  <option value="Rechazada">Rechazada</option>
                 </select>
               </div>
             </div>
@@ -96,7 +98,8 @@ export const CaseManagement = () => {
                 <CaseCard
                   key={c.id_diagnostico}
                   caseData={c}
-                  onView={(id) => navigate(`/case-analysis?id=${id}`)} // Or appropriate detail route
+                  onView={(id) => navigate(`/clinical-diagnostic?id=${id}`)}
+                  onMachineView={(id) => navigate(`/case-analysis?id=${id}`)}
                 />
               ))}
             </div>

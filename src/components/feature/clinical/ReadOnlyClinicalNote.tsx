@@ -1,6 +1,10 @@
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui";
 
-export const ReadOnlyClinicalNote = () => {
+interface ReadOnlyClinicalNoteProps {
+  note: string;
+}
+
+export const ReadOnlyClinicalNote = ({ note }: ReadOnlyClinicalNoteProps) => {
   return (
     <Card className="rounded-2xl border-zinc-100 shadow-sm bg-white overflow-hidden p-8 mt-8">
       <CardHeader className="p-0 mb-4">
@@ -12,7 +16,7 @@ export const ReadOnlyClinicalNote = () => {
 
       <CardContent className="p-0">
         <div className="w-full p-6 rounded-xl border border-zinc-50 bg-white text-[11px] font-medium text-slate-500 leading-relaxed italic">
-          Paciente femenina de 28 años que acude a consulta refiriendo sentimientos persistentes de tristeza, pérdida de interés en actividades que antes disfrutaba, y dificultades para conciliar al sueño durante las últimas 8 semanas. Refiere fatiga constante, dificultades de concentración en el trabajo, y episodios de llanto sin motivo aparente. No presenta antecedentes psiquiátricos previos. Menciona que estos síntomas iniciaron después de una ruptura sentimental significativa.
+          {note || "Sin historia clínica registrada."}
         </div>
       </CardContent>
     </Card>

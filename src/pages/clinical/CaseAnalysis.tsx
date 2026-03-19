@@ -59,7 +59,6 @@ export const CaseAnalysis = () => {
           ) : (
             <DiagnosticCriteriaView
               dsm5={data.criteria.dsm5}
-              cie11={data.criteria.cie11}
             />
           )}
         </div>

@@ -1,16 +1,29 @@
 import { Card } from "@/components/ui";
 import { User, Calendar, FileText } from "lucide-react";
+import type { Diagnostico } from "@/types/BackendTypes";
 
-export const ReviewHeader = () => {
+interface ReviewHeaderProps {
+  diagnosis: Diagnostico | null;
+}
+
+export const ReviewHeader = ({ diagnosis }: ReviewHeaderProps) => {
+  const caseNumber = diagnosis?.id_diagnostico ? `#${new Date(diagnosis.fecha).getFullYear()}-${String(diagnosis.id_diagnostico).padStart(3, '0')}` : "#----";
+  const statusLabel = typeof diagnosis?.estado === 'object' ? diagnosis.estado.nombre : "Pendiente Revisión";
+  const practitionerName = diagnosis?.practicante?.nombre || "Cargando...";
+  const sendDate = diagnosis?.fecha ? new Date(diagnosis.fecha).toLocaleDateString('es-ES', { day: 'numeric', month: 'long', year: 'numeric' }) : "---";
+  const caseId = diagnosis?.id_diagnostico ? `PH${String(diagnosis.id_diagnostico).padStart(4, '0')}` : "---";
+
   return (
     <Card className="rounded-2xl border-zinc-100 shadow-sm bg-white overflow-hidden p-8 mb-8">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
         <div className="space-y-2">
           <div className="flex items-center gap-3">
-            <h2 className="text-2xl font-bold text-zinc-900">Revisión del Caso Clínico #2024-015</h2>
-            <span className="px-3 py-1 bg-zinc-50 border border-zinc-200 rounded-full text-[9px] font-bold text-zinc-400 uppercase tracking-widest">Pendiente Revisión</span>
+            <h2 className="text-2xl font-bold text-zinc-900">Revisión del Caso Clínico {caseNumber}</h2>
+            <span className="px-3 py-1 bg-zinc-50 border border-zinc-200 rounded-full text-[9px] font-bold text-zinc-400 uppercase tracking-widest">{statusLabel}</span>
           </div>
-          <p className="text-[10px] text-slate-400 font-medium">Sistema de Práctica para Casos Simulados · Evaluación Supervisada</p>
+          <p className="text-[10px] text-slate-400 font-medium leading-relaxed">
+            Sistema de Práctica para Casos Simulados · Evaluación Supervisada
+          </p>
         </div>
       </div>
 
@@ -21,7 +34,7 @@ export const ReviewHeader = () => {
           </div>
           <div>
             <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">Estudiante</p>
-            <p className="text-[11px] font-bold text-zinc-900">Maria González Parra</p>
+            <p className="text-[11px] font-bold text-zinc-900">{practitionerName}</p>
           </div>
         </div>
 
@@ -31,7 +44,7 @@ export const ReviewHeader = () => {
           </div>
           <div>
             <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">Fecha de Envío</p>
-            <p className="text-[11px] font-bold text-zinc-900">15 de Marzo, 2024</p>
+            <p className="text-[11px] font-bold text-zinc-900">{sendDate}</p>
           </div>
         </div>
 
@@ -41,7 +54,7 @@ export const ReviewHeader = () => {
           </div>
           <div>
             <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">Caso ID</p>
-            <p className="text-[11px] font-bold text-zinc-900">PH0201</p>
+            <p className="text-[11px] font-bold text-zinc-900">{caseId}</p>
           </div>
         </div>
       </div>

@@ -39,6 +39,37 @@ export class DiagnosticosService implements IDiagnosticosService {
     await api.delete(`/diagnostico/${id}/`);
   }
 
+  async analizarIA(id: number): Promise<Clasificacion> {
+    const response = await api.post<Clasificacion>(
+      `/diagnostico/${id}/analizar/`,
+    );
+    return response.data;
+  }
+
+  async getRetroalimentacionesByDiagnostico(
+    id: number,
+  ): Promise<Retroalimentacion[]> {
+    const response = await api.get<Retroalimentacion[]>(`/retroalimentacion/`, {
+      params: { diagnostico: id },
+    });
+    return response.data;
+  }
+
+  async cambiarEstado(id: number, id_estado: number): Promise<Diagnostico> {
+    const response = await api.patch<Diagnostico>(
+      `/diagnostico/${id}/cambiar_estado/`,
+      { id_estado },
+    );
+    return response.data;
+  }
+
+  async descargarReportePDF(id: number): Promise<Blob> {
+    const response = await api.get<Blob>(`/diagnostico/${id}/reporte_pdf/`, {
+      responseType: "blob",
+    });
+    return response.data;
+  }
+
   // Clasificaciones
   async getAllClasificaciones(): Promise<Clasificacion[]> {
     const response = await api.get<Clasificacion[]>("/clasificacion/");
@@ -68,6 +99,17 @@ export class DiagnosticosService implements IDiagnosticosService {
   ): Promise<Retroalimentacion> {
     const response = await api.post<Retroalimentacion>(
       "/retroalimentacion/",
+      data,
+    );
+    return response.data;
+  }
+
+  async updateRetroalimentacion(
+    id: number,
+    data: Partial<Retroalimentacion>,
+  ): Promise<Retroalimentacion> {
+    const response = await api.patch<Retroalimentacion>(
+      `/retroalimentacion/${id}/`,
       data,
     );
     return response.data;

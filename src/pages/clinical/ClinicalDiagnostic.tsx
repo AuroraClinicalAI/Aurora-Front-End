@@ -30,7 +30,7 @@ export const ClinicalDiagnostic = () => {
   const { usuario } = useUser();
   const { diagnosticosService, pacientesService } = useServices();
   const userRole = usuario?.tipo_usuario as UserRole;
-  const { actions, loading, error } = useClinicalWorkflow(); // To get createPatient action
+  const { state, actions, loading, error } = useClinicalWorkflow();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const reviewId = searchParams.get('id');
@@ -56,42 +56,31 @@ export const ClinicalDiagnostic = () => {
     q4: 0
   });
 
-  // Role Logic based on Real User
   const isPsychologist = ([UserRole.ADMIN, UserRole.MODERADOR, UserRole.PSICOLOGO, UserRole.EVALUADOR] as UserRole[]).includes(userRole);
-
-  // Mode Logic (Psychologist can switch between Diagnostic and Review, Student is always Diagnostic)
-  // Default to REVIEW for Psychologist, DIAGNOSTIC for Student
-  const [mode, setMode] = useState<ClinicalMode>('REVIEW');
+  const [mode, setMode] = useState<ClinicalMode>('DIAGNOSTIC');
   const [phase, setPhase] = useState<PractitionerPhase>('input');
+  const [isEditing, setIsEditing] = useState(false);
 
   useEffect(() => {
-    if (userRole === UserRole.PRACTICANTE) {
+    if (userRole === UserRole.PRACTICANTE && !reviewId) {
       setMode('DIAGNOSTIC');
-    } else if (isPsychologist && reviewId) {
+    } else if (reviewId) {
       setMode('REVIEW');
-      // If entering via review link, bypass consent
-      setIsConsentOpen(false);
-      setHasAcceptedConsent(true);
-
       const fetchDiagnosis = async () => {
         try {
           const id = Number(reviewId);
           if (isNaN(id)) return;
-
           const diagnosis = await diagnosticosService.getDiagnosticoById(id);
           if (diagnosis) {
-            // Populate fields
+            actions.setCurrentDiagnosis(diagnosis);
             setClinicalNote(diagnosis.historia_clinica || "");
             setAnalysisData({
               impresion: diagnosis.impresion_clinica || "",
               sintomas: diagnosis.sintomas_identificados || [],
-              factoresRiesgo: "", // backend type might not have this, leave empty or map if added later
+              factoresRiesgo: "",
               hipotesis: diagnosis.hipotesis_diagnostica || ""
             });
-            // Cast tamizaje to ScreeningData, assuming structure matches or backend returns congruent JSON
             setScreeningData(diagnosis.tamizaje as unknown as ScreeningData || { q1: 0, q2: 0, q3: 0, q4: 0 });
-
-            // Fetch patient data to populate caseData header
             if (diagnosis.id_paciente) {
               try {
                 const patient = await pacientesService.getPacienteById(diagnosis.id_paciente);
@@ -101,8 +90,6 @@ export const ClinicalDiagnostic = () => {
                   sexo: patient.sexo,
                   fecha_consulta: diagnosis.fecha ? diagnosis.fecha.split('T')[0] : new Date().toISOString().split('T')[0]
                 });
-                // We also set selectedPatientId so if they switch back to managing it works,
-                // though in Review mode usually read-only.
                 setSelectedPatientId(diagnosis.id_paciente);
               } catch (err) {
                 console.error("Error fetching patient:", err);
@@ -114,18 +101,15 @@ export const ClinicalDiagnostic = () => {
           alert("Error al cargar el diagnóstico para revisión.");
         }
       };
-
       fetchDiagnosis();
     }
-  }, [userRole, reviewId, isPsychologist, diagnosticosService, pacientesService]);
+  }, [userRole, reviewId, isPsychologist, diagnosticosService, pacientesService, actions]);
 
   const isReviewMode = isPsychologist && mode === 'REVIEW';
-
-  // Patient Management State
   const [isManagingPatients, setIsManagingPatients] = useState(false);
   const [selectedPatientId, setSelectedPatientId] = useState<number | null>(null);
-  const [isConsentOpen, setIsConsentOpen] = useState(true);
-  const [hasAcceptedConsent, setHasAcceptedConsent] = useState(false);
+  const [isConsentOpen, setIsConsentOpen] = useState(!reviewId);
+  const [hasAcceptedConsent, setHasAcceptedConsent] = useState(!!reviewId);
 
   const handleSaveCase = async () => {
     if (!hasAcceptedConsent) {
@@ -135,8 +119,6 @@ export const ClinicalDiagnostic = () => {
     }
     try {
       let patientId = selectedPatientId;
-
-      // If it's a student and no patient selected, create one implicitly
       if (!isPsychologist && !patientId) {
         if (!caseData.rango_edad || !caseData.sexo) {
           alert("Por favor complete los datos del paciente (Rango de edad y Sexo).");
@@ -145,45 +127,66 @@ export const ClinicalDiagnostic = () => {
         const newPatient = await actions.createPatient({
           sexo: Number(caseData.sexo),
           rango_edad: Number(caseData.rango_edad)
-        }, true); // autoSelect=true ensures it's in the hook's state
-
+        }, true);
         if (!newPatient) return;
         patientId = newPatient.id_paciente;
       }
-
       if (!patientId) {
         alert("Debe seleccionar o crear un paciente.");
         return;
       }
-
-      // Construct Diagnosis Object
       const diagnosis: Partial<Diagnostico> = {
         nombre: caseData.nombre || `Caso - ${caseData.fecha_consulta}`,
         historia_clinica: clinicalNote,
         impresion_clinica: analysisData.impresion,
         hipotesis_diagnostica: analysisData.hipotesis,
         id_paciente: patientId,
-        // Filter symptoms: only those with intensity > 0 are sent
         sintomas_identificados: analysisData.sintomas.filter(s => s.intensity > 0),
         tamizaje: screeningData,
-        // Optional: add more fields or metadata if needed
       };
-
-      await actions.submitDiagnosis(diagnosis);
-      alert("Caso guardado exitosamente en la tabla de diagnósticos.");
+      if (reviewId) {
+        await actions.updateDiagnosis(Number(reviewId), diagnosis);
+        alert("Diagnóstico actualizado correctamente.");
+        setIsEditing(false);
+      } else {
+        await actions.submitDiagnosis(diagnosis);
+        alert("Caso creado exitosamente en la tabla de diagnósticos.");
+      }
     } catch (e) {
       console.error(e);
       alert("Error al guardar el caso.");
     }
   };
 
+  const handleViewModelComparison = () => {
+    navigate('/researching-panel?tab=modelos');
+  };
+
+  const handleDownloadPDF = async () => {
+    const id = reviewId || (state.currentDiagnosis as Diagnostico)?.id_diagnostico;
+    if (!id) {
+      alert("Debe guardar el caso antes de generar un reporte PDF.");
+      return;
+    }
+    const url = await actions.descargarReportePDF(Number(id));
+    if (url) {
+      const link = document.createElement('a');
+      link.href = url;
+      link.target = '_blank';
+      link.download = `Reporte_Caso_${id}.pdf`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }
+  };
+
+  const formIsDisabled = !!reviewId && !isPsychologist && !isEditing;
 
   return (
     <DefaultLayout>
       <div className="bg-[#f8faff] min-h-screen font-poppins pb-10">
         <div className="max-w-7xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
 
-          {/* Main Header */}
           <div className="flex flex-col sm:flex-row justify-between items-center gap-6 mb-12">
             <div className="space-y-1">
               <h1 className="text-3xl font-bold text-zinc-900 transition-all">
@@ -198,7 +201,6 @@ export const ClinicalDiagnostic = () => {
             </div>
 
             <div className="flex gap-4 items-center">
-              {/* Feature: Patient Management (Only for Psychologists/Evaluators) */}
               {isPsychologist && (
                 <button
                   onClick={() => setIsManagingPatients(true)}
@@ -210,16 +212,33 @@ export const ClinicalDiagnostic = () => {
 
               {!isReviewMode && (
                 <>
-                  <button
-                    onClick={handleSaveCase}
-                    disabled={loading}
-                    className="px-6 py-2.5 bg-[#637bc4] hover:bg-indigo-500 text-white rounded-md text-xs font-bold transition-all shadow-md shadow-indigo-100 disabled:opacity-50"
-                  >
-                    {loading ? "Guardando..." : "Guardar Caso"}
-                  </button>
-                  <button className="px-6 py-2.5 bg-[#7693cc] hover:bg-indigo-400 text-white rounded-md text-xs font-bold transition-all shadow-md shadow-indigo-100">
-                    Exportar Informe
-                  </button>
+                  {!!reviewId && !isEditing && !isPsychologist && (
+                    <button
+                      onClick={() => setIsEditing(true)}
+                      className="px-6 py-2.5 bg-zinc-100 hover:bg-zinc-200 text-zinc-900 border border-zinc-200 rounded-md text-xs font-bold transition-all shadow-sm"
+                    >
+                      Actualizar
+                    </button>
+                  )}
+                  {(!reviewId || isEditing || isPsychologist) && (
+                    <button
+                      onClick={handleSaveCase}
+                      disabled={loading || formIsDisabled}
+                      className="px-6 py-2.5 bg-[#637bc4] hover:bg-indigo-500 text-white rounded-md text-xs font-bold transition-all shadow-md shadow-indigo-100 disabled:opacity-50"
+                    >
+                      {loading ? "Guardando..." : (reviewId ? "Guardar Cambios" : "Guardar Caso")}
+                    </button>
+                  )}
+                  {isPsychologist && (
+                    <button onClick={async () => {
+                      if (reviewId) {
+                        const url = await actions.descargarReportePDF(Number(reviewId));
+                        if (url) alert("Reporte descargado");
+                      }
+                    }} className="px-6 py-2.5 bg-[#7693cc] hover:bg-indigo-400 text-white rounded-md text-xs font-bold transition-all shadow-md shadow-indigo-100">
+                      Exportar Informe
+                    </button>
+                  )}
                 </>
               )}
             </div>
@@ -243,7 +262,6 @@ export const ClinicalDiagnostic = () => {
             </div>
           )}
 
-          {/* Dialog for Patient Management */}
           <Dialog open={isManagingPatients} onOpenChange={setIsManagingPatients}>
             <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
               <DialogHeader>
@@ -255,7 +273,7 @@ export const ClinicalDiagnostic = () => {
               <div className="py-4">
                 <PatientSelector
                   onSelect={(p) => {
-                    actions.selectPatient(p); // Select in hook state
+                    actions.selectPatient(p);
                     setSelectedPatientId(p.id_paciente);
                     setCaseData({
                       ...caseData,
@@ -267,7 +285,7 @@ export const ClinicalDiagnostic = () => {
                   }}
                   onCreate={async (p) => {
                     try {
-                      const newP = await actions.createPatient(p, true); // autoSelect=true
+                      const newP = await actions.createPatient(p, true);
                       if (!newP) return;
                       alert("Paciente creado exitosamente.");
                       setSelectedPatientId(newP.id_paciente);
@@ -291,38 +309,50 @@ export const ClinicalDiagnostic = () => {
             <div className="lg:col-span-2 space-y-8 animate-in fade-in duration-500">
               {isReviewMode ? (
                 <>
-                  <ReviewHeader />
-                  <ReadOnlyClinicalNote />
-                  <ReadOnlyScreening />
-                  <ReadOnlyAnalysis />
+                  <ReviewHeader diagnosis={state.currentDiagnosis as unknown as Diagnostico} />
+                  <ReadOnlyClinicalNote note={clinicalNote} />
+                  <ReadOnlyScreening data={screeningData} />
+                  <ReadOnlyAnalysis analysisData={analysisData} />
                 </>
               ) : (
                 <>
-                  <CaseDataForm
-                    data={caseData}
-                    onChange={setCaseData}
-                  />
-                  <ClinicalNoteSection
-                    value={clinicalNote}
-                    onChange={setClinicalNote}
-                  />
+                  <div className={formIsDisabled ? 'opacity-70 pointer-events-none' : ''}>
+                    <CaseDataForm
+                      data={caseData}
+                      onChange={setCaseData}
+                    />
+                    <ClinicalNoteSection
+                      value={clinicalNote}
+                      onChange={setClinicalNote}
+                    />
+                  </div>
 
                   {isPsychologist ? (
                     <>
-                      <MLAnalysisResults />
+                      <MLAnalysisResults
+                        clasificacion={state.currentDiagnosis?.clasificacion}
+                        onViewDetails={() => navigate(`/case-analysis?id=${reviewId || state.currentDiagnosis?.id_diagnostico}`)}
+                      />
                       <DiagnosticEditor />
                     </>
                   ) : (
                     <>
-                      <ScreeningScales
-                        value={screeningData}
-                        onChange={setScreeningData}
+                      <div className={formIsDisabled ? 'opacity-70 pointer-events-none' : ''}>
+                        <ScreeningScales
+                          value={screeningData}
+                          onChange={setScreeningData}
+                        />
+                        <PractitionerAnalysis
+                          data={analysisData}
+                          onChange={setAnalysisData}
+                        />
+                      </div>
+                      {/* AI Analysis visibility for Practitioner */}
+                      <MLAnalysisResults
+                        clasificacion={state.currentDiagnosis?.clasificacion}
+                        onViewDetails={() => navigate(`/case-analysis?id=${reviewId || state.currentDiagnosis?.id_diagnostico}`)}
                       />
-                      <PractitionerAnalysis
-                        data={analysisData}
-                        onChange={setAnalysisData}
-                      />
-                      {phase === 'input' && (
+                      {phase === 'input' && !formIsDisabled && (
                         <div className="h-20 flex items-center justify-center border-t border-zinc-50">
                           <p className="text-[10px] text-slate-400 font-medium italic">Completa el análisis clínico antes de ejecutar el sistema.</p>
                         </div>
@@ -336,21 +366,69 @@ export const ClinicalDiagnostic = () => {
             {/* Right Column */}
             <div className="lg:col-span-1">
               {isReviewMode ? (
-                <ReviewSidebar />
+                <ReviewSidebar
+                  clasificacion={state.currentDiagnosis?.clasificacion || null}
+                  retroalimentaciones={state.currentDiagnosis?.retroalimentaciones || []}
+                  userId={usuario?.id}
+                  currentStatusId={typeof state.currentDiagnosis?.estado === 'object' ? state.currentDiagnosis?.estado.id_estado : Number(state.currentDiagnosis?.estado)}
+                  onViewDetails={() => navigate(`/case-analysis?id=${reviewId || state.currentDiagnosis?.id_diagnostico}`)}
+                  onDownloadPDF={handleDownloadPDF}
+                  onSaveFeedback={async (title, comment, feedbackId) => {
+                    const id = reviewId || state.currentDiagnosis?.id_diagnostico;
+                    if (id) await actions.enviarRetroalimentacion(Number(id), title, comment, feedbackId);
+                  }}
+                  onViewModelComparison={handleViewModelComparison}
+                  onApprove={async () => { if (reviewId) await actions.actualizarEstadoCaso(Number(reviewId), 8); }}
+                  onReject={async () => { if (reviewId) await actions.actualizarEstadoCaso(Number(reviewId), 18); }}
+                  onReport={async () => { if (reviewId) await actions.actualizarEstadoCaso(Number(reviewId), 9); }}
+                  loading={loading}
+                />
               ) : (
                 isPsychologist ? (
-                  <DiagnosticSidebar />
+                  <DiagnosticSidebar
+                    onExecute={() => {
+                      const id = reviewId || (state.currentDiagnosis as Diagnostico)?.id_diagnostico;
+                      if (id) actions.ejecutarAnalisisIA(Number(id));
+                      else alert("Guarde el diagnóstico antes de ejecutar el análisis.");
+                    }}
+                    onSave={handleSaveCase}
+                    onDownloadPDF={handleDownloadPDF}
+                    onViewModelComparison={handleViewModelComparison}
+                    retroalimentaciones={state.currentDiagnosis?.retroalimentaciones || []}
+                  />
                 ) : (
                   <PractitionerSidebar
+                    clasificacion={state.currentDiagnosis?.clasificacion}
+                    retroalimentaciones={state.currentDiagnosis?.retroalimentaciones}
+                    userSymptoms={analysisData.sintomas}
                     phase={phase}
-                    onExecute={() => setPhase('results')}
+                    isLoading={loading}
+                    onDownloadPDF={handleDownloadPDF}
+                    onViewDetails={() => navigate(`/case-analysis?id=${reviewId || state.currentDiagnosis?.id_diagnostico}`)}
+                    onReprocess={async () => {
+                      const id = reviewId || state.currentDiagnosis?.id_diagnostico;
+                      if (id) {
+                        await actions.ejecutarAnalisisIA(Number(id));
+                        setPhase('results');
+                      }
+                    }}
+                    onExecute={async () => {
+                      const id_to_analyze = reviewId;
+                      if (!id_to_analyze) {
+                        try {
+                          await handleSaveCase();
+                        } catch (err) { console.error(err) }
+                      } else {
+                        await actions.ejecutarAnalisisIA(Number(id_to_analyze));
+                        setPhase('results');
+                      }
+                    }}
                   />
                 )
               )}
             </div>
           </div>
 
-          {/* Footer Disclaimer */}
           <div className="mt-16 bg-white border border-zinc-100 rounded-xl p-4 flex items-center justify-between">
             <p className="text-[10px] text-zinc-900 leading-relaxed">
               <span className="font-bold">Uso Académico:</span> Este sistema es únicamente para fines educativos. Los resultados no constituyen diagnósticos médicos reales y no deben usarse para decisiones clínicas en pacientes reales.
@@ -360,4 +438,4 @@ export const ClinicalDiagnostic = () => {
       </div>
     </DefaultLayout>
   );
-}
+};

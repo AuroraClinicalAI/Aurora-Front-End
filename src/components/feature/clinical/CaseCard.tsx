@@ -5,9 +5,10 @@ import type { Diagnostico, Estado } from "@/types/BackendTypes";
 interface CaseCardProps {
   caseData: Diagnostico;
   onView: (id: number) => void;
+  onMachineView: (id: number) => void;
 }
 
-export const CaseCard = ({ caseData, onView }: CaseCardProps) => {
+export const CaseCard = ({ caseData, onView, onMachineView }: CaseCardProps) => {
   const getStatusBadge = () => {
     const rawEstado = caseData.estado;
     let status = "";
@@ -77,7 +78,7 @@ export const CaseCard = ({ caseData, onView }: CaseCardProps) => {
             <Eye className="w-3.5 h-3.5" /> Ver Detalle
           </button>
           <button
-            onClick={() => onView(caseData.id_diagnostico)}
+            onClick={() => onMachineView(caseData.id_diagnostico)}
             className="p-2 border border-zinc-100 rounded-lg text-zinc-400 hover:text-indigo-600 hover:bg-indigo-50 transition-all"
           >
             <ArrowRight className="w-4 h-4" />

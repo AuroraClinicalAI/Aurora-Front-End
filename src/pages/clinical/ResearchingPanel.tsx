@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useSearchParams } from "react-router-dom";
 import { DefaultLayout } from "@/layout/DefaultLayout";
 import { ResearchFilters } from "@/components/feature/clinical/ResearchFilters";
 import { ResearchStatsSummary } from "@/components/feature/clinical/ResearchStatsSummary";
@@ -12,7 +13,16 @@ import { CohortComparisonView } from "@/components/feature/clinical/CohortCompar
 type TabType = 'poblacional' | 'modelos' | 'patrones' | 'cohortes';
 
 export const ResearchingPanel = () => {
-  const [activeTab, setActiveTab] = useState<TabType>('poblacional');
+  const [searchParams] = useSearchParams();
+  const initialTab = (searchParams.get('tab') as TabType) || 'poblacional';
+  const [activeTab, setActiveTab] = useState<TabType>(initialTab);
+
+  useEffect(() => {
+    const tabParam = searchParams.get('tab') as TabType;
+    if (tabParam && ['poblacional', 'modelos', 'patrones', 'cohortes'].includes(tabParam)) {
+      setActiveTab(tabParam);
+    }
+  }, [searchParams]);
 
   const scrollToExport = () => {
     const element = document.getElementById('export-section');

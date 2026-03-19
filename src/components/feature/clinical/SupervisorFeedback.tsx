@@ -1,5 +1,6 @@
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui";
+import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
+import type { Retroalimentacion } from "@/types/BackendTypes";
 
 interface FeedbackItemProps {
   name: string;
@@ -33,7 +34,7 @@ const FeedbackItem = ({ name, role, date, pic, initials, content }: FeedbackItem
   </div>
 );
 
-export const SupervisorFeedback = () => {
+export const SupervisorFeedback = ({ retroalimentaciones = [] }: { retroalimentaciones?: Retroalimentacion[] }) => {
   return (
     <Card className="rounded-2xl border-zinc-100 shadow-sm bg-white overflow-hidden p-8 mt-8">
       <CardHeader className="p-0 mb-6">
@@ -42,20 +43,22 @@ export const SupervisorFeedback = () => {
       </CardHeader>
 
       <CardContent className="p-0 space-y-4">
-        <FeedbackItem
-          name="Dr. Santiago Arango"
-          role="Psicólogo"
-          date="FEB 2025"
-          initials="SA"
-          content="Excelente identificación de los síntomas principales. Sin embargo te falta considerar el impacto que pudo tener la falta de sueño en el rendimiento laboral y académico del paciente."
-        />
-        <FeedbackItem
-          name="Dr. Mateo Ramos"
-          role="Investigador"
-          date="ENERO 2025"
-          initials="MR"
-          content="He sugerido profundizar más en la exploración de factores de riesgo, con el fin de realizar un proceso más detallado y tener datos concluyentes con mayor detalle."
-        />
+        {retroalimentaciones.length > 0 ? (
+          retroalimentaciones.map((item) => (
+            <FeedbackItem
+              key={item.id}
+              name={item.supervisor_nombre}
+              role={item.supervisor_rol}
+              date={new Date(item.fecha).toLocaleDateString('es-ES', { month: 'short', year: 'numeric' }).toUpperCase()}
+              initials={item.supervisor_nombre.split(' ').map(n => n[0]).join('')}
+              content={item.comentario}
+            />
+          ))
+        ) : (
+          <div className="py-8 text-center border-2 border-dashed border-zinc-50 rounded-xl">
+            <p className="text-[10px] text-slate-400 font-medium italic">No hay retroalimentaciones registradas para este caso.</p>
+          </div>
+        )}
       </CardContent>
     </Card>
   );
