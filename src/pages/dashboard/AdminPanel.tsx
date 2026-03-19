@@ -25,15 +25,23 @@ export const AdminPanel = () => {
             <div className="bg-white border border-zinc-100 rounded-[2rem] p-4 sm:p-12 shadow-sm">
               <div className="mb-8 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                 <div>
-                  <h2 className="text-2xl font-bold text-zinc-900">Solicitudes de Usuario</h2>
-                  <p className="text-[10px] text-slate-400 font-medium mt-1">Revisa y gestiona las solicitudes de bloqueo y desbloqueo de usuarios</p>
+                  <h2 className="text-2xl font-bold text-zinc-900">Solicitudes de Usuario y PQRS</h2>
+                  <p className="text-[10px] text-slate-400 font-medium mt-1">Revisa y gestiona las solicitudes de bloqueo y PQRS de usuarios</p>
                 </div>
-                <button
-                  onClick={() => navigate('/admin/users')}
-                  className="text-xs font-bold text-indigo-600 hover:underline flex items-center gap-1"
-                >
-                  Ver Directorio Completo de Usuarios &rarr;
-                </button>
+                <div className="flex flex-col sm:flex-row items-end sm:items-center gap-4">
+                  <button
+                    onClick={() => navigate('/admin/pqrs')}
+                    className="text-xs font-bold text-indigo-600 hover:underline flex items-center gap-1"
+                  >
+                    Bandeja de PQRS &rarr;
+                  </button>
+                  <button
+                    onClick={() => navigate('/admin/users')}
+                    className="text-xs font-bold text-indigo-600 hover:underline flex items-center gap-1"
+                  >
+                    Directorio Completo &rarr;
+                  </button>
+                </div>
               </div>
 
               <UserRequestGrid />
