@@ -30,7 +30,24 @@ export class AuthService implements IAuthService {
   }
 
   async updateProfile(data: Partial<UpdateUserData>): Promise<UserProfile> {
-    const response = await api.patch("/me/", data);
+    let payload: Partial<UpdateUserData> | FormData = data;
+
+    if (data.imagen instanceof File) {
+      const formData = new FormData();
+      Object.entries(data).forEach(([key, value]) => {
+        if (value !== undefined) {
+          formData.append(key, value as string | Blob);
+        }
+      });
+      payload = formData;
+    }
+
+    const response = await api.patch("/me/", payload, {
+      headers:
+        payload instanceof FormData
+          ? { "Content-Type": "multipart/form-data" }
+          : undefined,
+    });
     return response.data;
   }
 
@@ -57,7 +74,7 @@ export class AuthService implements IAuthService {
     await api.post("/password-reset/", { correo: email });
   }
 
-  async confirmPasswordReset(data: any): Promise<void> {
+  async confirmPasswordReset(data: Record<string, string>): Promise<void> {
     await api.post("/password-reset-confirm/", data);
   }
 

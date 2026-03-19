@@ -136,6 +136,29 @@ export const useUpdateUser = () => {
     }
     return response;
   };
+
+  const handleUpdateImage = async (image: File) => {
+    setLoading(true);
+    setError(null);
+    let response = false;
+    try {
+      const updatedUser = await authService.updateProfile({
+        nombre: undefined,
+        imagen: image,
+      });
+      dispatch(setUsuario(updatedUser));
+      response = true;
+    } catch (err) {
+      let errorMessage = "Error al actualizar la imagen";
+      if (err instanceof ApiError) {
+        errorMessage = err.message;
+      }
+      setError(errorMessage);
+    } finally {
+      setLoading(false);
+    }
+    return response;
+  };
   const handleUpdatePassword = async (data: UpdatePasswordData) => {
     setLoading(true);
     setError(null);
@@ -160,7 +183,72 @@ export const useUpdateUser = () => {
     return response;
   };
 
-  return { handleUpdateUsername, handleUpdatePassword, loading, error };
+  return {
+    handleUpdateUsername,
+    handleUpdateImage,
+    handleUpdatePassword,
+    loading,
+    error,
+  };
+};
+
+export const useForgotPassword = () => {
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const { authService } = useServices();
+
+  const handleRequestReset = async (email: string) => {
+    setLoading(true);
+    setError(null);
+    let response = false;
+    try {
+      await authService.requestPasswordReset(email);
+      response = true;
+    } catch (err) {
+      let errorMessage = "Error al solicitar el restablecimiento";
+      if (err instanceof ApiError) {
+        errorMessage = err.message;
+      }
+      setError(errorMessage);
+    } finally {
+      setLoading(false);
+    }
+    return response;
+  };
+
+  return { handleRequestReset, loading, error };
+};
+
+export const useResetPassword = () => {
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const { authService } = useServices();
+
+  const handleConfirmReset = async (data: Record<string, string>) => {
+    setLoading(true);
+    setError(null);
+    let response = false;
+    try {
+      if (data.clave !== data.confirmar_clave) {
+        setError("Las contraseñas no coinciden");
+        setLoading(false);
+        return false;
+      }
+      await authService.confirmPasswordReset(data);
+      response = true;
+    } catch (err) {
+      let errorMessage = "Error al restablecer la contraseña";
+      if (err instanceof ApiError) {
+        errorMessage = err.message;
+      }
+      setError(errorMessage);
+    } finally {
+      setLoading(false);
+    }
+    return response;
+  };
+
+  return { handleConfirmReset, loading, error };
 };
 
 export const useUser = () => {

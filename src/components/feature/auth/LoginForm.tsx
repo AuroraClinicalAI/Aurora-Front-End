@@ -104,7 +104,7 @@ export const LoginForm = () => {
                     <FieldError errors={[fieldState.error]} />
                   )}
                   <div className="flex flex-col gap-1">
-                    <Button variant={"link"} size={"sm"} onClick={() => navigate("/forgot-password")}>Olvide mi contraseña</Button>
+                    <Button variant={"link"} size={"sm"} onClick={() => navigate("/forgot-password")} type="button">Olvide mi contraseña</Button>
                     {/* Mostrar error del servidor si existe */}
                     {error && (
                       <p className="text-[0.8rem] font-medium text-destructive">
