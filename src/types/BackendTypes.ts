@@ -25,7 +25,10 @@ export interface Clasificacion {
   id_etiqueta: number;
   modelo_usado: string;
   probabilidad_certeza: number;
-  estado: string;
+  ml_sintomas_identificados?: JSONValue;
+  ml_dsm5_evaluacion?: JSONValue;
+  ml_lime_explicacion?: JSONValue;
+  estado: string | number | Estado;
 }
 
 export type JSONValue =
@@ -44,6 +47,7 @@ export interface SintomaIdentificado {
 export interface Diagnostico {
   id_diagnostico: number;
   id_practicante: number;
+  practicante?: UsuarioMini;
   id_paciente: number;
   nombre: string;
   historia_clinica: string;
@@ -53,6 +57,9 @@ export interface Diagnostico {
   fecha: string;
   estado: string | number | Estado;
   sintomas_identificados?: SintomaIdentificado[];
+  clasificacion?: Clasificacion;
+  paciente?: Paciente;
+  retroalimentaciones?: Retroalimentacion[];
 }
 
 export interface EtiquetaClasificacion {
@@ -95,6 +102,7 @@ export interface UserProfile {
   correo: string;
   nombre_usuario: string;
   tipo_usuario: string;
+  estado?: string;
   last_login: string;
   imagen?: string;
   permissions?: string[]; // strings or objects depending on serializer
@@ -110,10 +118,12 @@ export interface Modelo {
 export interface Retroalimentacion {
   id: number;
   supervisor: number;
+  supervisor_nombre: string;
+  supervisor_rol: string;
   diagnostico: number;
   titulo: string;
   comentario: string;
-  estado: string;
+  estado: string | number | Estado;
   tipo_interaccion: number; // FK
   fecha: string;
 }
@@ -131,10 +141,48 @@ export interface Grafica {
 
 export interface PQRS {
   id_pqrs: number;
-  usuario: number;
+  usuario: UsuarioMini; // Anidado por el serializer
   tipo: "PETICION" | "QUEJA" | "RECLAMO" | "SUGERENCIA";
   asunto: string;
   mensaje: string;
   fecha_creacion: string;
   leido: boolean;
+  respuesta?: string;
+  fecha_respuesta?: string;
+  respondido_por?: UsuarioMini;
+}
+
+// ─── Admin Panel Types ───────────────────────────────────────────
+
+export interface AdminStats {
+  total_usuarios: number;
+  usuarios_activos: number;
+  usuarios_bloqueados: number;
+  solicitudes_pendientes: number;
+}
+
+export interface UsuarioMini {
+  id: number;
+  nombre: string;
+  correo: string;
+}
+
+export interface Solicitud {
+  id: number;
+  tipo: "BLOQUEAR" | "DESBLOQUEAR";
+  motivo: string;
+  estado: "PENDIENTE" | "RESUELTA" | "RECHAZADA";
+  usuario_objetivo: UsuarioMini;
+  creado_por: UsuarioMini;
+  fecha_creacion: string;
+  fecha_resolucion: string | null;
+  resuelto_por: UsuarioMini | null;
+  nota_resolucion: string;
+}
+
+export interface PaginatedResponse<T> {
+  count: number;
+  next: string | null;
+  previous: string | null;
+  results: T[];
 }

@@ -134,6 +134,9 @@ export const Navbar = () => {
                     <DropdownMenuItem onClick={() => navigate("/profile")}>
                       Perfil
                     </DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => navigate("/mis-pqrs")}>
+                      Mis PQRS
+                    </DropdownMenuItem>
                     <DropdownMenuItem onClick={() => navigate("/profile/settings")}>
                       Configuración
                     </DropdownMenuItem>

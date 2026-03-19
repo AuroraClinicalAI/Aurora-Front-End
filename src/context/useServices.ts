@@ -1,5 +1,6 @@
 import { createContext, useContext } from "react";
 import type {
+  IAdminService,
   IAuthService,
   IAuditoriaService,
   ICommonService,
@@ -10,6 +11,7 @@ import type {
 } from "../services/serviceInterfaces";
 
 export interface IServiceContext {
+  adminService: IAdminService;
   authService: IAuthService;
   auditoriaService: IAuditoriaService;
   commonService: ICommonService;

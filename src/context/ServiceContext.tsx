@@ -1,4 +1,5 @@
 import { type ReactNode, useMemo } from 'react';
+import { AdminService } from '../services/AdminService';
 import { AuthService } from '../services/AuthService';
 import { AuditoriaService } from '../services/AuditoriaService';
 import { CommonService } from '../services/CommonService';
@@ -10,10 +11,8 @@ import { ServiceContext } from './useServices';
 
 export const ServiceProvider = ({ children }: { children: ReactNode }) => {
 
-  // We instantiate the services here. In the future, this could be more sophisticated
-  // (e.g., using a DI container library, or passing config).
-  // For now, simple instantiation is sufficient.
   const services = useMemo(() => ({
+    adminService: new AdminService(),
     authService: new AuthService(),
     auditoriaService: new AuditoriaService(),
     commonService: new CommonService(),

@@ -7,6 +7,7 @@ import type {
   RegisterResponse,
 } from "@/types/AuthType";
 import type {
+  AdminStats,
   Auditoria,
   Estado,
   TipoEstado,
@@ -18,8 +19,10 @@ import type {
   TipoInteraccion,
   Grafica,
   Paciente,
+  PaginatedResponse,
   RangoEdad,
   Reporte,
+  Solicitud,
   UserProfile,
   PQRS,
 } from "@/types/BackendTypes";
@@ -58,6 +61,10 @@ export interface IDiagnosticosService {
     data: Partial<Diagnostico>,
   ): Promise<Diagnostico>;
   deleteDiagnostico(id: number): Promise<void>;
+  analizarIA(id: number): Promise<Clasificacion>;
+  getRetroalimentacionesByDiagnostico(id: number): Promise<Retroalimentacion[]>;
+  cambiarEstado(id: number, id_estado: number): Promise<Diagnostico>;
+  descargarReportePDF(id: number): Promise<Blob>;
 
   // Clasificaciones
   getAllClasificaciones(): Promise<Clasificacion[]>;
@@ -71,6 +78,10 @@ export interface IDiagnosticosService {
 
   // Retroalimentacion
   createRetroalimentacion(
+    data: Partial<Retroalimentacion>,
+  ): Promise<Retroalimentacion>;
+  updateRetroalimentacion(
+    id: number,
     data: Partial<Retroalimentacion>,
   ): Promise<Retroalimentacion>;
 
@@ -97,11 +108,28 @@ export interface IReportesService {
   // PQRS
   getAllPQRS(): Promise<PQRS[]>;
   createPQRS(data: Partial<PQRS>): Promise<PQRS>;
+  marcarPQRSLeido(id: number): Promise<PQRS>;
+  responderPQRS(id: number, respuesta: string): Promise<PQRS>;
 }
 
 export interface IUsuariosService {
   getAllUsuarios(): Promise<UserProfile[]>;
   getUsuarioById(id: number): Promise<UserProfile>;
   updateUsuario(id: number, data: Partial<UserProfile>): Promise<UserProfile>;
-  // Permissions handled via specialized endpoints or included in user profile
+  getAllUsuariosPaginated(
+    params?: Record<string, string>,
+  ): Promise<PaginatedResponse<UserProfile>>;
+  desactivarUsuario(id: number): Promise<void>;
+}
+
+export interface IAdminService {
+  getAdminStats(): Promise<AdminStats>;
+  getSolicitudes(
+    params?: Record<string, string>,
+  ): Promise<PaginatedResponse<Solicitud>>;
+  createSolicitud(data: Partial<Solicitud>): Promise<Solicitud>;
+  resolverSolicitud(
+    id: number,
+    data?: { nota_resolucion?: string },
+  ): Promise<Solicitud>;
 }

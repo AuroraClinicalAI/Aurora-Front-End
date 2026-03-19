@@ -30,6 +30,9 @@ import { Dashboard } from '@/pages/dashboard/Dashboard';
 import { CaseManagement } from '@/pages/clinical/CaseManagement';
 import { UserDirectory } from '@/pages/dashboard/UserDirectory';
 import { HelpCenter } from '@/pages/tutorial/HelpCenter';
+import { AdminPQRS } from '@/pages/dashboard/AdminPQRS';
+import { MisPQRS } from '@/pages/dashboard/MisPQRS';
+import { ResetPassword } from '@/pages/auth/ResetPassword';
 
 export const Router = () => {
   return (
@@ -41,6 +44,7 @@ export const Router = () => {
       <Route path='/register-confirm' element={<RegisterConfirm />} />
       <Route path='/activate/:token' element={<AccountActivation />} />
       <Route path='/forgot-password' element={<ForgotPassword />} />
+      <Route path='/reset-password/:token' element={<ResetPassword />} />
       <Route path='/about' element={<About />} />
       <Route path='/role-guide' element={<RoleGuide />} />
       <Route path='/unauthorized' element={<Unauthorized />} />
@@ -56,6 +60,7 @@ export const Router = () => {
         <Route path='/library' element={<Library />} />
         <Route path='/recent-activity' element={<RecentActivity />} />
         <Route path='/dashboard' element={<Dashboard />} />
+        <Route path='/mis-pqrs' element={<MisPQRS />} />
       </Route>
 
       {/* Role Restricted Routes */}
@@ -64,7 +69,9 @@ export const Router = () => {
       <Route element={<ProtectedRoute allowedRoles={[UserRole.ADMIN, UserRole.MODERADOR]} />}>
         <Route path='/admin-panel' element={<AdminPanel />} />
         <Route path='/admin/users' element={<UserDirectory />} />
+        <Route path='/admin/pqrs' element={<AdminPQRS />} />
       </Route>
+
 
       {/* PRACTICANTE, PSICOLOGO, EVALUADOR */}
       <Route element={<ProtectedRoute allowedRoles={[UserRole.PRACTICANTE, UserRole.PSICOLOGO, UserRole.EVALUADOR, UserRole.ADMIN, UserRole.MODERADOR]} />}>

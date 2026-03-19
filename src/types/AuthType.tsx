@@ -21,6 +21,7 @@ export interface RegisterData {
 }
 export interface UpdateUserData {
   nombre: string;
+  imagen?: File;
 }
 export interface UpdatePasswordData {
   correo: string;

@@ -3,7 +3,6 @@ import {
   HelpCircle,
   MessageCircle,
   FileText,
-  Video,
   Search
 } from "lucide-react";
 import {
@@ -13,8 +12,46 @@ import {
   CardTitle
 } from "@/components/ui";
 import { PQRSForm } from "@/components/feature/help/PQRSForm";
+import { useUser } from "@/hooks/useAuth";
+import { SUPPORT_EMAIL } from "@/config";
+
+/* ── Importación estática de PDFs (Vite los resuelve como URLs) ── */
+import guiaAdmin from "@/assets/guides/guia_admin.pdf";
+import guiaPracticante from "@/assets/guides/guia_practicante.pdf";
+import guiaModeradorPdf from "@/assets/guides/guia_moderador.pdf";
+import guiaPsicologoPdf from "@/assets/guides/guia_psicologo.pdf";
+import guiaEvaluadorPdf from "@/assets/guides/guia_evaluador.pdf";
+import guiaGeneralPdf from "@/assets/guides/guia_general.pdf";
+
+/**
+ * Mapa de tipo de usuario → URL del PDF de guía.
+ * Para agregar un nuevo rol basta con añadir una entrada aquí
+ * e importar el PDF correspondiente arriba.
+ */
+const USER_GUIDE_MAP: Record<string, string> = {
+  ADMIN: guiaAdmin,
+  PRACTICANTE: guiaPracticante,
+  MODERADOR: guiaModeradorPdf,
+  PSICOLOGO: guiaPsicologoPdf,
+  EVALUADOR: guiaEvaluadorPdf,
+  GENERAL: guiaGeneralPdf,
+};
 
 export const HelpCenter = () => {
+  const { usuario } = useUser();
+
+  /** Abre el PDF de guía correspondiente al rol del usuario en una nueva pestaña. */
+  const handleOpenGuide = () => {
+    const userType = usuario?.tipo_usuario ?? "GENERAL";
+    const pdfUrl = USER_GUIDE_MAP[userType] ?? USER_GUIDE_MAP["GENERAL"];
+    window.open(pdfUrl, "_blank");
+  };
+
+  /** Abre el cliente de correo con el email de soporte preconfigurado. */
+  const handleContactSupport = () => {
+    window.location.href = `mailto:${SUPPORT_EMAIL}`;
+  };
+
   const faqs = [
     {
       q: "¿Cómo inicio un nuevo diagnóstico?",
@@ -52,7 +89,11 @@ export const HelpCenter = () => {
           </div>
 
           <div className="flex justify-center gap-6 mb-16">
-            <Card className="rounded-2xl border-zinc-100 shadow-sm hover:shadow-md transition-all cursor-pointer">
+            {/* Guías de Usuario → abre PDF según rol */}
+            <Card
+              className="rounded-2xl border-zinc-100 shadow-sm hover:shadow-md transition-all cursor-pointer"
+              onClick={handleOpenGuide}
+            >
               <CardContent className="p-6 text-center space-y-4">
                 <div className="w-12 h-12 bg-indigo-50 rounded-xl flex items-center justify-center mx-auto">
                   <FileText className="w-6 h-6 text-indigo-600" />
@@ -64,7 +105,11 @@ export const HelpCenter = () => {
               </CardContent>
             </Card>
 
-            <Card className="rounded-2xl border-zinc-100 shadow-sm hover:shadow-md transition-all cursor-pointer">
+            {/* Soporte Técnico → mailto: */}
+            <Card
+              className="rounded-2xl border-zinc-100 shadow-sm hover:shadow-md transition-all cursor-pointer"
+              onClick={handleContactSupport}
+            >
               <CardContent className="p-6 text-center space-y-4">
                 <div className="w-12 h-12 bg-orange-50 rounded-xl flex items-center justify-center mx-auto">
                   <MessageCircle className="w-6 h-6 text-orange-600" />
