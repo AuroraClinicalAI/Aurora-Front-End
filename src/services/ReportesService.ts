@@ -34,4 +34,16 @@ export class ReportesService implements IReportesService {
     const response = await api.post<PQRS>("/pqrs/", data);
     return response.data;
   }
+
+  async marcarPQRSLeido(id: number): Promise<PQRS> {
+    const response = await api.post<PQRS>(`/pqrs/${id}/marcar_leido/`);
+    return response.data;
+  }
+
+  async responderPQRS(id: number, respuesta: string): Promise<PQRS> {
+    const response = await api.post<PQRS>(`/pqrs/${id}/responder/`, {
+      respuesta,
+    });
+    return response.data;
+  }
 }
