@@ -1,10 +1,17 @@
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui";
+import { useUser } from "@/hooks";
+import packageJson from "../../../../package.json";
 
 export const SystemInfoSection = () => {
+  const userState = useUser();
+  const lastLogin = userState.usuario?.last_login
+    ? new Date(userState.usuario.last_login).toLocaleString('es-ES', { hour: '2-digit', minute: '2-digit', day: '2-digit', month: 'short' })
+    : "Primera sesión";
+
   const info = [
-    { label: "Último Acceso:", value: "Hoy, 14:30" },
-    { label: "Sesiones Activas:", value: "2" },
-    { label: "Versión del Sistema:", value: "v2.1.0" },
+    { label: "Último Acceso:", value: lastLogin },
+    { label: "Sesiones Activas:", value: "1" },
+    { label: "Versión del Sistema:", value: `v${packageJson.version}` },
   ];
 
   return (

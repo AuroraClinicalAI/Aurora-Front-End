@@ -3,7 +3,6 @@ import { useNavigate } from "react-router-dom";
 import { DefaultLayout } from "@/layout/DefaultLayout";
 import { PersonalInformationCard } from "@/components/feature/profile/PersonalInformationCard";
 import { ActivityStatistics } from "@/components/feature/profile/ActivityStatistics";
-import { ProfileActivityList } from "@/components/feature/profile/ProfileActivityList";
 import { QuickActions } from "@/components/feature/profile/QuickActions";
 import { SystemInfoSection } from "@/components/feature/profile/SystemInfoSection";
 import { SupportSection } from "@/components/feature/profile/SupportSection";
@@ -23,10 +22,10 @@ export const UserProfile = () => {
   if (!user) return null;
 
   const userData = {
-    nombre: user.nombre || "Dr Santiago Naranjo",
-    email: user.correo || "snaranjoh@ucundinamarca.edu.co",
-    rol: user.tipo_usuario || "Psicólogo",
-    fechaRegistro: "Marzo 2023",
+    nombre: user.nombre || "Usuario",
+    email: user.correo || "",
+    rol: user.tipo_usuario || "PRACTICANTE",
+    fechaRegistro: user.last_login ? new Date(user.last_login).toLocaleDateString('es-ES', { month: 'long', year: 'numeric' }) : "Desconocida",
     imagen: user.imagen
   };
 
@@ -39,7 +38,6 @@ export const UserProfile = () => {
             <div className="lg:col-span-2 space-y-8">
               <PersonalInformationCard user={userData} />
               <ActivityStatistics />
-              <ProfileActivityList />
             </div>
 
             {/* Sidebar Column */}

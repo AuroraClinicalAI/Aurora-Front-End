@@ -17,7 +17,7 @@ export const ProfileForm = () => {
   const [localError, setLocalError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
 
-  const error = localError || hookError;
+  const error = hookError || localError;
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
@@ -39,9 +39,10 @@ export const ProfileForm = () => {
 
     // 1. Update Name if changed
     if (formData.nombre !== userState.usuario?.nombre) {
-      profileUpdated = await handleUpdateUsername({ nombre: formData.nombre });
-      if (profileUpdated) {
-        setSuccess("Perfil actualizado correctamente");
+      const updated = await handleUpdateUsername({ nombre: formData.nombre });
+      if (updated) {
+        setSuccess("Nombre actualizado correctamente");
+        profileUpdated = true;
       }
     }
 
@@ -52,22 +53,22 @@ export const ProfileForm = () => {
         return;
       }
 
-      if (formData.nuevaClave !== formData.confirmarNuevaClave) {
-        setLocalError("Las nuevas contraseñas no coinciden");
-        return;
-      }
-
-      passwordUpdated = await handleUpdatePassword({
+      const updated = await handleUpdatePassword({
         correo: formData.email,
         clave: formData.claveActual,
         nueva_clave: formData.nuevaClave,
         confirmar_clave: formData.confirmarNuevaClave
       });
 
-      if (passwordUpdated) {
+      if (updated) {
         setSuccess(prev => prev ? prev + " e contraseña actualizada" : "Contraseña actualizada correctamente");
         setFormData(prev => ({ ...prev, claveActual: '', nuevaClave: '', confirmarNuevaClave: '' }));
+        passwordUpdated = true;
       }
+    }
+
+    if (!profileUpdated && !passwordUpdated && !error && formData.nombre === userState.usuario?.nombre) {
+      setLocalError("No se detectaron cambios para guardar");
     }
   };
 

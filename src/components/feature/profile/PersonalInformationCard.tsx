@@ -12,6 +12,9 @@ interface PersonalInformationCardProps {
 }
 
 export const PersonalInformationCard = ({ user }: PersonalInformationCardProps) => {
+  const apiUrl = import.meta.env.VITE_BASE_URL;
+  const imageUrl = user.imagen?.startsWith('http') ? user.imagen : `${apiUrl}${user.imagen}`;
+
   return (
     <Card className="rounded-2xl border-zinc-100 shadow-sm bg-white overflow-hidden p-8">
       <CardHeader className="p-0 mb-6">
@@ -19,7 +22,7 @@ export const PersonalInformationCard = ({ user }: PersonalInformationCardProps) 
       </CardHeader>
       <CardContent className="p-0 flex flex-col md:flex-row items-center md:items-start gap-8">
         <Avatar className="w-24 h-24 border-4 border-slate-50 shadow-sm">
-          <AvatarImage src={user.imagen} />
+          <AvatarImage src={imageUrl} />
           <AvatarFallback className="bg-indigo-400 text-white text-2xl font-bold">
             {user.nombre.charAt(0).toUpperCase()}
           </AvatarFallback>
