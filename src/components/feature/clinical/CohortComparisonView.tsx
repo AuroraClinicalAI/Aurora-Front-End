@@ -1,4 +1,8 @@
 import { Card } from "@/components/ui";
+import { Loader2 } from "lucide-react";
+import { useAnalytics } from "@/hooks/useAnalytics";
+import { useEffect, useState } from "react";
+import type { CohortData } from "@/services/AnalyticsService";
 
 const CohortCard = ({ period, cases, diff }: { period: string, cases: string, diff: string }) => (
   <Card className="rounded-xl border border-zinc-100 p-6 flex flex-col items-center justify-center space-y-4 hover:shadow-md transition-all">
@@ -14,16 +18,40 @@ const CohortCard = ({ period, cases, diff }: { period: string, cases: string, di
 );
 
 export const CohortComparisonView = () => {
+  const { getCohorts, loading } = useAnalytics();
+  const [data, setData] = useState<CohortData[] | null>(null);
+
+  useEffect(() => {
+    const fetch = async () => {
+      const resp = await getCohorts();
+      if (resp) setData(resp);
+    };
+    fetch();
+  }, [getCohorts]);
+
+  if (loading || !data) {
+    return (
+      <div className="flex justify-center items-center py-20">
+        <Loader2 className="w-8 h-8 animate-spin text-indigo-500" />
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-12 animate-in fade-in duration-700">
       <Card className="rounded-2xl border-zinc-100 shadow-sm bg-white overflow-hidden p-8">
         <h4 className="text-xl font-bold text-zinc-900 mb-2">Análisis Longitudinal por Cohortes</h4>
-        <p className="text-[10px] text-slate-400 font-medium mb-12">Comparación entre diferentes períodos académicos</p>
+        <p className="text-[10px] text-slate-400 font-medium mb-12">Comparación mensual entre diferentes períodos generacionales</p>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          <CohortCard period="2024-I" cases="1.247" diff="15.2%" />
-          <CohortCard period="2024-II" cases="1.247" diff="15.2%" />
-          <CohortCard period="2024-I" cases="1.247" diff="15.2%" />
+        <div className="grid grid-cols-1 md:grid-cols-3 xl:grid-cols-6 gap-6">
+          {data.map((cohort, i) => (
+            <CohortCard key={i} period={cohort.period} cases={cohort.cases.toString()} diff={cohort.diff} />
+          ))}
+          {data.length === 0 && (
+            <div className="col-span-full py-8 text-center text-xs text-slate-400">
+              Aún no hay suficientes cortes transversales de casos
+            </div>
+          )}
         </div>
       </Card>
     </div>
