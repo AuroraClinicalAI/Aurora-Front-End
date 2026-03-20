@@ -9,6 +9,7 @@ import type {
   IReportesService,
   IUsuariosService,
 } from "../services/serviceInterfaces";
+import type { IAnalyticsService } from "../services/AnalyticsService";
 
 export interface IServiceContext {
   adminService: IAdminService;
@@ -19,6 +20,7 @@ export interface IServiceContext {
   pacientesService: IPacientesService;
   reportesService: IReportesService;
   usuariosService: IUsuariosService;
+  analyticsService: IAnalyticsService;
 }
 
 export const ServiceContext = createContext<IServiceContext | null>(null);

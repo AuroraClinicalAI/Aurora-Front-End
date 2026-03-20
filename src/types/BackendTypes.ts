@@ -108,13 +108,6 @@ export interface UserProfile {
   permissions?: string[]; // strings or objects depending on serializer
 }
 
-export interface Modelo {
-  id_modelo: number;
-  nombre_modelo: string;
-  fecha_entrenamiento: string;
-  precision: number;
-}
-
 export interface Retroalimentacion {
   id: number;
   supervisor: number;
@@ -137,6 +130,27 @@ export interface TipoInteraccion {
 export interface Grafica {
   id_grafica: number;
   nombre_grafica: string;
+  archivo: string;
+  id_entrenamiento: number;
+}
+
+export interface Entrenamiento {
+  id_entrenamiento: number;
+  descripcion: string;
+  fecha_entrenamiento: string;
+  precision: number;
+  f_score: number;
+  recall: number;
+  sensibilidad: number;
+  graficas: Grafica[];
+}
+
+export interface Modelo {
+  id_modelo: number;
+  nombre_modelo: string;
+  fecha_entrenamiento: string;
+  precision: number;
+  entrenamientos?: Entrenamiento[];
 }
 
 export interface PQRS {

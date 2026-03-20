@@ -7,6 +7,7 @@ import { DiagnosticosService } from '../services/DiagnosticosService';
 import { PacientesService } from '../services/PacientesService';
 import { ReportesService } from '../services/ReportesService';
 import { UsuariosService } from '../services/UsuariosService';
+import { AnalyticsService } from '../services/AnalyticsService';
 import { ServiceContext } from './useServices';
 
 export const ServiceProvider = ({ children }: { children: ReactNode }) => {
@@ -20,6 +21,7 @@ export const ServiceProvider = ({ children }: { children: ReactNode }) => {
     pacientesService: new PacientesService(),
     reportesService: new ReportesService(),
     usuariosService: new UsuariosService(),
+    analyticsService: new AnalyticsService(),
   }), []);
 
   return (

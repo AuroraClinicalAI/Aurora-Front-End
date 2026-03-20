@@ -5,6 +5,7 @@ import { NotFound } from '@/pages/general/NotFound';
 import { Register } from '@/pages/auth/Register';
 import { RegisterConfirm } from '@/pages/auth/RegisterConfirm';
 import { About } from '@/pages/home/About';
+import { ModelReports } from '@/pages/clinical/ModelReports';
 import { AdminPanel } from '@/pages/dashboard/AdminPanel';
 import { Analysis } from '@/pages/clinical/Analysis';
 import { CaseAnalysis } from '@/pages/clinical/CaseAnalysis';
@@ -70,6 +71,7 @@ export const Router = () => {
         <Route path='/admin-panel' element={<AdminPanel />} />
         <Route path='/admin/users' element={<UserDirectory />} />
         <Route path='/admin/pqrs' element={<AdminPQRS />} />
+        <Route path='/reports' element={<ModelReports />} />
       </Route>
 
 

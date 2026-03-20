@@ -1,5 +1,7 @@
 import { DefaultLayout } from "@/layout/DefaultLayout";
-import { useUser } from "@/hooks";
+import { useUser, useModelos, useDiagnosticos } from "@/hooks";
+import { useEffect, useState } from "react";
+import type { Modelo, Diagnostico } from "@/types/BackendTypes";
 import { useNavigate } from "react-router-dom";
 import {
   Card,
@@ -23,8 +25,25 @@ import { UserRole } from "@/types/Roles";
 
 export const Dashboard = () => {
   const { usuario } = useUser();
+  const { getAllModelos } = useModelos();
+  const { getAllDiagnosticos } = useDiagnosticos();
   const navigate = useNavigate();
   const apiUrl = import.meta.env.VITE_BASE_URL;
+
+  const [latestModel, setLatestModel] = useState<Modelo | null>(null);
+  const [diagnosticos, setDiagnosticos] = useState<Diagnostico[]>([]);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      const models = await getAllModelos();
+      if (models && models.length > 0) {
+        setLatestModel(models[models.length - 1]);
+      }
+      const diags = await getAllDiagnosticos();
+      if (diags) setDiagnosticos(diags);
+    };
+    fetchData();
+  }, [getAllModelos, getAllDiagnosticos]);
 
   if (!usuario) return null;
 
@@ -151,7 +170,7 @@ export const Dashboard = () => {
           </div>
 
           {/* Activity Placeholder or Secondary Stats */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+          <div className="grid gap-8">
             <Card className="rounded-[2rem] border-zinc-100 shadow-sm transition-all hover:shadow-md">
               <CardHeader>
                 <CardTitle className="text-xl font-bold text-zinc-900">Estado del Sistema</CardTitle>
@@ -159,47 +178,37 @@ export const Dashboard = () => {
               <CardContent className="space-y-6">
                 <div className="space-y-2">
                   <div className="flex justify-between text-sm">
-                    <span className="text-slate-500">Precisión del Modelo</span>
-                    <span className="font-bold text-indigo-600">94.2%</span>
+                    <span className="text-slate-500">
+                      Precisión del Modelo {latestModel ? `(${new Date(latestModel.fecha_entrenamiento).toLocaleDateString()})` : ''}
+                    </span>
+                    <span className="font-bold text-indigo-600">
+                      {latestModel && latestModel.precision ? (latestModel.precision * 100).toFixed(1) : 0}%
+                    </span>
                   </div>
                   <div className="w-full bg-indigo-50 h-2 rounded-full overflow-hidden">
-                    <div className="bg-indigo-500 h-full w-[94.2%]" />
+                    <div
+                      className="bg-indigo-500 h-full transition-all duration-1000"
+                      style={{ width: `${latestModel && latestModel.precision ? (latestModel.precision * 100).toFixed(1) : 0}%` }}
+                    />
                   </div>
                 </div>
                 <div className="grid grid-cols-2 gap-4 pt-4">
                   <div className="p-4 bg-orange-50 rounded-2xl border border-orange-100">
                     <p className="text-[10px] font-bold text-orange-600 uppercase tracking-wider mb-1">Casos Hoy</p>
-                    <p className="text-2xl font-bold text-orange-900">12</p>
+                    <p className="text-2xl font-bold text-orange-900">
+                      {diagnosticos.filter(d => d.fecha && d.fecha.startsWith(new Date().toISOString().split('T')[0])).length}
+                    </p>
                   </div>
                   <div className="p-4 bg-emerald-50 rounded-2xl border border-emerald-100">
-                    <p className="text-[10px] font-bold text-emerald-600 uppercase tracking-wider mb-1">Activos</p>
-                    <p className="text-2xl font-bold text-emerald-900">4</p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card className="rounded-[2rem] border-zinc-100 shadow-sm transition-all hover:shadow-md overflow-hidden">
-              <CardHeader>
-                <CardTitle className="text-xl font-bold text-zinc-900">Avisos Recientes</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  <div className="flex gap-4 p-4 hover:bg-slate-50 rounded-xl transition-colors cursor-pointer border border-transparent hover:border-slate-100">
-                    <div className="w-10 h-10 rounded-full bg-indigo-100 flex items-center justify-center flex-shrink-0">
-                      <ClipboardList className="w-5 h-5 text-indigo-600" />
-                    </div>
-                    <div>
-                      <h4 className="text-sm font-bold text-zinc-900">Actualización del Protocolo</h4>
-                      <p className="text-xs text-slate-500 mt-1">Se han actualizado las guías clínicas para el screening DSM-5.</p>
-                      <span className="text-[10px] text-slate-400 mt-2 block">Hace 2 horas</span>
-                    </div>
+                    <p className="text-[10px] font-bold text-emerald-600 uppercase tracking-wider mb-1">Casos Totales</p>
+                    <p className="text-2xl font-bold text-emerald-900">
+                      {diagnosticos.length}
+                    </p>
                   </div>
                 </div>
               </CardContent>
             </Card>
           </div>
-
           <div className="mt-20 bg-white border border-zinc-100 rounded-xl p-4">
             <p className="text-[10px] text-zinc-900 leading-relaxed">
               <span className="font-bold">Uso Académico:</span> Este sistema es únicamente para fines educativos. Los resultados no constituyen diagnósticos médicos reales y no deben usarse para decisiones clínicas en pacientes reales.
