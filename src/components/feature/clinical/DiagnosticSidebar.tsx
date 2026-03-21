@@ -72,12 +72,13 @@ export const DiagnosticSidebar = ({
             >
               Ejecutar Análisis
             </button>
-            <p
+            <button
+              type="button"
               onClick={onViewModelComparison}
-              className="text-[9px] text-indigo-400 font-bold text-center cursor-pointer hover:underline"
+              className="w-full block text-[9px] text-indigo-400 font-bold text-center cursor-pointer hover:underline focus:outline-none focus:underline"
             >
               Ver Comparación de Modelos
-            </p>
+            </button>
           </div>
 
           <div className="space-y-4 pt-4 border-t border-zinc-100 font-poppins">

@@ -79,9 +79,9 @@ export const Navbar = () => {
   return (
     <header className='w-full bg-indigo-300'>
       <nav className="navbar h-20 relative bg-indigo-300 flex justify-between p-0 md:p-5 items-center flex-wrap max-w-[1600px] mx-auto">
-        <div className="flex items-center gap-2 cursor-pointer" onClick={() => navigate(userState.usuario ? '/dashboard' : '/')}>
+        <button type="button" className="flex items-center gap-2 cursor-pointer" onClick={() => navigate(userState.usuario ? '/dashboard' : '/')}>
           <span className="text-white text-3xl font-bold my-5 ml-5 md:m-0">AURORA</span>
-        </div>
+        </button>
 
         {/* Desktop Menu */}
         <div className='flex gap-5 items-center'>

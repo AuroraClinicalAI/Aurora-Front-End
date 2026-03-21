@@ -106,12 +106,13 @@ export const ReviewSidebar = ({
             <button
               onClick={onViewDetails}
               className="w-full py-2 bg-indigo-300 hover:bg-indigo-400 text-white rounded-lg text-[10px] font-bold transition-all">Ver Análisis</button>
-            <p
+            <button
+              type="button"
               onClick={onViewModelComparison}
-              className="text-[9px] text-indigo-400 font-bold text-center cursor-pointer hover:underline"
+              className="w-full py-2 bg-indigo-300 hover:bg-indigo-400 text-white rounded-lg text-[10px] font-bold transition-all"
             >
               Ver Comparación de Modelos
-            </p>
+            </button>
           </div>
           <button
             onClick={onDownloadPDF}

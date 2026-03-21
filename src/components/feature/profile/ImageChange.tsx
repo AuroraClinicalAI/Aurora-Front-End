@@ -37,7 +37,7 @@ export const ImageChange = () => {
 
   return (
     <div className="max-w-[300px] flex flex-col items-center gap-4 py-5">
-      <div className="relative group cursor-pointer" onClick={onButtonClick}>
+      <button type="button" className="relative group cursor-pointer" onClick={onButtonClick}>
         <img
           className="rounded-full w-40 h-40 object-cover border-4 border-indigo-50 transition-all hover:border-indigo-200 shadow-md"
           src={preview || `${apiUrl}${userState.usuario?.imagen}`}
@@ -46,7 +46,7 @@ export const ImageChange = () => {
         <div className="absolute inset-0 flex items-center justify-center bg-black/20 rounded-full opacity-0 group-hover:opacity-100 transition-opacity">
           <span className="text-white text-xs font-bold">Cambiar</span>
         </div>
-      </div>
+      </button>
       <input
         type="file"
         ref={fileInputRef}

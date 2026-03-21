@@ -19,8 +19,7 @@ const ReportCard = ({ id, caseId, type, format, integrity, size, date, status }:
         <h4 className="text-xl font-bold text-zinc-900">{id}</h4>
         <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Caso: {caseId}</p>
       </div>
-      <span className={`flex items-center gap-1.5 px-3 py-1 border rounded-full text-[9px] font-bold uppercase tracking-widest leading-none ${status === 'Activo' ? 'bg-zinc-50 border-zinc-100 text-zinc-900' :
-          status === 'Pendiente' ? 'bg-zinc-50 border-zinc-100 text-zinc-900' : 'bg-zinc-50 border-zinc-100 text-zinc-900'
+      <span className={`flex items-center gap-1.5 px-3 py-1 border rounded-full text-[9px] font-bold uppercase tracking-widest leading-none bg-zinc-50 border-zinc-100 text-zinc-900'
         }`}>
         {status === 'Activo' && <Check className="w-3 h-3" />}
         {status === 'Pendiente' && <Clock className="w-3 h-3" />}

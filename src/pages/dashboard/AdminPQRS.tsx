@@ -124,7 +124,8 @@ export const AdminPQRS = () => {
                 <Card key={pqrs.id_pqrs} className={`rounded-2xl shadow-sm transition-all overflow-hidden ${!pqrs.leido ? 'border-l-4 border-l-indigo-500 bg-white border-y-zinc-100 border-r-zinc-100' : 'border-zinc-100 bg-white'}`}>
                   <CardContent className="p-0">
                     {/* Header: Clickable to expand */}
-                    <div
+                    <button
+                      type="button"
                       className="p-6 cursor-pointer hover:bg-slate-50 transition-colors flex flex-col md:flex-row md:items-center justify-between gap-4"
                       onClick={() => handleExpand(pqrs)}
                     >
@@ -154,7 +155,7 @@ export const AdminPQRS = () => {
                         </span>
                         {expandedId === pqrs.id_pqrs ? <ChevronUp className="w-5 h-5 text-slate-400" /> : <ChevronDown className="w-5 h-5 text-slate-400" />}
                       </div>
-                    </div>
+                    </button>
 
                     {/* Expanded Content */}
                     {expandedId === pqrs.id_pqrs && (
