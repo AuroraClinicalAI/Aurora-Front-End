@@ -200,3 +200,68 @@ export interface PaginatedResponse<T> {
   previous: string | null;
   results: T[];
 }
+
+// ─── Research & Analytics Types ────────────────────────────────
+export interface ResearchSummary {
+  total_cases: number;
+  risk_cases: number;
+  model_accuracy: number;
+  f1_score: number;
+}
+
+export interface AgeDistribution {
+  rango: string;
+  count: number;
+}
+
+export interface SexDistribution {
+  sexo: string;
+  count: number;
+}
+
+export interface AnonymizedCase {
+  id: string;
+  age: string;
+  sex: string;
+  score: string;
+  class: string;
+}
+
+export interface PopulationData {
+  age_distribution: AgeDistribution[];
+  sex_distribution: SexDistribution[];
+  anonymized_cases: AnonymizedCase[];
+}
+
+export interface TopPattern {
+  label: string;
+  cases: number;
+  percentage: number;
+}
+
+export interface PatternsData {
+  top_patterns: TopPattern[];
+  correlation_matrix: Record<string, number>;
+}
+
+export interface CohortData {
+  period: string;
+  cases: number;
+  diff: string;
+}
+
+export interface ResearchFilters {
+  cohorts: string[];
+  age_ranges: { id_rango_edad: number; nombre_rango: string }[];
+  models: { id_modelo: number; nombre_modelo: string }[];
+  genders: { id: number; nombre: string }[];
+}
+
+export interface ExportParams {
+  cohort?: string;
+  gender?: number;
+  age_range?: number;
+  model?: number;
+  format?: "csv" | "json" | "xlsx";
+  export_format?: "csv" | "json" | "xlsx";
+}

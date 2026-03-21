@@ -1,78 +1,85 @@
 import api from "@/config/axios";
+import type {
+  ResearchSummary,
+  PopulationData,
+  PatternsData,
+  CohortData,
+  ResearchFilters,
+  ExportParams,
+} from "@/types/BackendTypes";
 
-export interface ResearchSummary {
-  total_cases: number;
-  risk_cases: number;
-  model_accuracy: number;
-  f1_score: number;
-}
-
-export interface AgeDistribution {
-  rango: string;
-  count: number;
-}
-
-export interface SexDistribution {
-  sexo: string;
-  count: number;
-}
-
-export interface AnonymizedCase {
-  id: string;
-  age: string;
-  sex: string;
-  score: string;
-  class: string;
-}
-
-export interface PopulationData {
-  age_distribution: AgeDistribution[];
-  sex_distribution: SexDistribution[];
-  anonymized_cases: AnonymizedCase[];
-}
-
-export interface TopPattern {
-  label: string;
-  cases: number;
-  percentage: number;
-}
-
-export interface PatternsData {
-  top_patterns: TopPattern[];
-  correlation_matrix: Record<string, number>;
-}
-
-export interface CohortData {
-  period: string;
-  cases: number;
-  diff: string;
-}
+export type {
+  ResearchSummary,
+  PopulationData,
+  PatternsData,
+  CohortData,
+  ResearchFilters,
+  ExportParams,
+};
 
 export interface IAnalyticsService {
-  getSummary(): Promise<ResearchSummary>;
-  getPopulation(): Promise<PopulationData>;
-  getPatterns(): Promise<PatternsData>;
-  getCohorts(): Promise<CohortData[]>;
+  getSummary(params?: ExportParams): Promise<ResearchSummary>;
+  getPopulation(params?: ExportParams): Promise<PopulationData>;
+  getPatterns(params?: ExportParams): Promise<PatternsData>;
+  getCohorts(params?: ExportParams): Promise<CohortData[]>;
+  getFilters(): Promise<ResearchFilters>;
+  exportData(params: ExportParams): Promise<Blob | unknown>;
 }
 
 export class AnalyticsService implements IAnalyticsService {
-  public async getSummary(): Promise<ResearchSummary> {
-    const response = await api.get<ResearchSummary>("/research/summary/");
+  public async getSummary(params?: ExportParams): Promise<ResearchSummary> {
+    const rest = { ...params };
+    delete rest.format;
+    const response = await api.get<ResearchSummary>(
+      "/research-analytics/summary/",
+      { params: rest },
+    );
     return response.data;
   }
 
-  public async getPopulation(): Promise<PopulationData> {
-    const response = await api.get<PopulationData>("/research/population/");
+  public async getPopulation(params?: ExportParams): Promise<PopulationData> {
+    const rest = { ...params };
+    delete rest.format;
+    const response = await api.get<PopulationData>(
+      "/research-analytics/population/",
+      { params: rest },
+    );
     return response.data;
   }
 
-  public async getPatterns(): Promise<PatternsData> {
-    const response = await api.get<PatternsData>("/research/patterns/");
+  public async getPatterns(params?: ExportParams): Promise<PatternsData> {
+    const rest = { ...params };
+    delete rest.format;
+    const response = await api.get<PatternsData>(
+      "/research-analytics/patterns/",
+      { params: rest },
+    );
     return response.data;
   }
 
-  public async getCohorts(): Promise<CohortData[]> {
-    const response = await api.get<CohortData[]>("/research/cohorts/");
+  public async getCohorts(params?: ExportParams): Promise<CohortData[]> {
+    const rest = { ...params };
+    delete rest.format;
+    const response = await api.get<CohortData[]>(
+      "/research-analytics/cohorts/",
+      { params: rest },
+    );
+    return response.data;
+  }
+
+  public async getFilters(): Promise<ResearchFilters> {
+    const response = await api.get<ResearchFilters>(
+      "/research-analytics/filters/",
+    );
+    return response.data;
+  }
+
+  public async exportData(params: ExportParams): Promise<Blob | unknown> {
+    const { format, ...rest } = params;
+    const response = await api.get("/research-analytics/export_data/", {
+      params: { ...rest, export_format: format },
+      responseType: format === "csv" || format === "xlsx" ? "blob" : "json",
+    });
     return response.data;
   }
 }

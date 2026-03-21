@@ -25,6 +25,12 @@ import type {
   Solicitud,
   UserProfile,
   PQRS,
+  ResearchSummary,
+  PopulationData,
+  PatternsData,
+  CohortData,
+  ResearchFilters,
+  ExportParams,
 } from "@/types/BackendTypes";
 
 export interface IAuthService {
@@ -120,6 +126,15 @@ export interface IUsuariosService {
     params?: Record<string, string>,
   ): Promise<PaginatedResponse<UserProfile>>;
   desactivarUsuario(id: number): Promise<void>;
+}
+
+export interface IAnalyticsService {
+  getSummary(params?: ExportParams): Promise<ResearchSummary>;
+  getPopulation(params?: ExportParams): Promise<PopulationData>;
+  getPatterns(params?: ExportParams): Promise<PatternsData>;
+  getCohorts(params?: ExportParams): Promise<CohortData[]>;
+  getFilters(): Promise<ResearchFilters>;
+  exportData(params: ExportParams): Promise<Blob | unknown>;
 }
 
 export interface IAdminService {
