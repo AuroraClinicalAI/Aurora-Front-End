@@ -63,7 +63,8 @@ export const MisPQRS = () => {
               pqrsList.map((pqrs) => (
                 <Card key={pqrs.id_pqrs} className="rounded-2xl border-zinc-100 shadow-sm bg-white overflow-hidden transition-all hover:shadow-md">
                   <CardContent className="p-0">
-                    <div
+                    <button
+                      type="button"
                       className="p-6 cursor-pointer hover:bg-slate-50 transition-colors flex flex-col sm:flex-row sm:items-center justify-between gap-4"
                       onClick={() => setExpandedId(expandedId === pqrs.id_pqrs ? null : pqrs.id_pqrs)}
                     >
@@ -88,7 +89,7 @@ export const MisPQRS = () => {
                       <div className="flex items-center shrink-0">
                         {expandedId === pqrs.id_pqrs ? <ChevronUp className="w-5 h-5 text-slate-400" /> : <ChevronDown className="w-5 h-5 text-slate-400" />}
                       </div>
-                    </div>
+                    </button>
 
                     {expandedId === pqrs.id_pqrs && (
                       <div className="px-6 pb-6 bg-slate-50/50 border-t border-zinc-100 pt-6">
