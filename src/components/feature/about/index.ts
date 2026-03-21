@@ -1,0 +1,6 @@
+export * from './AboutBorn'
+export * from './AboutEthics'
+export * from './AboutImpact'
+export * from './AboutMission'
+export * from './AboutTeam'
+export * from './AboutTitle'
