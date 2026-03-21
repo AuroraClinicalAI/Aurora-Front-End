@@ -1,8 +1,6 @@
 import { Card } from "@/components/ui";
 import { Users, Target, Activity, HeartPulse } from "lucide-react";
-import { useAnalytics } from "@/hooks/useAnalytics";
-import { useEffect, useState } from "react";
-import type { ResearchSummary } from "@/services/AnalyticsService";
+import type { ResearchSummary } from "@/types/BackendTypes";
 
 interface StatCardProps {
   label: string;
@@ -27,17 +25,12 @@ const StatCard = ({ label, value, subtext, icon, color = "indigo-400" }: StatCar
   </Card>
 );
 
-export const ResearchStatsSummary = () => {
-  const { getSummary, loading } = useAnalytics();
-  const [summary, setSummary] = useState<ResearchSummary | null>(null);
+interface ResearchStatsSummaryProps {
+  summary: ResearchSummary | null;
+  loading: boolean;
+}
 
-  useEffect(() => {
-    const fetchStats = async () => {
-      const data = await getSummary();
-      setSummary(data);
-    };
-    fetchStats();
-  }, [getSummary]);
+export const ResearchStatsSummary = ({ summary, loading }: ResearchStatsSummaryProps) => {
 
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">

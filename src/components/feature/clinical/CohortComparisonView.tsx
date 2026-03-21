@@ -1,8 +1,6 @@
 import { Card } from "@/components/ui";
 import { Loader2 } from "lucide-react";
-import { useAnalytics } from "@/hooks/useAnalytics";
-import { useEffect, useState } from "react";
-import type { CohortData } from "@/services/AnalyticsService";
+import type { CohortData } from "@/types/BackendTypes";
 
 const CohortCard = ({ period, cases, diff }: { period: string, cases: string, diff: string }) => (
   <Card className="rounded-xl border border-zinc-100 p-6 flex flex-col items-center justify-center space-y-4 hover:shadow-md transition-all">
@@ -17,18 +15,12 @@ const CohortCard = ({ period, cases, diff }: { period: string, cases: string, di
   </Card>
 );
 
-export const CohortComparisonView = () => {
-  const { getCohorts, loading } = useAnalytics();
-  const [data, setData] = useState<CohortData[] | null>(null);
+interface CohortComparisonViewProps {
+  data: CohortData[];
+  loading: boolean;
+}
 
-  useEffect(() => {
-    const fetch = async () => {
-      const resp = await getCohorts();
-      if (resp) setData(resp);
-    };
-    fetch();
-  }, [getCohorts]);
-
+export const CohortComparisonView = ({ data, loading }: CohortComparisonViewProps) => {
   if (loading || !data) {
     return (
       <div className="flex justify-center items-center py-20">

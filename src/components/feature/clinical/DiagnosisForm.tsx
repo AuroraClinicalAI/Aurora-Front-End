@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Button, Input, Label, Textarea } from "@/components/ui";
-import type { Diagnostico } from "@/types/BackendTypes";
+import type { Diagnostico, SintomaIdentificado } from "@/types/BackendTypes";
 import { Plus, Trash2 } from "lucide-react";
 
 interface DiagnosisFormProps {
@@ -32,7 +32,7 @@ export const DiagnosisForm = ({ initialData, onSubmit, onCancel }: DiagnosisForm
       const currentSintomas = Array.isArray(formData.sintomas_identificados) ? formData.sintomas_identificados : [];
       setFormData({
         ...formData,
-        sintomas_identificados: [...currentSintomas, newSintoma.trim()]
+        sintomas_identificados: [...currentSintomas, { name: newSintoma.trim(), intensity: 1 }]
       });
       setNewSintoma("");
     }
@@ -123,9 +123,9 @@ export const DiagnosisForm = ({ initialData, onSubmit, onCancel }: DiagnosisForm
               <Button type="button" onClick={addSintoma} size="sm"><Plus className="w-4 h-4" /></Button>
             </div>
             <div className="flex flex-wrap gap-2 mt-2">
-              {(Array.isArray(formData.sintomas_identificados) ? formData.sintomas_identificados : []).map((sintoma: string, idx: number) => (
+              {(Array.isArray(formData.sintomas_identificados) ? formData.sintomas_identificados : []).map((sintoma: SintomaIdentificado | string, idx: number) => (
                 <span key={idx} className="bg-indigo-100 text-indigo-800 text-sm px-2 py-1 rounded-full flex items-center gap-1">
-                  {sintoma}
+                  {typeof sintoma === 'string' ? sintoma : sintoma.name}
                   <button type="button" onClick={() => removeSintoma(idx)} className="text-indigo-600 hover:text-red-500"><Trash2 className="w-3 h-3" /></button>
                 </span>
               ))}

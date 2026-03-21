@@ -1,8 +1,6 @@
 import { Card } from "@/components/ui";
 import { Loader2 } from "lucide-react";
-import { useAnalytics } from "@/hooks/useAnalytics";
-import { useEffect, useState } from "react";
-import type { PatternsData } from "@/services/AnalyticsService";
+import type { PatternsData } from "@/types/BackendTypes";
 
 const PatternBar = ({ label, cases, percentage }: { label: string, cases: number, percentage: number }) => (
   <div className="space-y-2">
@@ -22,18 +20,12 @@ const PatternBar = ({ label, cases, percentage }: { label: string, cases: number
   </div>
 );
 
-export const SymptomPatternsView = () => {
-  const { getPatterns, loading } = useAnalytics();
-  const [data, setData] = useState<PatternsData | null>(null);
+interface SymptomPatternsViewProps {
+  data: PatternsData | null;
+  loading: boolean;
+}
 
-  useEffect(() => {
-    const fetch = async () => {
-      const resp = await getPatterns();
-      if (resp) setData(resp);
-    };
-    fetch();
-  }, [getPatterns]);
-
+export const SymptomPatternsView = ({ data, loading }: SymptomPatternsViewProps) => {
   if (loading || !data) {
     return (
       <div className="flex justify-center items-center py-20">

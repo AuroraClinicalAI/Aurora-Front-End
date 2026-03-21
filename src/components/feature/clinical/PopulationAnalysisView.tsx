@@ -1,24 +1,16 @@
 import { Card, CardHeader, CardTitle } from "@/components/ui";
 import { Loader2 } from "lucide-react";
-import { useAnalytics } from "@/hooks/useAnalytics";
-import { useEffect, useState } from "react";
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, BarChart, Bar, XAxis, YAxis, CartesianGrid } from "recharts";
-import type { PopulationData } from "@/services/AnalyticsService";
+import type { PopulationData } from "@/types/BackendTypes";
 
 const COLORS = ['#818cf8', '#34d399', '#fbbf24', '#f87171', '#a78bfa'];
 
-export const PopulationAnalysisView = () => {
-  const { getPopulation, loading } = useAnalytics();
-  const [data, setData] = useState<PopulationData | null>(null);
+interface PopulationAnalysisViewProps {
+  data: PopulationData | null;
+  loading: boolean;
+}
 
-  useEffect(() => {
-    const fetch = async () => {
-      const resp = await getPopulation();
-      if (resp) setData(resp);
-    };
-    fetch();
-  }, [getPopulation]);
-
+export const PopulationAnalysisView = ({ data, loading }: PopulationAnalysisViewProps) => {
   if (loading || !data) {
     return (
       <div className="flex justify-center items-center py-20">
