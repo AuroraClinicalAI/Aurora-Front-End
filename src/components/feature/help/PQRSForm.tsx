@@ -68,7 +68,7 @@ export const PQRSForm = () => {
               <label className="text-[10px] font-bold text-zinc-900 uppercase tracking-widest">Tipo de Solicitud</label>
               <select
                 value={formData.tipo}
-                onChange={(e) => setFormData({ ...formData, tipo: e.target.value })}
+                onChange={(e) => setFormData({ ...formData, tipo: e.target.value as "PETICION" | "QUEJA" | "RECLAMO" | "SUGERENCIA" })}
                 className="w-full p-3 rounded-xl border border-zinc-200 text-xs font-medium focus:outline-none focus:ring-2 focus:ring-indigo-500/20 transition-all bg-white"
                 required
               >

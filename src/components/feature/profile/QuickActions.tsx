@@ -1,4 +1,4 @@
-import { Stethoscope, ClipboardCheck, Activity } from "lucide-react";
+import { Stethoscope, Activity } from "lucide-react";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui";
 import { useNavigate } from "react-router-dom";
 
