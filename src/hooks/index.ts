@@ -5,4 +5,6 @@ export * from "./useAdminUsuarios";
 export * from "./usePQRS";
 export * from "./useModelos";
 export * from "./useDiagnosticos";
+export * from "./useClinicalWorkflow";
 export * from "./useResearchAnalytics";
+export * from "./useActivityStatistics";

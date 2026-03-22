@@ -11,7 +11,7 @@ const buttonVariants = cva(
       variant: {
         default:
           // "bg-primary text-primary-foreground shadow hover:bg-primary/90",
-          "text-white bg-transparent shadow-transparent hover:bg-indigo-400 md:shadow-[2px_2px_0px_0px_rgba(139,117,226,1.00)] md:bg-accent-1",
+          "text-white bg-transparent shadow-transparent hover:bg-indigo-400 md:shadow-[2px_2px_0px_0px_rgba(139,117,226,1.00)] bg-accent-1",
         secondary:
           "bg-transparent shadow-transparent text-white md:bg-neutral md:shadow-[2px_2px_0px_0px_rgba(117,203,226,1.00)] bg-transparent shadow-transparent hover:bg-indigo-400 md:hover:bg-neutral",
         destructive:

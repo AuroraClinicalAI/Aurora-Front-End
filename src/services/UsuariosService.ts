@@ -1,5 +1,9 @@
 import api from "@/config/axios";
-import type { PaginatedResponse, UserProfile } from "@/types/BackendTypes";
+import type {
+  PaginatedResponse,
+  UserProfile,
+  ActivityStatistics,
+} from "@/types/BackendTypes";
 import type { IUsuariosService } from "./serviceInterfaces";
 
 export class UsuariosService implements IUsuariosService {
@@ -33,5 +37,12 @@ export class UsuariosService implements IUsuariosService {
 
   async desactivarUsuario(id: number): Promise<void> {
     await api.post(`/usuarios/${id}/desactivar/`);
+  }
+
+  async getSelfActivityStatistics(): Promise<ActivityStatistics> {
+    const response = await api.get<ActivityStatistics>(
+      "/me/activity-statistics/",
+    );
+    return response.data;
   }
 }

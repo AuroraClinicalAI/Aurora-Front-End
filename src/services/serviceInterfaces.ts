@@ -22,9 +22,10 @@ import type {
   PaginatedResponse,
   RangoEdad,
   Reporte,
-  Solicitud,
   UserProfile,
   PQRS,
+  Solicitud,
+  ActivityStatistics,
   ResearchSummary,
   PopulationData,
   PatternsData,
@@ -126,6 +127,7 @@ export interface IUsuariosService {
     params?: Record<string, string>,
   ): Promise<PaginatedResponse<UserProfile>>;
   desactivarUsuario(id: number): Promise<void>;
+  getSelfActivityStatistics(): Promise<ActivityStatistics>;
 }
 
 export interface IAnalyticsService {

@@ -108,6 +108,15 @@ export interface UserProfile {
   permissions?: string[]; // strings or objects depending on serializer
 }
 
+export interface ActivityStatistics {
+  diagnosticos_totales: number;
+  casos_validados: number;
+  casos_pendientes: number;
+  tasa_certeza: number;
+  colaboraciones: number;
+  ultima_actividad: string | null;
+}
+
 export interface Retroalimentacion {
   id: number;
   supervisor: number;
