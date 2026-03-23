@@ -1,4 +1,6 @@
-type TabType = 'poblacional' | 'modelos' | 'patrones' | 'cohortes';
+import { useUser } from "@/hooks";
+
+type TabType = 'poblacional' | 'modelos' | 'patrones' | 'cohortes' | 'gestion_modelos';
 
 interface ResearchTabsProps {
   activeTab: TabType;
@@ -6,12 +8,17 @@ interface ResearchTabsProps {
 }
 
 export const ResearchTabs = ({ activeTab, onTabChange }: ResearchTabsProps) => {
+  const { usuario } = useUser();
   const tabs = [
     { id: 'poblacional', label: 'Análisis Poblacional' },
     { id: 'modelos', label: 'Evaluación de Modelos' },
     { id: 'patrones', label: 'Patrones Sintomáticos' },
     { id: 'cohortes', label: 'Comparación de Cohortes' },
   ];
+
+  if (usuario?.tipo_usuario === 'ADMIN') {
+    tabs.push({ id: 'gestion_modelos', label: 'Gestión de Modelos' });
+  }
 
   return (
     <div className="bg-zinc-200 p-1 rounded-xl flex flex-col sm:flex-row gap-1 mb-12">
@@ -20,8 +27,8 @@ export const ResearchTabs = ({ activeTab, onTabChange }: ResearchTabsProps) => {
           key={tab.id}
           onClick={() => onTabChange(tab.id as TabType)}
           className={`flex-grow py-3 px-6 rounded-lg text-[10px] font-bold uppercase tracking-widest transition-all ${activeTab === tab.id
-              ? 'bg-white text-zinc-900 shadow-sm'
-              : 'text-zinc-500 hover:text-zinc-700 hover:bg-zinc-100/50'
+            ? 'bg-white text-zinc-900 shadow-sm'
+            : 'text-zinc-500 hover:text-zinc-700 hover:bg-zinc-100/50'
             }`}
         >
           {tab.label}

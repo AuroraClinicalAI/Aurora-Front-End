@@ -79,6 +79,16 @@ export interface IDiagnosticosService {
 
   // Modelos
   getAllModelos(): Promise<Modelo[]>;
+  getDeletedModelos(): Promise<Modelo[]>;
+  softDeleteModelo(id: number): Promise<void>;
+  recoverModelo(id: number): Promise<void>;
+  toggleProductionModelo(id: number): Promise<Modelo>;
+  trainCustomModelo(
+    file: File | null,
+    datasetName: string,
+    customName: string,
+  ): Promise<Record<string, unknown>>;
+  syncModelos(): Promise<Record<string, unknown>>;
 
   // Etiquetas
   getAllEtiquetas(): Promise<EtiquetaClasificacion[]>;

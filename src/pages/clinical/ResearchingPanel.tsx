@@ -9,10 +9,11 @@ import { PopulationAnalysisView } from "@/components/feature/clinical/Population
 import { ModelEvaluationView } from "@/components/feature/clinical/ModelEvaluationView";
 import { SymptomPatternsView } from "@/components/feature/clinical/SymptomPatternsView";
 import { CohortComparisonView } from "@/components/feature/clinical/CohortComparisonView";
+import { ModelManagementView } from "@/components/feature/clinical/ModelManagementView";
 
 import { useResearchAnalytics } from "@/hooks/useResearchAnalytics";
 
-type TabType = 'poblacional' | 'modelos' | 'patrones' | 'cohortes';
+type TabType = 'poblacional' | 'modelos' | 'patrones' | 'cohortes' | 'gestion_modelos';
 
 export const ResearchingPanel = () => {
   const [searchParams] = useSearchParams();
@@ -34,7 +35,7 @@ export const ResearchingPanel = () => {
 
   useEffect(() => {
     const tabParam = searchParams.get('tab') as TabType;
-    if (tabParam && ['poblacional', 'modelos', 'patrones', 'cohortes'].includes(tabParam)) {
+    if (tabParam && ['poblacional', 'modelos', 'patrones', 'cohortes', 'gestion_modelos'].includes(tabParam)) {
       setActiveTab(tabParam);
     }
   }, [searchParams]);
@@ -56,6 +57,8 @@ export const ResearchingPanel = () => {
         return <SymptomPatternsView data={patterns} loading={loading} />;
       case 'cohortes':
         return <CohortComparisonView data={cohorts} loading={loading} />;
+      case 'gestion_modelos':
+        return <ModelManagementView />;
       default:
         return <PopulationAnalysisView data={population} loading={loading} />;
     }

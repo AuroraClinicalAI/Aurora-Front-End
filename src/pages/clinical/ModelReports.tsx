@@ -1,4 +1,5 @@
 import { useEffect, useState, useRef } from "react";
+import { useSearchParams } from "react-router-dom";
 import { useReactToPrint } from "react-to-print";
 import { Download, Target, Calendar, Award, AlertCircle, Activity } from "lucide-react";
 import { useModelos } from "@/hooks";
@@ -10,6 +11,7 @@ import { DefaultLayout } from "@/layout/DefaultLayout";
 export const ModelReports = () => {
   const { getAllModelos, loading, error } = useModelos();
   const [modelos, setModelos] = useState<Modelo[]>([]);
+  const [searchParams] = useSearchParams();
   const [selectedModeloId, setSelectedModeloId] = useState<number | "">("");
   const reportRef = useRef<HTMLDivElement>(null);
 
@@ -18,11 +20,12 @@ export const ModelReports = () => {
       const data = await getAllModelos();
       setModelos(data);
       if (data.length > 0) {
-        setSelectedModeloId(data[data.length - 1].id_modelo); // default to latest
+        const queryModel = searchParams.get('modelo');
+        setSelectedModeloId(queryModel ? Number(queryModel) : data[data.length - 1].id_modelo);
       }
     };
     fetchModelos();
-  }, [getAllModelos]);
+  }, [getAllModelos, searchParams]);
 
   const selectedModelo = modelos.find((m) => m.id_modelo === Number(selectedModeloId));
   const latestEntrenamiento: Entrenamiento | undefined =

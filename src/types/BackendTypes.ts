@@ -159,6 +159,9 @@ export interface Modelo {
   nombre_modelo: string;
   fecha_entrenamiento: string;
   precision: number;
+  is_active?: boolean;
+  deleted_at?: string | null;
+  is_production: boolean;
   entrenamientos?: Entrenamiento[];
 }
 

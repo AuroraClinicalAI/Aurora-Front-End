@@ -81,9 +81,53 @@ export class DiagnosticosService implements IDiagnosticosService {
     return response.data;
   }
 
-  // Modelos
   async getAllModelos(): Promise<Modelo[]> {
     const response = await api.get<Modelo[]>("/modelo/");
+    return response.data;
+  }
+
+  async getDeletedModelos(): Promise<Modelo[]> {
+    const response = await api.get<Modelo[]>("/modelo/recycle_bin/");
+    return response.data;
+  }
+
+  async softDeleteModelo(id: number): Promise<void> {
+    await api.post(`/modelo/${id}/soft_delete/`);
+  }
+
+  async recoverModelo(id: number): Promise<void> {
+    await api.post(`/modelo/${id}/recover/`);
+  }
+
+  async toggleProductionModelo(id: number): Promise<Modelo> {
+    const response = await api.post<Modelo>(`/modelo/${id}/toggle_production/`);
+    return response.data;
+  }
+
+  async trainCustomModelo(
+    file: File | null,
+    datasetName: string,
+    customName: string,
+  ): Promise<Record<string, unknown>> {
+    const formData = new FormData();
+    if (file) {
+      formData.append("file", file);
+    }
+    if (datasetName) {
+      formData.append("dataset_name", datasetName);
+    }
+    if (customName) {
+      formData.append("custom_name", customName);
+    }
+    const response = await api.post("/modelo/entrenar_modelo/", formData, {
+      headers: { "Content-Type": "multipart/form-data" },
+      timeout: 300000, // 5 minutes
+    });
+    return response.data;
+  }
+
+  async syncModelos(): Promise<Record<string, unknown>> {
+    const response = await api.post("/modelo/sincronizar_modelos/");
     return response.data;
   }
 
