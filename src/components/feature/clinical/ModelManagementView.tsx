@@ -71,10 +71,6 @@ export const ModelManagementView = () => {
 
   const handleTrain = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!trainConfig.name) {
-      alert("Por favor inserta un nombre para el modelo");
-      return;
-    }
     try {
       await trainCustomModelo(trainConfig.file, trainConfig.dataset, trainConfig.name);
       alert("El entrenamiento ha comenzado. Esto tomará varios minutos.");
@@ -188,14 +184,13 @@ export const ModelManagementView = () => {
 
             <form onSubmit={handleTrain} className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-zinc-700 mb-1">Nombre Personalizado</label>
+                <label className="block text-sm font-medium text-zinc-700 mb-1">Nombre Personalizado (Opcional)</label>
                 <input
                   type="text"
                   value={trainConfig.name}
                   onChange={e => setTrainConfig({ ...trainConfig, name: e.target.value })}
                   placeholder="ej. v2_clinical_advanced"
                   className="w-full px-3 py-2 border border-zinc-200 rounded-md text-sm focus:ring-2 focus:ring-[#637bc4] focus:outline-none"
-                  required
                 />
               </div>
 
