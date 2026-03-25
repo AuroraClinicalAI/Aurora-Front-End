@@ -121,7 +121,6 @@ export class DiagnosticosService implements IDiagnosticosService {
     }
     const response = await api.post("/modelo/entrenar_modelo/", formData, {
       headers: { "Content-Type": "multipart/form-data" },
-      timeout: 300000, // 5 minutes
     });
     return response.data;
   }

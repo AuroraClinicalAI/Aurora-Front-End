@@ -72,8 +72,8 @@ export const ModelManagementView = () => {
   const handleTrain = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      await trainCustomModelo(trainConfig.file, trainConfig.dataset, trainConfig.name);
-      alert("El entrenamiento ha comenzado. Esto tomará varios minutos.");
+      const resp = await trainCustomModelo(trainConfig.file, trainConfig.dataset, trainConfig.name);
+      alert((resp as any).message || "El entrenamiento ha comenzado. Esto tomará varios minutos.");
       setShowTrainModal(false);
       setTrainConfig({ name: '', dataset: '', file: null });
       loadData();
