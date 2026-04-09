@@ -83,28 +83,55 @@ const MyComponent = () => {
 
 ## Pasos de Instalación :checkered_flag:
 
-Sigue estos pasos para instalar y ejecutar el proyecto en tu máquina local.
+Sigue estos pasos para instalar y ejecutar el proyecto en tu máquina local o mediante contenedores.
+
+### Opción 1: Desarrollo Local (Node.js)
 
 1. Clona el repositorio:
 
-```
+```bash
 git clone https://github.com/TatoNaranjo/Aurora-Front-End
 cd Aurora-Front-End
 ```
 
-2. Instala las dependencias:
-
+2. Configura las variables de entorno:
+Crea un archivo `.env` en la raíz del proyecto definiendo al menos las variables necesarias:
+```env
+VITE_BASE_URL=tu_url_base_api
+VITE_SUPPORT_EMAIL=tu_correo_de_soporte
 ```
+
+3. Instala las dependencias necesarias:
+
+```bash
 npm install
 ```
 
-3. Inicia el servidor de desarrollo:
+4. Inicia el servidor de desarrollo (impulsado por Vite):
 
-```
+```bash
 npm run dev
 ```
 
 Esto iniciará la aplicación en `http://localhost:5173` (o un puerto diferente si el `5173` ya está en uso).
+
+### Opción 2: Despliegue con Docker :whale:
+
+El proyecto incluye un `Dockerfile` optimizado en dos etapas (Node.js para el build y Nginx para servir estáticos) ideal para ambientes de producción.
+
+1. Construye la imagen de Docker pasando los argumentos de compilación requeridos por Vite:
+
+```bash
+docker build --build-arg VITE_BASE_URL=https://tu-api.com --build-arg VITE_SUPPORT_EMAIL=soporte@tu-api.com -t aurora-frontend .
+```
+
+2. Ejecuta el contenedor exponiendo el puerto 80 del Nginx a un puerto de tu máquina (por ejemplo, 8080):
+
+```bash
+docker run -p 8080:80 -d aurora-frontend
+```
+
+La aplicación estará disponible en `http://localhost:8080`.
 
 ## Notas adicionales :construction:
 
