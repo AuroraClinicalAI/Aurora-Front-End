@@ -1,5 +1,6 @@
 import { Card } from "@/components/ui";
-import { Search, Filter, CheckCircle, Clock, XCircle, Eye, Check } from "lucide-react";
+import { Search, Filter, CheckCircle, Clock, XCircle, Check, Loader2 } from "lucide-react";
+import { useReportVerification } from "@/hooks";
 
 interface ReportCardProps {
   id: string;
@@ -50,28 +51,66 @@ const ReportCard = ({ id, caseId, type, format, integrity, size, date, status }:
         <p className="text-[10px] font-medium text-zinc-900">{date}</p>
       </div>
     </div>
-
-    <div className="flex flex-wrap gap-4 border-t border-zinc-50 pt-6">
-      <button className="flex items-center gap-2 px-4 py-2 border border-zinc-100 rounded-lg text-[10px] font-bold text-zinc-900 hover:bg-zinc-50 transition-all">
-        <Eye className="w-3.5 h-3.5" /> Ver Estructura
-      </button>
-      {status === 'Pendiente' && (
-        <>
-          <button className="flex items-center gap-2 px-4 py-2 border border-zinc-100 rounded-lg text-[10px] font-bold text-zinc-900 hover:bg-zinc-50 transition-all">
-            <CheckCircle className="w-3.5 h-3.5" /> Aprobar Formato
-          </button>
-          <button className="flex items-center gap-2 px-4 py-2 border border-zinc-100 rounded-lg text-[10px] font-bold text-zinc-900 hover:bg-zinc-50 transition-all">
-            <XCircle className="w-3.5 h-3.5" /> Rechazar
-          </button>
-        </>
-      )}
-    </div>
   </Card>
 );
 
 export const ReportValidationView = () => {
+  const { verifyReports, loading, error, result, reports, loadingReports } = useReportVerification();
+
+  const handleVerify = async () => {
+    try {
+      await verifyReports();
+    } catch {
+      // hook handles state
+    }
+  };
+
   return (
     <div className="space-y-12 animate-in fade-in duration-700">
+      {/* Verification Action Card */}
+      <Card className="rounded-2xl border-zinc-100 shadow-sm bg-white overflow-hidden p-8 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+        <div>
+          <h3 className="text-xl font-bold text-zinc-900">Validación de Motor de Reportes</h3>
+          <p className="text-xs text-slate-400 mt-1">Lanza un diagnóstico en memoria para probar la integridad de iteración PDF del backend</p>
+        </div>
+
+        <button
+          onClick={handleVerify}
+          disabled={loading}
+          className="px-6 py-2.5 bg-[#637bc4] hover:bg-indigo-500 text-white rounded-lg text-sm font-bold transition-all shadow-md flex items-center gap-2 shrink-0 disabled:opacity-50"
+        >
+          {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <CheckCircle className="w-4 h-4" />}
+          Verificar Integridad
+        </button>
+      </Card>
+
+      {error && (
+        <Card className="rounded-2xl bg-red-50 border border-red-100 p-6 flex flex-col items-center justify-center animate-in fade-in">
+          <XCircle className="w-8 h-8 text-red-500 mb-2" />
+          <p className="text-sm font-bold text-red-700">{error}</p>
+        </Card>
+      )}
+
+      {result && (
+        <Card className="rounded-2xl border-zinc-100 shadow-sm bg-white overflow-hidden p-8 animate-in slide-in-from-top-4">
+          <div className="flex items-center gap-3 mb-6">
+            <CheckCircle className="w-6 h-6 text-green-500" />
+            <h4 className="text-lg font-bold text-zinc-900">Validación Exitosa</h4>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 bg-zinc-50 p-6 rounded-xl border border-zinc-100">
+            <div>
+              <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Estado General</p>
+              <p className="text-sm font-bold text-zinc-900">{result.message}</p>
+            </div>
+            <div>
+              <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Peso Verificado (Bytes)</p>
+              <p className="text-sm font-bold text-indigo-600">{result.pdf_bytes.toLocaleString()} bytes</p>
+            </div>
+          </div>
+        </Card>
+      )}
+
       {/* Filters */}
       <Card className="rounded-2xl border-zinc-100 shadow-sm bg-white overflow-hidden p-8">
         <div className="flex items-center gap-2 mb-8">
@@ -110,41 +149,31 @@ export const ReportValidationView = () => {
       <div className="space-y-8">
         <div className="flex items-center gap-2">
           <Filter className="w-4 h-4 text-zinc-900" />
-          <h3 className="text-xl font-bold text-zinc-900">Reportes para Validación</h3>
-          <span className="ml-2 text-[10px] text-slate-400 font-bold uppercase">3 reportes encontrados</span>
+          <h3 className="text-xl font-bold text-zinc-900">Reportes Históricos</h3>
+          <span className="ml-2 text-[10px] text-slate-400 font-bold uppercase">{reports.length} reportes encontrados</span>
         </div>
 
         <div className="space-y-6">
-          <ReportCard
-            id="RPT-001"
-            caseId="PAT-2024-001"
-            type="Análisis de Viñeta"
-            format="Válido"
-            integrity="Completo"
-            size="2.4 KB"
-            date="2024-01-15"
-            status="Activo"
-          />
-          <ReportCard
-            id="RPT-002"
-            caseId="PAT-2024-002"
-            type="Evaluación PHQ-9"
-            format="Advertencia"
-            integrity="Incompleto"
-            size="1.8 KB"
-            date="2024-01-14"
-            status="Pendiente"
-          />
-          <ReportCard
-            id="RPT-003"
-            caseId="PAT-2024-003"
-            type="Evaluación PHQ-9"
-            format="Advertencia"
-            integrity="Incompleto"
-            size="3.2 KB"
-            date="2024-01-13"
-            status="Rechazado"
-          />
+          {loadingReports ? (
+            <div className="flex justify-center p-8"><Loader2 className="w-8 h-8 animate-spin text-zinc-400" /></div>
+          ) : (
+            reports.map((r) => (
+              <ReportCard
+                key={r.id_reporte}
+                id={`RPT-${String(r.id_reporte).padStart(3, '0')}`}
+                caseId={`USR-${r.autor}`}
+                type={r.nombre_reporte || "Desconocido"}
+                format={r.ruta_archivo.endsWith('.pdf') ? 'PDF' : r.ruta_archivo.split('.').pop()?.toUpperCase() || 'DAT'}
+                integrity={r.descripcion ? 'Completo' : 'Incompleto'}
+                size="N/A"
+                date={new Date(r.fecha_creacion).toLocaleString()}
+                status="Activo"
+              />
+            ))
+          )}
+          {reports.length === 0 && !loadingReports && (
+            <p className="text-sm text-zinc-500 bg-white p-8 rounded-xl border border-zinc-100 text-center">No hay reportes generados en el sistema.</p>
+          )}
         </div>
       </div>
     </div>

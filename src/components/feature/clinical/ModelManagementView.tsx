@@ -73,7 +73,8 @@ export const ModelManagementView = () => {
     e.preventDefault();
     try {
       const resp = await trainCustomModelo(trainConfig.file, trainConfig.dataset, trainConfig.name);
-      alert((resp as any).message || "El entrenamiento ha comenzado. Esto tomará varios minutos.");
+      const respObj = resp as { message?: string };
+      alert(respObj?.message || "El entrenamiento ha comenzado. Esto tomará varios minutos.");
       setShowTrainModal(false);
       setTrainConfig({ name: '', dataset: '', file: null });
       loadData();
