@@ -3,6 +3,7 @@ FROM node:20-alpine AS build-stage
 
 WORKDIR /app
 
+RUN corepack enable pnpm
 # Add build arguments for environment variables
 ARG VITE_BASE_URL
 ARG VITE_SUPPORT_EMAIL
@@ -13,13 +14,13 @@ ENV VITE_SUPPORT_EMAIL=$VITE_SUPPORT_EMAIL
 
 # Copy package files and install dependencies
 COPY package*.json ./
-RUN npm install
+RUN pnpm install
 
 # Copy the rest of the application code
 COPY . .
 
 # Build the application
-RUN npm run build
+RUN pnpm run build
 
 # Production stage
 FROM nginx:stable-alpine AS production-stage
