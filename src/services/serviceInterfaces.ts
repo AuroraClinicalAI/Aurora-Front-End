@@ -32,6 +32,8 @@ import type {
   CohortData,
   ResearchFilters,
   ExportParams,
+  SystemHealth,
+  ValidationMetrics,
 } from "@/types/BackendTypes";
 
 export interface IAuthService {
@@ -51,6 +53,7 @@ export interface IAuthService {
 export interface IAuditoriaService {
   getAll(): Promise<Auditoria[]>;
   getById(id: number): Promise<Auditoria>;
+  exportAudits(): Promise<Blob>;
 }
 
 export interface ICommonService {
@@ -121,12 +124,18 @@ export interface IReportesService {
   getReporteById(id: number): Promise<Reporte>;
   createReporte(data: Partial<Reporte>): Promise<Reporte>;
   downloadReporte(id: number): Promise<Blob>;
+  verifyReports(): Promise<{ message: string; pdf_bytes: number }>;
 
   // PQRS
   getAllPQRS(): Promise<PQRS[]>;
   createPQRS(data: Partial<PQRS>): Promise<PQRS>;
   marcarPQRSLeido(id: number): Promise<PQRS>;
   responderPQRS(id: number, respuesta: string): Promise<PQRS>;
+  testUploadModel(
+    file: File,
+    dataset?: string,
+    customName?: string,
+  ): Promise<{ message: string; filas: number }>;
 }
 
 export interface IUsuariosService {
@@ -147,6 +156,8 @@ export interface IAnalyticsService {
   getCohorts(params?: ExportParams): Promise<CohortData[]>;
   getFilters(): Promise<ResearchFilters>;
   exportData(params: ExportParams): Promise<Blob | unknown>;
+  getSystemHealth(): Promise<SystemHealth>;
+  getValidationMetrics(): Promise<ValidationMetrics>;
 }
 
 export interface IAdminService {
