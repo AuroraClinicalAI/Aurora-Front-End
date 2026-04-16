@@ -19,7 +19,8 @@ import {
   Settings,
   HelpCircle,
   BarChart3,
-  ArrowRight
+  ArrowRight,
+  SearchCode
 } from "lucide-react";
 import { UserRole } from "@/types/Roles";
 
@@ -87,6 +88,14 @@ export const Dashboard = () => {
       path: "/reports",
       roles: [UserRole.ADMIN, UserRole.MODERADOR, UserRole.PSICOLOGO, UserRole.EVALUADOR],
       color: "bg-blue-50"
+    },
+    {
+      title: "Validación",
+      description: "Validar el funcionamiento del sistema",
+      icon: <SearchCode className="w-6 h-6 text-yellow-500" />,
+      path: "/testing-validation",
+      roles: [UserRole.ADMIN, UserRole.MODERADOR, UserRole.PSICOLOGO, UserRole.EVALUADOR],
+      color: "bg-yellow-50"
     },
     {
       title: "Configuración",

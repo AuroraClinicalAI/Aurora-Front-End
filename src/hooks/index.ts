@@ -8,3 +8,6 @@ export * from "./useDiagnosticos";
 export * from "./useClinicalWorkflow";
 export * from "./useResearchAnalytics";
 export * from "./useActivityStatistics";
+export * from "./useValidationDashboard";
+export * from "./useModelTesting";
+export * from "./useReportVerification";
