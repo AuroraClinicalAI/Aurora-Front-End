@@ -262,6 +262,29 @@ export interface CohortData {
   diff: string;
 }
 
+export interface SystemComponent {
+  label: string;
+  value: string;
+  percentage: number;
+  status: string;
+}
+
+export interface SystemHealth {
+  components: SystemComponent[];
+}
+
+export interface ValidationMetric {
+  value: string;
+  subtext: string;
+}
+
+export interface ValidationMetrics {
+  archivos_cargados: ValidationMetric;
+  pruebas_carga: ValidationMetric;
+  tiempo_respuesta: ValidationMetric;
+  integridad_datos: ValidationMetric;
+}
+
 export interface ResearchFilters {
   cohorts: string[];
   age_ranges: { id_rango_edad: number; nombre_rango: string }[];

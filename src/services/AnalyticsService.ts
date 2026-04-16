@@ -6,6 +6,8 @@ import type {
   CohortData,
   ResearchFilters,
   ExportParams,
+  SystemHealth,
+  ValidationMetrics,
 } from "@/types/BackendTypes";
 
 export type {
@@ -15,6 +17,8 @@ export type {
   CohortData,
   ResearchFilters,
   ExportParams,
+  SystemHealth,
+  ValidationMetrics,
 };
 
 export interface IAnalyticsService {
@@ -24,6 +28,8 @@ export interface IAnalyticsService {
   getCohorts(params?: ExportParams): Promise<CohortData[]>;
   getFilters(): Promise<ResearchFilters>;
   exportData(params: ExportParams): Promise<Blob | unknown>;
+  getSystemHealth(): Promise<SystemHealth>;
+  getValidationMetrics(): Promise<ValidationMetrics>;
 }
 
 export class AnalyticsService implements IAnalyticsService {
@@ -80,6 +86,20 @@ export class AnalyticsService implements IAnalyticsService {
       params: { ...rest, export_format: format },
       responseType: format === "csv" || format === "xlsx" ? "blob" : "json",
     });
+    return response.data;
+  }
+
+  public async getSystemHealth(): Promise<SystemHealth> {
+    const response = await api.get<SystemHealth>(
+      "/research-analytics/system_health/",
+    );
+    return response.data;
+  }
+
+  public async getValidationMetrics(): Promise<ValidationMetrics> {
+    const response = await api.get<ValidationMetrics>(
+      "/research-analytics/validation_metrics/",
+    );
     return response.data;
   }
 }

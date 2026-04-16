@@ -70,6 +70,13 @@ export class DiagnosticosService implements IDiagnosticosService {
     return response.data;
   }
 
+  async verifyReports(): Promise<{ message: string; pdf_bytes: number }> {
+    const response = await api.get<{ message: string; pdf_bytes: number }>(
+      "/diagnostico/verificar_reportes/",
+    );
+    return response.data;
+  }
+
   // Clasificaciones
   async getAllClasificaciones(): Promise<Clasificacion[]> {
     const response = await api.get<Clasificacion[]>("/clasificacion/");

@@ -12,4 +12,11 @@ export class AuditoriaService implements IAuditoriaService {
     const response = await api.get<Auditoria>(`/auditoria/${id}/`);
     return response.data;
   }
+
+  async exportAudits(): Promise<Blob> {
+    const response = await api.get<Blob>("/auditoria/exportar/", {
+      responseType: "blob",
+    });
+    return response.data;
+  }
 }
