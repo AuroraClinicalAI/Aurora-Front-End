@@ -41,6 +41,11 @@ export interface ScreeningData {
   q2: number;
   q3: number;
   q4: number;
+  q5: number;
+  q6: number;
+  q7: number;
+  q8: number;
+  q9: number;
 }
 
 interface ScreeningScalesProps {
@@ -66,14 +71,14 @@ export const ScreeningScales = ({ value, onChange }: ScreeningScalesProps) => {
       <CardContent className="p-0 space-y-10">
         <Question
           number={1}
-          question="¿Con qué frecuencia se ha sentido desanimado, deprimido o sin esperanza?*"
+          question="¿Con qué frecuencia ha tenido poco interés o placer en hacer cosas?*"
           id="q1"
           value={value.q1}
           onChange={handleQuestionChange}
         />
         <Question
           number={2}
-          question="¿Con qué frecuencia ha tenido poco interés o placer en hacer cosas?*"
+          question="¿Con qué frecuencia se ha sentido desanimado, deprimido o sin esperanza?*"
           id="q2"
           value={value.q2}
           onChange={handleQuestionChange}
@@ -90,6 +95,41 @@ export const ScreeningScales = ({ value, onChange }: ScreeningScalesProps) => {
           question="¿Se ha sentido cansado o con poca energía?*"
           id="q4"
           value={value.q4}
+          onChange={handleQuestionChange}
+        />
+        <Question
+          number={5}
+          question="¿Se ha sentido sin apetito o ha comido en exceso?*"
+          id="q5"
+          value={value.q5}
+          onChange={handleQuestionChange}
+        />
+        <Question
+          number={6}
+          question="¿Se ha sentido mal con usted mismo(a) - o que es un fracaso o que ha quedado mal con usted mismo(a) o con su familia?*"
+          id="q6"
+          value={value.q6}
+          onChange={handleQuestionChange}
+        />
+        <Question
+          number={7}
+          question="¿Que tan frecuentemente ha tenido dificultad para concentrarse en ciertas actividades, tales como leer el periódico o ver la televisión?*"
+          id="q7"
+          value={value.q7}
+          onChange={handleQuestionChange}
+        />
+        <Question
+          number={8}
+          question="¿Se ha movido o hablado tan lento que otras personas podrían haberlo notado? o lo contrario - muy inquieto(a) o agitado(a) que ha estado moviéndose mucho más de lo normal*"
+          id="q8"
+          value={value.q8}
+          onChange={handleQuestionChange}
+        />
+        <Question
+          number={9}
+          question="¿Que tan frecuentemente ha tenido pensamientos de que estaría mejor muerto(a) o de lastimarse de alguna manera?*"
+          id="q9"
+          value={value.q9}
           onChange={handleQuestionChange}
         />
       </CardContent>

@@ -2,8 +2,9 @@ import { logout, setAccessToken } from '@/store/userSlice';
 import axios, { AxiosError } from 'axios';
 import { store } from '@/store/store';
 import { ApiError } from '@/types/ErrorType';
+import { API_BASE_URL } from '@/config';
 
-const apiUrl = import.meta.env.VITE_BASE_URL;
+const apiUrl = API_BASE_URL;
 const api = axios.create({
   baseURL: apiUrl + "/api/",
   withCredentials: true,

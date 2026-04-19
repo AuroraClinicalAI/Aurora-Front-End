@@ -7,6 +7,7 @@ import type { Modelo, Entrenamiento } from "@/types/BackendTypes";
 import { Button } from "@/components/ui/button";
 import { Card, CardHeader, CardContent, CardTitle } from "@/components/ui/card";
 import { DefaultLayout } from "@/layout/DefaultLayout";
+import { API_BASE_URL } from "@/config";
 
 export const ModelReports = () => {
   const { getAllModelos, loading, error } = useModelos();
@@ -181,7 +182,7 @@ export const ModelReports = () => {
                           // Filter out anything that's json, only display png
                           if (!g.archivo || g.archivo.endsWith(".json")) return null;
 
-                          const rawUrl = g.archivo.startsWith('http') ? g.archivo : `http://localhost:8000${g.archivo}`;
+                          const rawUrl = g.archivo.startsWith('http') ? g.archivo : `${API_BASE_URL}${g.archivo}`;
 
                           // Map graphic name to readable title
                           let readableName = g.nombre_grafica;

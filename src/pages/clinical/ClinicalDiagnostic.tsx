@@ -53,7 +53,12 @@ export const ClinicalDiagnostic = () => {
     q1: 0,
     q2: 0,
     q3: 0,
-    q4: 0
+    q4: 0,
+    q5: 0,
+    q6: 0,
+    q7: 0,
+    q8: 0,
+    q9: 0
   });
 
   const isPsychologist = ([UserRole.ADMIN, UserRole.MODERADOR, UserRole.PSICOLOGO, UserRole.EVALUADOR] as UserRole[]).includes(userRole);
