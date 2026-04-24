@@ -393,12 +393,16 @@ export const ClinicalDiagnostic = () => {
                 />
               ) : isPsychologist ? (
                 <DiagnosticSidebar
-                  onExecute={() => {
+                  onExecute={async () => {
                     const id =
                       reviewId ||
                       (state.currentDiagnosis as Diagnostico)?.id_diagnostico;
-                    if (id) actions.ejecutarAnalisisIA(Number(id));
-                    else
+                    if (id) {
+                      const res = await actions.ejecutarAnalisisIA(Number(id));
+                      if (res && "status" in res && res.status === "processing") {
+                        alert(res.message || "Análisis encolado en background. Recibirás un correo cuando finalice.");
+                      }
+                    } else
                       alert(
                         "Guarde el diagnóstico antes de ejecutar el análisis.",
                       );
@@ -429,8 +433,12 @@ export const ClinicalDiagnostic = () => {
                     const id =
                       reviewId || state.currentDiagnosis?.id_diagnostico;
                     if (id) {
-                      await actions.ejecutarAnalisisIA(Number(id));
-                      setPhase("results");
+                      const result = await actions.ejecutarAnalisisIA(Number(id));
+                      if (result && "status" in result && result.status === "processing") {
+                        alert(result.message || "Análisis encolado en background. Recibirás un correo cuando finalice.");
+                      } else if (result) {
+                        setPhase("results");
+                      }
                     }
                   }}
                   onExecute={async () => {
@@ -445,7 +453,9 @@ export const ClinicalDiagnostic = () => {
                       const result = await actions.ejecutarAnalisisIA(
                         Number(id_to_analyze),
                       );
-                      if (
+                      if (result && "status" in result && result.status === "processing") {
+                        alert(result.message || "Análisis encolado en background. Recibirás un correo cuando finalice.");
+                      } else if (
                         result &&
                         !("status" in result && result.status === "processing")
                       ) {
