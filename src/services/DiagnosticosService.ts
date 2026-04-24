@@ -39,10 +39,12 @@ export class DiagnosticosService implements IDiagnosticosService {
     await api.delete(`/diagnostico/${id}/`);
   }
 
-  async analizarIA(id: number): Promise<Clasificacion> {
-    const response = await api.post<Clasificacion>(
-      `/diagnostico/${id}/analizar/`,
-    );
+  async analizarIA(
+    id: number,
+  ): Promise<
+    Clasificacion | { status: string; message: string; id_diagnostico: number }
+  > {
+    const response = await api.post(`/diagnostico/${id}/analizar/`);
     return response.data;
   }
 

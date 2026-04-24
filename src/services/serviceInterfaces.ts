@@ -71,7 +71,11 @@ export interface IDiagnosticosService {
     data: Partial<Diagnostico>,
   ): Promise<Diagnostico>;
   deleteDiagnostico(id: number): Promise<void>;
-  analizarIA(id: number): Promise<Clasificacion>;
+  analizarIA(
+    id: number,
+  ): Promise<
+    Clasificacion | { status: string; message: string; id_diagnostico: number }
+  >;
   getRetroalimentacionesByDiagnostico(id: number): Promise<Retroalimentacion[]>;
   cambiarEstado(id: number, id_estado: number): Promise<Diagnostico>;
   descargarReportePDF(id: number): Promise<Blob>;

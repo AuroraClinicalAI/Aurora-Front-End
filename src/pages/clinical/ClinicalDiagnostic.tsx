@@ -391,48 +391,69 @@ export const ClinicalDiagnostic = () => {
                   onReport={async () => { if (reviewId) await actions.actualizarEstadoCaso(Number(reviewId), 9); }}
                   loading={loading}
                 />
+              ) : isPsychologist ? (
+                <DiagnosticSidebar
+                  onExecute={() => {
+                    const id =
+                      reviewId ||
+                      (state.currentDiagnosis as Diagnostico)?.id_diagnostico;
+                    if (id) actions.ejecutarAnalisisIA(Number(id));
+                    else
+                      alert(
+                        "Guarde el diagnóstico antes de ejecutar el análisis.",
+                      );
+                  }}
+                  onSave={handleSaveCase}
+                  onDownloadPDF={handleDownloadPDF}
+                  onViewModelComparison={handleViewModelComparison}
+                  retroalimentaciones={
+                    state.currentDiagnosis?.retroalimentaciones || []
+                  }
+                />
               ) : (
-                isPsychologist ? (
-                  <DiagnosticSidebar
-                    onExecute={() => {
-                      const id = reviewId || (state.currentDiagnosis as Diagnostico)?.id_diagnostico;
-                      if (id) actions.ejecutarAnalisisIA(Number(id));
-                      else alert("Guarde el diagnóstico antes de ejecutar el análisis.");
-                    }}
-                    onSave={handleSaveCase}
-                    onDownloadPDF={handleDownloadPDF}
-                    onViewModelComparison={handleViewModelComparison}
-                    retroalimentaciones={state.currentDiagnosis?.retroalimentaciones || []}
-                  />
-                ) : (
-                  <PractitionerSidebar
-                    clasificacion={state.currentDiagnosis?.clasificacion}
-                    retroalimentaciones={state.currentDiagnosis?.retroalimentaciones}
-                    userSymptoms={analysisData.sintomas}
-                    phase={phase}
-                    isLoading={loading}
-                    onDownloadPDF={handleDownloadPDF}
-                    onViewDetails={() => navigate(`/case-analysis?id=${reviewId || state.currentDiagnosis?.id_diagnostico}`)}
-                    onReprocess={async () => {
-                      const id = reviewId || state.currentDiagnosis?.id_diagnostico;
-                      if (id) {
-                        await actions.ejecutarAnalisisIA(Number(id));
-                        setPhase('results');
+                <PractitionerSidebar
+                  clasificacion={state.currentDiagnosis?.clasificacion}
+                  retroalimentaciones={
+                    state.currentDiagnosis?.retroalimentaciones
+                  }
+                  userSymptoms={analysisData.sintomas}
+                  phase={phase}
+                  isLoading={loading}
+                  onDownloadPDF={handleDownloadPDF}
+                  onViewDetails={() =>
+                    navigate(
+                      `/case-analysis?id=${reviewId || state.currentDiagnosis?.id_diagnostico}`,
+                    )
+                  }
+                  onReprocess={async () => {
+                    const id =
+                      reviewId || state.currentDiagnosis?.id_diagnostico;
+                    if (id) {
+                      await actions.ejecutarAnalisisIA(Number(id));
+                      setPhase("results");
+                    }
+                  }}
+                  onExecute={async () => {
+                    const id_to_analyze = reviewId;
+                    if (!id_to_analyze) {
+                      try {
+                        await handleSaveCase();
+                      } catch (err) {
+                        console.error(err);
                       }
-                    }}
-                    onExecute={async () => {
-                      const id_to_analyze = reviewId;
-                      if (!id_to_analyze) {
-                        try {
-                          await handleSaveCase();
-                        } catch (err) { console.error(err) }
-                      } else {
-                        await actions.ejecutarAnalisisIA(Number(id_to_analyze));
-                        setPhase('results');
+                    } else {
+                      const result = await actions.ejecutarAnalisisIA(
+                        Number(id_to_analyze),
+                      );
+                      if (
+                        result &&
+                        !("status" in result && result.status === "processing")
+                      ) {
+                        setPhase("results");
                       }
-                    }}
-                  />
-                )
+                    }
+                  }}
+                />
               )}
             </div>
           </div>

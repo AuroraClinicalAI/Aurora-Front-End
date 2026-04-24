@@ -155,15 +155,24 @@ export const useClinicalWorkflow = () => {
       setLoading(true);
       setError(null);
       try {
-        const clasificacion =
-          await diagnosticosService.analizarIA(diagnosticoId);
+        const response = await diagnosticosService.analizarIA(diagnosticoId);
+
+        if ("status" in response && response.status === "processing") {
+          // Inform user that processing has started
+          return {
+            status: "processing",
+            message: response.message,
+          };
+        }
+
+        // Only runs if it was synchronous
         const updatedDiagnosis =
           await diagnosticosService.getDiagnosticoById(diagnosticoId);
         setState((prev) => ({
           ...prev,
           currentDiagnosis: updatedDiagnosis,
         }));
-        return clasificacion;
+        return response;
       } catch (err) {
         const error = err as Error;
         console.error("Error running AI analysis:", error);
