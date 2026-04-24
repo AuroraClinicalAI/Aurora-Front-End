@@ -78,6 +78,9 @@ export const ClinicalDiagnostic = () => {
           const diagnosis = await diagnosticosService.getDiagnosticoById(id);
           if (diagnosis) {
             actions.setCurrentDiagnosis(diagnosis);
+            if (diagnosis.clasificacion) {
+              setPhase('results');
+            }
             setClinicalNote(diagnosis.historia_clinica || "");
             setAnalysisData({
               impresion: diagnosis.impresion_clinica || "",
