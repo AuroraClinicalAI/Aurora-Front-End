@@ -23,7 +23,7 @@ export const CaseInfoSection = ({ ageGroup, gender, clinicalVignette, shapExplan
       const regex = new RegExp(`\\b(${safeFeature})\\b`, 'gi');
 
       const bgColor = weight > 0 ? 'bg-red-100 text-red-900' : 'bg-emerald-100 text-emerald-900';
-      result = result.replace(regex, `<span class="px-1.5 py-0.5 rounded-md font-bold ${bgColor} mx-0.5" title="Aporte SHAP: ${weight > 0 ? '+' : ''}${weight.toFixed(4)}">$1</span>`);
+      result = result.replace(regex, `<span class="px-1.5 py-0.5 rounded-md font-bold ${bgColor} mx-0.5" title="Peso Predictivo: ${weight > 0 ? '+' : ''}${weight.toFixed(4)}">$1</span>`);
     });
 
     return result;
