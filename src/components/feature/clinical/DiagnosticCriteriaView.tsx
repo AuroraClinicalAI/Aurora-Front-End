@@ -1,11 +1,13 @@
 import { useState } from "react";
 import { cn } from "@/lib/utils";
 import { Card, CardContent, CardTitle } from "@/components/ui";
+import { CheckCircle2, XCircle } from "lucide-react";
 
 interface Criterion {
   id: string;
   title: string;
   description: string;
+  met: boolean;
 }
 
 interface DiagnosticCriteriaViewProps {
@@ -41,9 +43,18 @@ export const DiagnosticCriteriaView = ({ dsm5 }: DiagnosticCriteriaViewProps) =>
         <CardContent className="p-0">
           <div className="divide-y divide-zinc-100">
             {dsm5.map((criterion) => (
-              <div key={criterion.id} className="p-5 hover:bg-zinc-50/50 transition-colors">
-                <h4 className="text-sm font-bold text-blue-700 mb-1">{criterion.title}</h4>
-                <p className="text-xs text-slate-500 leading-relaxed font-medium">{criterion.description}</p>
+              <div key={criterion.id} className="p-5 flex items-start gap-4 hover:bg-zinc-50/50 transition-colors">
+                <div className="mt-0.5">
+                  {criterion.met ? (
+                    <CheckCircle2 className="w-5 h-5 text-emerald-500" />
+                  ) : (
+                    <XCircle className="w-5 h-5 text-rose-500" />
+                  )}
+                </div>
+                <div className="flex-1">
+                  <h4 className="text-sm font-bold text-blue-700 mb-1">{criterion.title}</h4>
+                  <p className="text-xs text-slate-500 leading-relaxed font-medium">{criterion.description}</p>
+                </div>
               </div>
             ))}
           </div>

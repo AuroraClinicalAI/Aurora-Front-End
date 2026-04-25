@@ -46,6 +46,7 @@ export const CaseAnalysis = () => {
             ageGroup={data.ageGroup}
             gender={data.gender}
             clinicalVignette={data.clinicalVignette}
+            shapExplanation={data.analysis.shapExplanation}
           />
 
           <AnalysisTabs activeTab={activeTab} setActiveTab={setActiveTab} />
