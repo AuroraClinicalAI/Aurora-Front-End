@@ -186,8 +186,8 @@ export const ModelReports = () => {
 
                           // Map graphic name to readable title
                           let readableName = g.nombre_grafica;
-                          if (g.nombre_grafica === 'accuracy_img') readableName = "Curva de Precisión por Época";
-                          if (g.nombre_grafica === 'loss_img') readableName = "Curva de Función de Pérdida";
+                          if (g.nombre_grafica === 'accuracy_img') readableName = "Learning Curve: Accuracy vs Training Set Size";
+                          if (g.nombre_grafica === 'loss_img') readableName = "Validation Curve: Accuracy vs Hyperparámetro Clave";
                           if (g.nombre_grafica === 'confusion_matrix') readableName = "Matriz de Confusión K-Fold";
                           if (g.nombre_grafica === 'xai_top_features') readableName = "Top LIME Features (Espectrogramas y LSA)";
 

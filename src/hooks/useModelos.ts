@@ -91,7 +91,13 @@ export const useModelos = () => {
   );
 
   const trainCustomModelo = useCallback(
-    async (file: File | null, datasetName: string, customName: string) => {
+    async (
+      file: File | null,
+      datasetName: string,
+      customName: string,
+      algorithm: string,
+      hyperparameters: Record<string, unknown>,
+    ) => {
       setLoading(true);
       setError(null);
       try {
@@ -99,6 +105,8 @@ export const useModelos = () => {
           file,
           datasetName,
           customName,
+          algorithm,
+          hyperparameters,
         );
       } catch (err: unknown) {
         setError(

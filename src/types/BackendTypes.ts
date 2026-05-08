@@ -152,6 +152,11 @@ export interface Entrenamiento {
   recall: number;
   sensibilidad: number;
   graficas: Grafica[];
+  taza_aprendizaje?: number;
+  batch_size?: number;
+  epocas?: number;
+  algorithm?: string;
+  hyperparameters?: Record<string, unknown>;
 }
 
 export interface Modelo {

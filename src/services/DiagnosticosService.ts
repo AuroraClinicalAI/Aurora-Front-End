@@ -117,6 +117,8 @@ export class DiagnosticosService implements IDiagnosticosService {
     file: File | null,
     datasetName: string,
     customName: string,
+    algorithm: string,
+    hyperparameters: Record<string, unknown>,
   ): Promise<Record<string, unknown>> {
     const formData = new FormData();
     if (file) {
@@ -128,6 +130,8 @@ export class DiagnosticosService implements IDiagnosticosService {
     if (customName) {
       formData.append("custom_name", customName);
     }
+    formData.append("algorithm", algorithm);
+    formData.append("hyperparameters", JSON.stringify(hyperparameters));
     const response = await api.post("/modelo/entrenar_modelo/", formData, {
       headers: { "Content-Type": "multipart/form-data" },
     });

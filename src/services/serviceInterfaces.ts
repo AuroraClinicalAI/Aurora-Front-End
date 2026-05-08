@@ -94,6 +94,8 @@ export interface IDiagnosticosService {
     file: File | null,
     datasetName: string,
     customName: string,
+    algorithm: string,
+    hyperparameters: Record<string, unknown>,
   ): Promise<Record<string, unknown>>;
   syncModelos(): Promise<Record<string, unknown>>;
 

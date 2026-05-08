@@ -17,8 +17,64 @@ export const ModelManagementView = () => {
 
   const [modelos, setModelos] = useState<Modelo[]>([]);
   const [showTrainModal, setShowTrainModal] = useState(false);
-  const [trainConfig, setTrainConfig] = useState<{ name: string, dataset: string, file: File | null }>({ name: '', dataset: '', file: null });
+  const [trainConfig, setTrainConfig] = useState<{
+    name: string;
+    dataset: string;
+    file: File | null;
+    algorithm: string;
+    hyperparameters: Record<string, unknown>;
+  }>({
+    name: '',
+    dataset: '',
+    file: null,
+    algorithm: 'svm',
+    hyperparameters: {
+      kernel: 'linear',
+      C: 1.0,
+      probability: true,
+      ngram_range: [1, 3],
+      min_df: 4,
+      max_df: 0.8,
+      cv_folds: 5,
+      random_state: 42,
+    },
+  });
   const navigate = useNavigate();
+
+  const algorithmOptions = [
+    { value: 'svm', label: 'SVM (Prioridad)' },
+    { value: 'random_forest', label: 'Random Forest' },
+    { value: 'xgboost', label: 'XGBoost' },
+    { value: 'naive_bayes', label: 'Naive Bayes' },
+  ];
+
+  const handleAlgorithmChange = (algo: string) => {
+    const defaults: Record<string, Record<string, unknown>> = {
+      svm: { kernel: 'linear', C: 1.0, probability: true },
+      random_forest: { n_estimators: 200, max_depth: null, class_weight: 'balanced' },
+      xgboost: { max_depth: 6, learning_rate: 0.1, n_estimators: 100, eval_metric: 'logloss' },
+      naive_bayes: { alpha: 1.0 },
+    };
+    const algoDefaults = defaults[algo] || {};
+    setTrainConfig(prev => ({
+      ...prev,
+      algorithm: algo,
+      hyperparameters: {
+        ...prev.hyperparameters,
+        ...algoDefaults,
+      },
+    }));
+  };
+
+  const updateHyperparam = (key: string, value: unknown) => {
+    setTrainConfig(prev => ({
+      ...prev,
+      hyperparameters: {
+        ...prev.hyperparameters,
+        [key]: value,
+      },
+    }));
+  };
 
   const loadData = async () => {
     try {
@@ -72,11 +128,32 @@ export const ModelManagementView = () => {
   const handleTrain = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      const resp = await trainCustomModelo(trainConfig.file, trainConfig.dataset, trainConfig.name);
+      const resp = await trainCustomModelo(
+        trainConfig.file,
+        trainConfig.dataset,
+        trainConfig.name,
+        trainConfig.algorithm,
+        trainConfig.hyperparameters,
+      );
       const respObj = resp as { message?: string };
       alert(respObj?.message || "El entrenamiento ha comenzado. Esto tomará varios minutos.");
       setShowTrainModal(false);
-      setTrainConfig({ name: '', dataset: '', file: null });
+      setTrainConfig({
+        name: '',
+        dataset: '',
+        file: null,
+        algorithm: 'svm',
+        hyperparameters: {
+          kernel: 'linear',
+          C: 1.0,
+          probability: true,
+          ngram_range: [1, 3],
+          min_df: 4,
+          max_df: 0.8,
+          cv_folds: 5,
+          random_state: 42,
+        },
+      });
       loadData();
     } catch (e) {
       console.error(e);
@@ -113,6 +190,7 @@ export const ModelManagementView = () => {
           <thead className="bg-zinc-50">
             <tr>
               <th className="px-6 py-3 text-left text-xs font-semibold text-zinc-500 uppercase tracking-wider">Nombre</th>
+              <th className="px-6 py-3 text-left text-xs font-semibold text-zinc-500 uppercase tracking-wider">Algoritmo</th>
               <th className="px-6 py-3 text-left text-xs font-semibold text-zinc-500 uppercase tracking-wider">Métricas</th>
               <th className="px-6 py-3 text-left text-xs font-semibold text-zinc-500 uppercase tracking-wider">Estado</th>
               <th className="px-6 py-3 text-left text-xs font-semibold text-zinc-500 uppercase tracking-wider">Producción</th>
@@ -125,6 +203,11 @@ export const ModelManagementView = () => {
                 <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-zinc-900 border-l-4" style={{ borderLeftColor: m.is_active ? '#10b981' : '#ef4444' }}>
                   {m.nombre_modelo}
                   <div className="text-[11px] text-zinc-400 font-normal">{new Date(m.fecha_entrenamiento).toLocaleString()}</div>
+                </td>
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-zinc-500">
+                  {m.entrenamientos && m.entrenamientos[0]?.algorithm
+                    ? m.entrenamientos[0].algorithm.toUpperCase()
+                    : "SVM"}
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-zinc-500">
                   {m.precision ? (m.precision * 100).toFixed(1) + "%" : "N/A"}
@@ -168,7 +251,7 @@ export const ModelManagementView = () => {
             ))}
             {modelos.length === 0 && (
               <tr>
-                <td colSpan={5} className="px-6 py-10 text-center text-sm text-zinc-500">
+                <td colSpan={6} className="px-6 py-10 text-center text-sm text-zinc-500">
                   No hay modelos disponibles. Sincroniza o entrena uno nuevo.
                 </td>
               </tr>
@@ -183,7 +266,7 @@ export const ModelManagementView = () => {
             <h3 className="text-xl font-bold mb-4">Entrenar Nuevo Modelo</h3>
             <p className="text-xs text-zinc-500 mb-6">Configura el nombre y dataset a procesar por el MLCore (FastAPI). Por defecto usará el dataset de consolidado diagnóstico.</p>
 
-            <form onSubmit={handleTrain} className="space-y-4">
+            <form onSubmit={handleTrain} className="space-y-4 max-h-[70vh] overflow-y-auto pr-2">
               <div>
                 <label className="block text-sm font-medium text-zinc-700 mb-1">Nombre Personalizado (Opcional)</label>
                 <input
@@ -193,6 +276,221 @@ export const ModelManagementView = () => {
                   placeholder="ej. v2_clinical_advanced"
                   className="w-full px-3 py-2 border border-zinc-200 rounded-md text-sm focus:ring-2 focus:ring-[#637bc4] focus:outline-none"
                 />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-zinc-700 mb-1">Algoritmo</label>
+                <select
+                  className="w-full px-3 py-2 border border-zinc-200 rounded-md text-sm focus:ring-2 focus:ring-[#637bc4] focus:outline-none"
+                  value={trainConfig.algorithm}
+                  onChange={e => handleAlgorithmChange(e.target.value)}
+                >
+                  {algorithmOptions.map(opt => (
+                    <option key={opt.value} value={opt.value}>{opt.label}</option>
+                  ))}
+                </select>
+              </div>
+
+              <div className="border border-zinc-200 rounded-md p-3 bg-zinc-50/50">
+                <h4 className="text-xs font-semibold text-zinc-600 uppercase tracking-wide mb-3">Hiperparámetros del Algoritmo</h4>
+                <div className="space-y-3">
+                  {trainConfig.algorithm === 'svm' && (
+                    <>
+                      <div>
+                        <label className="block text-xs font-medium text-zinc-600 mb-1">Kernel</label>
+                        <select
+                          className="w-full px-2 py-1.5 border border-zinc-200 rounded text-sm focus:ring-2 focus:ring-[#637bc4] focus:outline-none"
+                          value={String(trainConfig.hyperparameters.kernel || 'linear')}
+                          onChange={e => updateHyperparam('kernel', e.target.value)}
+                        >
+                          <option value="linear">linear</option>
+                          <option value="rbf">rbf</option>
+                          <option value="poly">poly</option>
+                        </select>
+                      </div>
+                      <div>
+                        <label className="block text-xs font-medium text-zinc-600 mb-1">C (Regularización)</label>
+                        <input
+                          type="number"
+                          step="0.1"
+                          min="0.1"
+                          max="10"
+                          value={Number(trainConfig.hyperparameters.C || 1.0)}
+                          onChange={e => updateHyperparam('C', parseFloat(e.target.value))}
+                          className="w-full px-2 py-1.5 border border-zinc-200 rounded text-sm focus:ring-2 focus:ring-[#637bc4] focus:outline-none"
+                        />
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <input
+                          type="checkbox"
+                          checked={Boolean(trainConfig.hyperparameters.probability)}
+                          onChange={e => updateHyperparam('probability', e.target.checked)}
+                          className="h-4 w-4 text-[#637bc4] focus:ring-[#637bc4] border-zinc-300 rounded"
+                        />
+                        <label className="text-xs text-zinc-600">Probability</label>
+                      </div>
+                    </>
+                  )}
+                  {trainConfig.algorithm === 'random_forest' && (
+                    <>
+                      <div>
+                        <label className="block text-xs font-medium text-zinc-600 mb-1">N Estimators</label>
+                        <input
+                          type="number"
+                          min="10"
+                          max="1000"
+                          value={Number(trainConfig.hyperparameters.n_estimators || 200)}
+                          onChange={e => updateHyperparam('n_estimators', parseInt(e.target.value))}
+                          className="w-full px-2 py-1.5 border border-zinc-200 rounded text-sm focus:ring-2 focus:ring-[#637bc4] focus:outline-none"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-xs font-medium text-zinc-600 mb-1">Max Depth</label>
+                        <input
+                          type="number"
+                          min="1"
+                          placeholder="null (sin límite)"
+                          value={trainConfig.hyperparameters.max_depth === null || trainConfig.hyperparameters.max_depth === undefined ? '' : Number(trainConfig.hyperparameters.max_depth)}
+                          onChange={e => updateHyperparam('max_depth', e.target.value === '' ? null : parseInt(e.target.value))}
+                          className="w-full px-2 py-1.5 border border-zinc-200 rounded text-sm focus:ring-2 focus:ring-[#637bc4] focus:outline-none"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-xs font-medium text-zinc-600 mb-1">Class Weight</label>
+                        <select
+                          className="w-full px-2 py-1.5 border border-zinc-200 rounded text-sm focus:ring-2 focus:ring-[#637bc4] focus:outline-none"
+                          value={String(trainConfig.hyperparameters.class_weight || 'balanced')}
+                          onChange={e => updateHyperparam('class_weight', e.target.value)}
+                        >
+                          <option value="balanced">balanced</option>
+                          <option value="balanced_subsample">balanced_subsample</option>
+                          <option value="">None</option>
+                        </select>
+                      </div>
+                    </>
+                  )}
+                  {trainConfig.algorithm === 'xgboost' && (
+                    <>
+                      <div>
+                        <label className="block text-xs font-medium text-zinc-600 mb-1">Max Depth</label>
+                        <input
+                          type="number"
+                          min="1"
+                          max="20"
+                          value={Number(trainConfig.hyperparameters.max_depth || 6)}
+                          onChange={e => updateHyperparam('max_depth', parseInt(e.target.value))}
+                          className="w-full px-2 py-1.5 border border-zinc-200 rounded text-sm focus:ring-2 focus:ring-[#637bc4] focus:outline-none"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-xs font-medium text-zinc-600 mb-1">Learning Rate (Tasa de Aprendizaje)</label>
+                        <input
+                          type="number"
+                          step="0.01"
+                          min="0.01"
+                          max="1"
+                          value={Number(trainConfig.hyperparameters.learning_rate || 0.1)}
+                          onChange={e => updateHyperparam('learning_rate', parseFloat(e.target.value))}
+                          className="w-full px-2 py-1.5 border border-zinc-200 rounded text-sm focus:ring-2 focus:ring-[#637bc4] focus:outline-none"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-xs font-medium text-zinc-600 mb-1">N Estimators</label>
+                        <input
+                          type="number"
+                          min="10"
+                          max="1000"
+                          value={Number(trainConfig.hyperparameters.n_estimators || 100)}
+                          onChange={e => updateHyperparam('n_estimators', parseInt(e.target.value))}
+                          className="w-full px-2 py-1.5 border border-zinc-200 rounded text-sm focus:ring-2 focus:ring-[#637bc4] focus:outline-none"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-xs font-medium text-zinc-600 mb-1">Eval Metric</label>
+                        <select
+                          className="w-full px-2 py-1.5 border border-zinc-200 rounded text-sm focus:ring-2 focus:ring-[#637bc4] focus:outline-none"
+                          value={String(trainConfig.hyperparameters.eval_metric || 'logloss')}
+                          onChange={e => updateHyperparam('eval_metric', e.target.value)}
+                        >
+                          <option value="logloss">logloss</option>
+                          <option value="error">error</option>
+                          <option value="auc">auc</option>
+                        </select>
+                      </div>
+                    </>
+                  )}
+                  {trainConfig.algorithm === 'naive_bayes' && (
+                    <>
+                      <div>
+                        <label className="block text-xs font-medium text-zinc-600 mb-1">Alpha (Smoothing)</label>
+                        <input
+                          type="number"
+                          step="0.1"
+                          min="0"
+                          max="10"
+                          value={Number(trainConfig.hyperparameters.alpha || 1.0)}
+                          onChange={e => updateHyperparam('alpha', parseFloat(e.target.value))}
+                          className="w-full px-2 py-1.5 border border-zinc-200 rounded text-sm focus:ring-2 focus:ring-[#637bc4] focus:outline-none"
+                        />
+                      </div>
+                    </>
+                  )}
+                </div>
+              </div>
+
+              <div className="border border-zinc-200 rounded-md p-3 bg-zinc-50/50">
+                <h4 className="text-xs font-semibold text-zinc-600 uppercase tracking-wide mb-3">Pipeline General (TF-IDF & Validación)</h4>
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-xs font-medium text-zinc-600 mb-1">N-Gram Range</label>
+                    <select
+                      className="w-full px-2 py-1.5 border border-zinc-200 rounded text-sm focus:ring-2 focus:ring-[#637bc4] focus:outline-none"
+                      value={String((trainConfig.hyperparameters.ngram_range as number[] || [1,3]).join(','))}
+                      onChange={e => {
+                        const [a, b] = e.target.value.split(',').map(Number);
+                        updateHyperparam('ngram_range', [a, b]);
+                      }}
+                    >
+                      <option value="1,1">1-1</option>
+                      <option value="1,2">1-2</option>
+                      <option value="1,3">1-3</option>
+                      <option value="2,3">2-3</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-xs font-medium text-zinc-600 mb-1">Min DF</label>
+                    <input
+                      type="number"
+                      min="1"
+                      value={Number(trainConfig.hyperparameters.min_df || 4)}
+                      onChange={e => updateHyperparam('min_df', parseInt(e.target.value))}
+                      className="w-full px-2 py-1.5 border border-zinc-200 rounded text-sm focus:ring-2 focus:ring-[#637bc4] focus:outline-none"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-medium text-zinc-600 mb-1">Max DF</label>
+                    <input
+                      type="number"
+                      step="0.1"
+                      min="0.1"
+                      max="1.0"
+                      value={Number(trainConfig.hyperparameters.max_df || 0.8)}
+                      onChange={e => updateHyperparam('max_df', parseFloat(e.target.value))}
+                      className="w-full px-2 py-1.5 border border-zinc-200 rounded text-sm focus:ring-2 focus:ring-[#637bc4] focus:outline-none"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-medium text-zinc-600 mb-1">CV Folds</label>
+                    <input
+                      type="number"
+                      min="2"
+                      max="10"
+                      value={Number(trainConfig.hyperparameters.cv_folds || 5)}
+                      onChange={e => updateHyperparam('cv_folds', parseInt(e.target.value))}
+                      className="w-full px-2 py-1.5 border border-zinc-200 rounded text-sm focus:ring-2 focus:ring-[#637bc4] focus:outline-none"
+                    />
+                  </div>
+                </div>
               </div>
 
               <div>
