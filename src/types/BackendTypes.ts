@@ -157,6 +157,7 @@ export interface Entrenamiento {
   epocas?: number;
   algorithm?: string;
   hyperparameters?: Record<string, unknown>;
+  analysis_metrics?: Record<string, unknown>;
 }
 
 export interface Modelo {
