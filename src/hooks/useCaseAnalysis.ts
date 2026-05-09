@@ -143,18 +143,26 @@ export const useCaseAnalysis = (caseId?: string) => {
             globalScore:
               (diagnosis.clasificacion?.probabilidad_certeza || 0) * 100,
             maxScore: 100,
-            symptoms: (realData.sintomas_identificados || []).map((s) => ({
-              name: s.name,
-              value: s.intensity,
+            symptoms: (Array.isArray(diagnosis.clasificacion?.ml_sintomas_identificados) ? diagnosis.clasificacion.ml_sintomas_identificados : []).map((s: any) => ({
+
+              name: s.symptom
+                ? s.symptom.replace(/_/g, " ").replace(/\b\w/g, (l: string) => l.toUpperCase())
+                : "Desconocido",
+              value: s.matches || 0,
             })),
-            shapExplanation: Array.isArray(
-              diagnosis.clasificacion?.ml_lime_explicacion,
-            )
-              ? (diagnosis.clasificacion.ml_lime_explicacion as [
-                  string,
-                  number,
-                ][])
-              : [],
+
+            shapExplanation: (() => {
+              const expl = diagnosis.clasificacion?.ml_lime_explicacion;
+              if (Array.isArray(expl)) {
+                // Legacy format: list of [word, weight]
+                return expl as [string, number][];
+              }
+              if (expl && typeof expl === "object" && Array.isArray(expl.lime_features)) {
+                // New enriched format: dict with lime_features + dsm5_symptoms
+                return expl.lime_features as [string, number][];
+              }
+              return [];
+            })(),
           },
           criteria: {
             dsm5: staticDsm5,
