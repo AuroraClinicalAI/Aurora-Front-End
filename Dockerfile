@@ -1,5 +1,5 @@
 # Build stage
-FROM node:20-alpine AS build-stage
+FROM node:22-alpine AS build-stage
 
 WORKDIR /app
 
@@ -14,6 +14,7 @@ ENV VITE_SUPPORT_EMAIL=$VITE_SUPPORT_EMAIL
 
 # Copy package files and install dependencies
 COPY package*.json ./
+RUN pnpm add esbuild@0.27.7 --allow-build=esbuild@0.27.7
 RUN pnpm install
 
 # Copy the rest of the application code
