@@ -151,18 +151,14 @@ export const useCaseAnalysis = (caseId?: string) => {
               value: s.matches || 0,
             })),
 
-            shapExplanation: (() => {
-              const expl = diagnosis.clasificacion?.ml_lime_explicacion;
-              if (Array.isArray(expl)) {
-                // Legacy format: list of [word, weight]
-                return expl as [string, number][];
-              }
-              if (expl && typeof expl === "object" && Array.isArray(expl.lime_features)) {
-                // New enriched format: dict with lime_features + dsm5_symptoms
-                return expl.lime_features as [string, number][];
-              }
-              return [];
-            })(),
+            shapExplanation: Array.isArray(
+              diagnosis.clasificacion?.ml_lime_explicacion,
+            )
+              ? (diagnosis.clasificacion.ml_lime_explicacion as [
+                  string,
+                  number,
+                ][])
+              : [],
           },
           criteria: {
             dsm5: staticDsm5,
