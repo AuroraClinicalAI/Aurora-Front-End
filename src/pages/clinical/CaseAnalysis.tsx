@@ -52,11 +52,14 @@ export const CaseAnalysis = () => {
           <AnalysisTabs activeTab={activeTab} setActiveTab={setActiveTab} />
 
           {activeTab === 'analysis' ? (
-            <AnalysisResults
-              globalScore={data.analysis.globalScore}
-              maxScore={data.analysis.maxScore}
-              symptoms={data.analysis.symptoms}
-            />
+            <>
+              <AnalysisResults
+                globalScore={data.analysis.globalScore}
+                maxScore={data.analysis.maxScore}
+                symptoms={data.analysis.symptoms}
+                classificationLabel={data.analysis.classificationLabel}
+              />
+            </>
           ) : (
             <DiagnosticCriteriaView
               dsm5={data.criteria.dsm5}

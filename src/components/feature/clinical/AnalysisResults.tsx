@@ -1,26 +1,54 @@
+import { AlertTriangle } from "lucide-react";
 import { Card, CardContent, CardTitle } from "@/components/ui";
+import { MedicalDisclaimer } from "./MedicalDisclaimer";
 import { ResponsiveContainer, PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, Tooltip, CartesianGrid } from 'recharts';
 
 interface AnalysisResultsProps {
   globalScore: number;
   maxScore: number;
   symptoms: { name: string; value: number }[];
+  classificationLabel?: string; // e.g. "Depresión" or "Control"
+  trueLabel?: string;           // ground truth label
 }
 
-export const AnalysisResults = ({ globalScore, maxScore, symptoms }: AnalysisResultsProps) => {
+export const AnalysisResults = ({ globalScore, maxScore, symptoms, classificationLabel, trueLabel }: AnalysisResultsProps) => {
+  const isDepression = classificationLabel === 'Depresión';
+  const isControl = classificationLabel === 'Control';
+  const hasMismatch = trueLabel && classificationLabel && trueLabel !== classificationLabel;
+
+  // Contextual title, color, and score label
+  const title = isControl ? 'Bajo Riesgo de Depresión' : 'Nivel de Depresión';
+  const scoreLabel = isControl ? 'Certeza del modelo' : 'Puntuación Global';
+  const primaryColor = isControl ? '#22c55e' : '#ea580c'; // green-500 vs orange-600
+
   const chartData = [
     { name: 'Completed', value: globalScore },
     { name: 'Remaining', value: maxScore - globalScore }
   ];
 
-  const COLORS = ['#ea580c', '#f1f5f9'];
+  const COLORS = [primaryColor, '#f1f5f9'];
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
       <Card className="rounded-xl shadow-sm border-zinc-200">
         <div className="p-6">
-          <CardTitle className="text-xl font-bold mb-1">Nivel de Depresión</CardTitle>
-          <p className="text-xs text-blue-500 font-medium">Puntuación Global: {globalScore}/{maxScore}</p>
+          <div className="flex items-center justify-between mb-1">
+            <CardTitle className="text-xl font-bold">{title}</CardTitle>
+            {classificationLabel && (
+              <span className={`text-xs font-bold px-2 py-1 rounded-full ${
+                isDepression ? 'bg-orange-100 text-orange-700' : 'bg-green-100 text-green-700'
+              }`}>
+                {classificationLabel}
+              </span>
+            )}
+          </div>
+          <p className="text-xs text-blue-500 font-medium">{scoreLabel}: {globalScore}/{maxScore}</p>
+          {hasMismatch && trueLabel && (
+            <div className="mt-2 flex items-center gap-2 text-[11px] font-bold text-amber-700 bg-amber-50 border border-amber-200 rounded-lg px-3 py-2">
+              <AlertTriangle className="w-3.5 h-3.5" />
+              <span>Etiqueta real: {trueLabel} — Discrepancia con el modelo</span>
+            </div>
+          )}
         </div>
         <CardContent className="flex justify-center items-center h-[250px]">
           <ResponsiveContainer width="100%" height="100%">
@@ -82,6 +110,8 @@ export const AnalysisResults = ({ globalScore, maxScore, symptoms }: AnalysisRes
           </ResponsiveContainer>
         </CardContent>
       </Card>
+
+      <MedicalDisclaimer className="md:col-span-2" />
     </div>
   );
 };

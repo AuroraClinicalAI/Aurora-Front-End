@@ -1,11 +1,29 @@
 import { Check, AlertTriangle } from "lucide-react";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui";
+import { MedicalDisclaimer } from "./MedicalDisclaimer";
+import type { Clasificacion } from "@/types/BackendTypes";
+
+interface MlSymptom {
+  symptom: string;
+  matches: number;
+  intensity: string;
+}
 
 interface SymptomIntensityProps {
   label: string;
   intensity: number;
   highlight?: boolean;
 }
+
+const getIntensityPercent = (intensity?: string): number => {
+  if (intensity === "Severo") return 100;
+  if (intensity === "Moderado") return 66;
+  if (intensity === "Leve") return 33;
+  return 50;
+};
+
+const formatSymptomName = (name: string): string =>
+  name ? name.replace(/_/g, " ").replace(/\b\w/g, (l) => l.toUpperCase()) : "Desconocido";
 
 const SymptomIntensity = ({ label, intensity, highlight }: SymptomIntensityProps) => (
   <div className="flex items-center justify-between gap-8 py-2">
@@ -29,8 +47,6 @@ const SymptomIntensity = ({ label, intensity, highlight }: SymptomIntensityProps
   </div>
 );
 
-import type { Clasificacion } from "@/types/BackendTypes";
-
 export const MLAnalysisResults = ({
   clasificacion,
   onViewDetails
@@ -42,9 +58,11 @@ export const MLAnalysisResults = ({
 
   const probability = (Number(clasificacion.probabilidad_certeza) * 100).toFixed(0);
 
-  // Safe extraction. The backend json structures
-  const symptoms: Record<string, number> = clasificacion.ml_sintomas_identificados as Record<string, number> || {};
+  // Backend sends ml_sintomas_identificados as an array of objects:
+  // [{"symptom": "animo_depresivo", "matches": 2, "intensity": "Moderado"}, ...]
+  const symptoms = (clasificacion.ml_sintomas_identificados as unknown as MlSymptom[]) || [];
   const dsm5: Record<string, unknown> = clasificacion.ml_dsm5_evaluacion as Record<string, unknown> || {};
+
   return (
     <Card className="rounded-2xl border-indigo-100/50 shadow-sm bg-white overflow-hidden p-8 mt-8 border-2">
       <CardHeader className="p-0 mb-6">
@@ -66,9 +84,15 @@ export const MLAnalysisResults = ({
         {/* Symptoms Intensity List */}
         <div className="space-y-1">
           <h4 className="text-[10px] font-bold text-zinc-900 uppercase tracking-widest mb-3">SÍNTOMAS DETECTADOS POR INTENSIDAD</h4>
-          {Object.entries(symptoms).map(([lbl, val], idx) => (
-            <SymptomIntensity key={idx} label={lbl} intensity={Number((val * 100).toFixed(0))} />
-          ))}
+          {symptoms.length > 0 ? symptoms.map((sym, idx) => (
+            <SymptomIntensity
+              key={idx}
+              label={formatSymptomName(sym.symptom)}
+              intensity={getIntensityPercent(sym.intensity)}
+            />
+          )) : (
+            <p className="text-[10px] text-slate-400 italic">Ningún síntoma detectado</p>
+          )}
         </div>
 
         {/* Comparison Box */}
@@ -87,6 +111,8 @@ export const MLAnalysisResults = ({
             </div>
           </div>
         </div>
+
+        <MedicalDisclaimer className="mt-4" />
 
         <button
           onClick={onViewDetails}

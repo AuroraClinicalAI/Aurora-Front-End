@@ -12,6 +12,7 @@ interface CaseData {
     maxScore: number;
     symptoms: { name: string; value: number }[];
     shapExplanation: [string, number][];
+    classificationLabel?: string;
   };
   criteria: {
     dsm5: { id: string; title: string; description: string; met: boolean }[];
@@ -143,6 +144,7 @@ export const useCaseAnalysis = (caseId?: string) => {
             globalScore:
               (diagnosis.clasificacion?.probabilidad_certeza || 0) * 100,
             maxScore: 100,
+            classificationLabel: diagnosis.clasificacion?.nombre_etiqueta,
             symptoms: (Array.isArray(diagnosis.clasificacion?.ml_sintomas_identificados) ? diagnosis.clasificacion.ml_sintomas_identificados : []).map((s: any) => ({
 
               name: s.symptom

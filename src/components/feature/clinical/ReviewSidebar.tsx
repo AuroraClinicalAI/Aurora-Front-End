@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui";
 import { Eye, Loader2, Edit3 } from "lucide-react";
+import { MedicalDisclaimer } from "./MedicalDisclaimer";
 import type { Clasificacion, Retroalimentacion } from "@/types/BackendTypes";
 
 const GuidedReviewComment = ({ question }: { question: string }) => (
@@ -119,6 +120,8 @@ export const ReviewSidebar = ({
             className="w-full py-2 bg-indigo-300 hover:bg-indigo-400 text-white rounded-lg text-[10px] font-bold transition-all">Generar Informe PDF</button>
         </CardContent>
       </Card>
+
+      <MedicalDisclaimer />
 
       {/* Guided Comments */}
       <Card className="rounded-2xl border-zinc-100 shadow-sm bg-white overflow-hidden p-8">

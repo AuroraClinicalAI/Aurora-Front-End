@@ -1,5 +1,12 @@
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui";
+import { MedicalDisclaimer } from "./MedicalDisclaimer";
 import type { Clasificacion, SintomaIdentificado } from "@/types/BackendTypes";
+
+interface MlSymptom {
+  symptom: string;
+  matches: number;
+  intensity: string;
+}
 
 interface AnalysisComparisonProps {
   clasificacion?: Clasificacion;
@@ -9,7 +16,7 @@ interface AnalysisComparisonProps {
 export const AnalysisComparison = ({ clasificacion, userSymptoms = [] }: AnalysisComparisonProps) => {
   if (!clasificacion) return null;
   const sysProbability = (Number(clasificacion.probabilidad_certeza) * 100).toFixed(0);
-  const mlSymptoms = clasificacion.ml_sintomas_identificados as Record<string, number> || {};
+  const mlSymptoms = (clasificacion.ml_sintomas_identificados as unknown as MlSymptom[]) || [];
 
   return (
     <Card className="rounded-2xl border-zinc-100 shadow-sm bg-white overflow-hidden p-8 mt-8">
@@ -26,7 +33,17 @@ export const AnalysisComparison = ({ clasificacion, userSymptoms = [] }: Analysi
           </div>
           <div className="p-3 rounded-xl bg-zinc-50/50 border border-zinc-100">
             <p className="text-[9px] font-bold text-zinc-400 uppercase tracking-widest mb-1">Gravedad del Sistema</p>
-            <p className="text-[10px] font-bold text-indigo-400">{Number(sysProbability) > 70 ? 'Alto Riesgo' : 'Evaluación Regular'}</p>
+            {(() => {
+              const label = clasificacion.nombre_etiqueta || (Number(sysProbability) > 50 ? 'Depresión' : 'Control');
+              const isDepression = label === 'Depresión';
+              const severityText = isDepression
+                ? (Number(sysProbability) > 70 ? 'Alto Riesgo' : 'Riesgo Moderado')
+                : 'Bajo Riesgo';
+              const colorClass = isDepression ? 'text-orange-500' : 'text-emerald-500';
+              return (
+                <p className={`text-[10px] font-bold ${colorClass}`}>{severityText} ({label})</p>
+              );
+            })()}
           </div>
         </div>
 
@@ -42,11 +59,17 @@ export const AnalysisComparison = ({ clasificacion, userSymptoms = [] }: Analysi
         <div className="space-y-2">
           <h5 className="text-[9px] font-bold text-zinc-900 uppercase tracking-widest">Síntomas Identificados Por Machine Learning</h5>
           <div className="flex flex-wrap gap-2">
-            {Object.keys(mlSymptoms).map((lbl, i) => (
-              <span key={i} className="px-3 py-1 bg-white border border-zinc-200 rounded-full text-[9px] font-bold text-zinc-400">{lbl}</span>
-            ))}
+            {mlSymptoms.length > 0 ? mlSymptoms.map((sym, i) => (
+              <span key={i} className="px-3 py-1 bg-white border border-zinc-200 rounded-full text-[9px] font-bold text-zinc-400">
+                {sym.symptom ? sym.symptom.replace(/_/g, ' ') : 'Desconocido'}
+              </span>
+            )) : (
+              <span className="text-[9px] text-slate-400 italic">Ninguno detectado</span>
+            )}
           </div>
         </div>
+
+        <MedicalDisclaimer />
 
         <div className="bg-indigo-50/30 border border-indigo-100 rounded-xl p-4 flex gap-3">
           <div className="w-4 h-4 rounded-full bg-white flex items-center justify-center border border-indigo-100 text-[8px] font-bold text-indigo-400 mt-1 italic">i</div>

@@ -23,6 +23,7 @@ export interface Clasificacion {
   id_clasificacion: number;
   id_diagnostico: number;
   id_etiqueta: number;
+  nombre_etiqueta?: string;
   modelo_usado: string;
   probabilidad_certeza: number;
   ml_sintomas_identificados?: JSONValue;

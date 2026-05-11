@@ -1,5 +1,6 @@
 import { RefreshCw, BarChart2, Loader2 } from "lucide-react";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
+import { MedicalDisclaimer } from "./MedicalDisclaimer";
 import type { Clasificacion } from "@/types/BackendTypes";
 
 interface ModelResultMiniCardProps {
@@ -51,10 +52,27 @@ export const ModelResultMiniCard = ({
       </CardHeader>
 
       <CardContent className="p-0">
-        <div className="bg-[#637bc4] text-white rounded-xl p-6 text-center shadow-lg shadow-indigo-100/50 mb-6 transition-all transform hover:scale-[1.02]">
-          <h4 className="text-sm font-bold tracking-widest uppercase">{Number(probability) > 70 ? 'Alto Riesgo' : 'Evaluación Regular'}</h4>
-          <p className="text-[9px] font-medium opacity-80 mt-1">Nivel de depresión detectado por la IA: {probability}%</p>
-        </div>
+        {(() => {
+          const label = clasificacion.nombre_etiqueta || (Number(probability) > 50 ? 'Depresión' : 'Control');
+          const isDepression = label === 'Depresión';
+          const isControl = label === 'Control';
+          const severityText = isDepression
+            ? (Number(probability) > 70 ? 'Alto Riesgo' : 'Riesgo Moderado')
+            : 'Bajo Riesgo';
+          const bannerColor = isDepression ? 'bg-orange-600' : 'bg-emerald-600';
+          const subtitle = isControl
+            ? `Certeza del modelo: ${probability}%`
+            : `Nivel de depresión detectado por la IA: ${probability}%`;
+          return (
+            <div className={`${bannerColor} text-white rounded-xl p-6 text-center shadow-lg shadow-indigo-100/50 mb-6 transition-all transform hover:scale-[1.02]`}>
+              <div className="flex items-center justify-center gap-2 mb-1">
+                <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full bg-white/20`}>{label}</span>
+              </div>
+              <h4 className="text-sm font-bold tracking-widest uppercase">{severityText}</h4>
+              <p className="text-[9px] font-medium opacity-80 mt-1">{subtitle}</p>
+            </div>
+          );
+        })()}
 
         <div className="space-y-4">
           <h5 className="text-[9px] font-bold text-zinc-900 uppercase tracking-widest text-center">Síntomas y su Intensidad</h5>
@@ -77,7 +95,9 @@ export const ModelResultMiniCard = ({
           </div>
         </div>
 
-        <div className="mt-8 pt-6 border-t border-zinc-50 space-y-3">
+        <MedicalDisclaimer className="mt-4" />
+
+        <div className="mt-6 pt-6 border-t border-zinc-50 space-y-3">
           <div className="p-4 rounded-xl border border-zinc-100 flex flex-col items-center text-center mb-2">
             <span className="text-[9px] text-zinc-400 font-bold mb-1">Diagnóstico Sugerido</span>
             <span className="text-[10px] text-zinc-900 font-bold">{dsm5.meets_criterion_a || dsm5.meets_criteria ? 'Cumple Criterios Mayores de Depresión' : 'No cumple Criterios de manera concluyente'}</span>
