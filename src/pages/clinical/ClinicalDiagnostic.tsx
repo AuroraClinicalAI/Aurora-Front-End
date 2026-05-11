@@ -20,8 +20,9 @@ import { UserRole } from "@/types/Roles";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui";
 import { PatientSelector } from "@/components/feature/clinical/PatientSelector";
 import { useClinicalWorkflow } from "@/hooks/useClinicalWorkflow";
+import { useModelos } from "@/hooks/useModelos";
 import { InformedConsent } from "@/components/feature/legal/InformedConsent";
-import type { Diagnostico } from "@/types/BackendTypes";
+import type { Diagnostico, Modelo } from "@/types/BackendTypes";
 
 type ClinicalMode = 'DIAGNOSTIC' | 'REVIEW';
 type PractitionerPhase = 'input' | 'results';
@@ -65,6 +66,12 @@ export const ClinicalDiagnostic = () => {
   const [mode, setMode] = useState<ClinicalMode>('DIAGNOSTIC');
   const [phase, setPhase] = useState<PractitionerPhase>('input');
   const [isEditing, setIsEditing] = useState(false);
+
+  // Model selection modal state
+  const [isModelModalOpen, setIsModelModalOpen] = useState(false);
+  const [selectedModelVersion, setSelectedModelVersion] = useState<string>("");
+  const [availableModels, setAvailableModels] = useState<Modelo[]>([]);
+  const { getAllModelos } = useModelos();
 
   useEffect(() => {
     if (userRole === UserRole.PRACTICANTE && !reviewId) {
@@ -189,6 +196,25 @@ export const ClinicalDiagnostic = () => {
   };
 
   const formIsDisabled = !!reviewId && !isPsychologist && !isEditing;
+
+  const handleOpenReprocessModal = async () => {
+    const models = await getAllModelos();
+    setAvailableModels(models);
+    setSelectedModelVersion("");
+    setIsModelModalOpen(true);
+  };
+
+  const handleConfirmReprocess = async () => {
+    const id = reviewId || state.currentDiagnosis?.id_diagnostico;
+    if (!id) return;
+    setIsModelModalOpen(false);
+    const result = await actions.ejecutarAnalisisIA(Number(id), selectedModelVersion || undefined);
+    if (result && "status" in result && result.status === "processing") {
+      alert(result.message || "Análisis encolado en background. Recibirás un correo cuando finalice.");
+    } else if (result) {
+      setPhase("results");
+    }
+  };
 
   return (
     <DefaultLayout>
@@ -429,18 +455,7 @@ export const ClinicalDiagnostic = () => {
                       `/case-analysis?id=${reviewId || state.currentDiagnosis?.id_diagnostico}`,
                     )
                   }
-                  onReprocess={async () => {
-                    const id =
-                      reviewId || state.currentDiagnosis?.id_diagnostico;
-                    if (id) {
-                      const result = await actions.ejecutarAnalisisIA(Number(id));
-                      if (result && "status" in result && result.status === "processing") {
-                        alert(result.message || "Análisis encolado en background. Recibirás un correo cuando finalice.");
-                      } else if (result) {
-                        setPhase("results");
-                      }
-                    }
-                  }}
+                  onReprocess={handleOpenReprocessModal}
                   onExecute={async () => {
                     const id_to_analyze = reviewId;
                     if (!id_to_analyze) {
@@ -467,6 +482,50 @@ export const ClinicalDiagnostic = () => {
               )}
             </div>
           </div>
+
+          {/* Model Selection Modal for Reprocess */}
+          <Dialog open={isModelModalOpen} onOpenChange={setIsModelModalOpen}>
+            <DialogContent className="max-w-md">
+              <DialogHeader>
+                <DialogTitle>Seleccionar Modelo para Reprocesar</DialogTitle>
+                <DialogDescription>
+                  Elija el modelo de IA que desea utilizar para reprocesar este diagnóstico.
+                </DialogDescription>
+              </DialogHeader>
+              <div className="py-4 space-y-4">
+                <div className="space-y-2">
+                  <label className="text-xs font-bold text-zinc-900 uppercase tracking-wider">Modelo</label>
+                  <select
+                    value={selectedModelVersion}
+                    onChange={(e) => setSelectedModelVersion(e.target.value)}
+                    className="w-full p-2.5 rounded-lg border border-zinc-200 text-xs font-medium text-slate-700 bg-white focus:outline-none focus:ring-1 focus:ring-indigo-100 transition-all"
+                  >
+                    <option value="">Usar modelo por defecto (más reciente)</option>
+                    {availableModels.map((m) => (
+                      <option key={m.id_modelo} value={m.nombre_modelo}>
+                        {m.nombre_modelo} {m.precision ? `(${(m.precision * 100).toFixed(1)}%)` : ''}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                <div className="flex gap-3 pt-2">
+                  <button
+                    onClick={() => setIsModelModalOpen(false)}
+                    className="flex-1 py-2.5 bg-zinc-100 hover:bg-zinc-200 text-zinc-900 rounded-lg text-xs font-bold transition-all"
+                  >
+                    Cancelar
+                  </button>
+                  <button
+                    onClick={handleConfirmReprocess}
+                    disabled={loading}
+                    className="flex-1 py-2.5 bg-[#637bc4] hover:bg-indigo-500 text-white rounded-lg text-xs font-bold transition-all shadow-md shadow-indigo-100 disabled:opacity-50"
+                  >
+                    {loading ? "Procesando..." : "Reprocesar"}
+                  </button>
+                </div>
+              </div>
+            </DialogContent>
+          </Dialog>
 
           <div className="mt-16 bg-white border border-zinc-100 rounded-xl p-4 flex items-center justify-between">
             <p className="text-[10px] text-zinc-900 leading-relaxed">

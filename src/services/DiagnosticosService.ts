@@ -41,10 +41,12 @@ export class DiagnosticosService implements IDiagnosticosService {
 
   async analizarIA(
     id: number,
+    modelVersion?: string,
   ): Promise<
     Clasificacion | { status: string; message: string; id_diagnostico: number }
   > {
-    const response = await api.post(`/diagnostico/${id}/analizar/`);
+    const payload = modelVersion ? { model_version: modelVersion } : {};
+    const response = await api.post(`/diagnostico/${id}/analizar/`, payload);
     return response.data;
   }
 

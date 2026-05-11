@@ -73,6 +73,7 @@ export interface IDiagnosticosService {
   deleteDiagnostico(id: number): Promise<void>;
   analizarIA(
     id: number,
+    modelVersion?: string,
   ): Promise<
     Clasificacion | { status: string; message: string; id_diagnostico: number }
   >;

@@ -151,11 +151,11 @@ export const useClinicalWorkflow = () => {
   );
 
   const ejecutarAnalisisIA = useCallback(
-    async (diagnosticoId: number) => {
+    async (diagnosticoId: number, modelVersion?: string) => {
       setLoading(true);
       setError(null);
       try {
-        const response = await diagnosticosService.analizarIA(diagnosticoId);
+        const response = await diagnosticosService.analizarIA(diagnosticoId, modelVersion);
 
         if ("status" in response && response.status === "processing") {
           // Inform user that processing has started
