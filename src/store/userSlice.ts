@@ -26,7 +26,6 @@ const userSlice = createSlice({
       state.refreshToken = action.payload.refreshToken;
       state.isAuthenticated = true;
       state.loading = false;
-      console.log(state);
     },
     loginFailure: (state, action: PayloadAction<string>) => {
       state.loading = false;

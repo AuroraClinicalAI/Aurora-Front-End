@@ -8,11 +8,20 @@ interface CaseInfoSectionProps {
   shapExplanation?: [string, number][];
 }
 
+const escapeHtml = (unsafe: string): string => {
+  return unsafe
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
+};
+
 export const CaseInfoSection = ({ ageGroup, gender, clinicalVignette, shapExplanation }: CaseInfoSectionProps) => {
   const highlightedText = useMemo(() => {
     if (!shapExplanation || shapExplanation.length === 0) return clinicalVignette;
 
-    let result = clinicalVignette;
+    let result = escapeHtml(clinicalVignette);
     // Sort features by length descending so that subset words don't replace longer matches prematurely
     const sortedFeatures = [...shapExplanation].sort((a, b) => b[0].length - a[0].length);
 

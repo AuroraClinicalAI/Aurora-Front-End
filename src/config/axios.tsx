@@ -96,7 +96,7 @@ api.interceptors.response.use(
 
     // Handle other errors
     if (error.response) {
-      console.log("Error de respuesta del servidor:", error.response.data);
+      // Error logged silently to avoid info leakage
       // Extracts message from { error: "..." }, { detail: "..." }, or the response data root if it's a string
       const message = error.response.data?.error ||
         error.response.data?.detail ||

@@ -9,8 +9,8 @@ export const Logout = () => {
     const performLogout = async () => {
       try {
         await handleLogout();
-      } catch (err) {
-        console.log("Error al cerrar sesión: ", err);
+      } catch {
+        // Silently ignore logout errors
       } finally {
         navigate('/');
       }

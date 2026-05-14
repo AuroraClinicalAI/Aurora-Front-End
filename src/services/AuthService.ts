@@ -24,8 +24,8 @@ export class AuthService implements IAuthService {
   async logout(): Promise<void> {
     try {
       await api.post("/logout/");
-    } catch (err) {
-      console.log("Error al cerrar sesión: ", err);
+    } catch {
+      // Silently ignore logout errors
     }
   }
 
@@ -56,8 +56,9 @@ export class AuthService implements IAuthService {
   }
 
   async checkUsername(username: string): Promise<{ existe: boolean }> {
-    const response = await api.get<{ existe: boolean }>(
-      `/check_nombre_usuario/?nombre_usuario=${username}`,
+    const response = await api.post<{ existe: boolean }>(
+      "/check_nombre_usuario/",
+      { nombre_usuario: username },
     );
     return response.data;
   }

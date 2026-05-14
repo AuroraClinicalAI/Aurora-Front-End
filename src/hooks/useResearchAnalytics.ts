@@ -79,7 +79,7 @@ export const useResearchAnalytics = () => {
         link.remove();
       } else {
         // Handle JSON or other formats if needed
-        console.log("Export data:", data);
+        // Export data logged silently
       }
     } catch (error) {
       console.error("Error exporting data:", error);
