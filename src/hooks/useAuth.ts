@@ -82,6 +82,33 @@ export const useRegister = () => {
   return { handleRegister, loading, error };
 };
 
+export const useInvitationRegister = () => {
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const { usuariosService } = useServices();
+
+  const handleInvitationRegister = async (data: Record<string, string>) => {
+    setLoading(true);
+    setError(null);
+    let response = false;
+    try {
+      await usuariosService.registerWithInvitation(data);
+      response = true;
+    } catch (err) {
+      let errorMessage = "Error en la conexión al servidor";
+      if (err instanceof ApiError) {
+        errorMessage = err.message;
+      }
+      setError(errorMessage);
+    } finally {
+      setLoading(false);
+    }
+    return response;
+  };
+
+  return { handleInvitationRegister, loading, error };
+};
+
 export const useLogout = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);

@@ -1,13 +1,13 @@
-import { useRegister } from "@/hooks";
+import { useRegister, useInvitationRegister } from "@/hooks";
 import type { RegisterData } from "@/types/AuthType";
 import { Controller, useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Button, Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle, Field, FieldDescription, FieldError, FieldGroup, FieldLabel, Input } from "@/components/ui";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { useServices } from "@/context/useServices";
-import { Check, X } from "lucide-react";
+import { Check, X, Loader2 } from "lucide-react";
 
 const registerSchema = z.object({
   nombre: z.string().min(3, "Nombre muy corto").trim(),
@@ -27,7 +27,18 @@ type RegisterFormValues = z.infer<typeof registerSchema>;
 
 export const RegisterForm = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const { loading, error, handleRegister } = useRegister();
+  const { loading: invitationLoading, error: invitationError, handleInvitationRegister } = useInvitationRegister();
+  const { usuariosService } = useServices();
+
+  // Invitation flow
+  const [invitationToken, setInvitationToken] = useState<string | null>(null);
+  const [checkingInvitation, setCheckingInvitation] = useState(false);
+  const [invitationValid, setInvitationValid] = useState(false);
+  const [invitationData, setInvitationData] = useState<{ correo: string; tipo_usuario: string } | null>(null);
+  const [invitationCheckError, setInvitationCheckError] = useState<string | null>(null);
+
   const form = useForm<RegisterFormValues>({
     resolver: zodResolver(registerSchema),
     defaultValues: {
@@ -45,6 +56,36 @@ export const RegisterForm = () => {
   const [usernameStatus, setUsernameStatus] = useState<'available' | 'taken' | null>(null);
 
   const { authService } = useServices();
+
+  // Check for invitation token on mount
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    const token = params.get('invitation');
+    if (token) {
+      setInvitationToken(token);
+      setCheckingInvitation(true);
+      setInvitationCheckError(null);
+      usuariosService.checkInvitationToken(token)
+        .then((data) => {
+          if (data.valid) {
+            setInvitationValid(true);
+            setInvitationData({
+              correo: data.correo || '',
+              tipo_usuario: data.tipo_usuario || '',
+            });
+            form.setValue('correo', data.correo || '');
+          } else {
+            setInvitationCheckError(data.error || 'Token de invitación inválido o expirado');
+          }
+        })
+        .catch(() => {
+          setInvitationCheckError('Error al validar el token de invitación');
+        })
+        .finally(() => {
+          setCheckingInvitation(false);
+        });
+    }
+  }, [location.search, usuariosService, form]);
 
   const handleVerifyUsername = async () => {
     const username = form.getValues('nombreUsuario');
@@ -75,26 +116,78 @@ export const RegisterForm = () => {
   }, [usernameValue]);
 
   const onSubmit = async (values: RegisterFormValues) => {
-    const data: RegisterData = {
-      nombre: values.nombre,
-      correo: values.correo,
-      nombre_usuario: values.nombreUsuario,
-      clave: values.clave,
-      confirmar_clave: values.confirmarClave
-    };
-    const success = await handleRegister(data);
-    if (success) {
-      navigate("/register-confirm");
+    if (invitationValid && invitationToken) {
+      // Register via invitation
+      const data = {
+        token: invitationToken,
+        nombre: values.nombre,
+        nombre_usuario: values.nombreUsuario,
+        clave: values.clave,
+        confirmar_clave: values.confirmarClave,
+      };
+      const success = await handleInvitationRegister(data);
+      if (success) {
+        navigate("/register-confirm");
+      }
+    } else {
+      // Normal registration
+      const data: RegisterData = {
+        nombre: values.nombre,
+        correo: values.correo,
+        nombre_usuario: values.nombreUsuario,
+        clave: values.clave,
+        confirmar_clave: values.confirmarClave
+      };
+      const success = await handleRegister(data);
+      if (success) {
+        navigate("/register-confirm");
+      }
     }
   };
+
+  // Show loading while checking invitation
+  if (checkingInvitation) {
+    return (
+      <Card className="min-w-100 min-h-96 rounded-[5px] md:outline-2 md:outline-offset-[-2px] md:outline-zinc-800/20 flex flex-col items-center justify-center mx-auto">
+        <div className="flex flex-col items-center gap-4 py-12">
+          <Loader2 className="w-10 h-10 text-zinc-900 animate-spin" />
+          <p className="text-sm text-slate-500 font-medium">Verificando invitación...</p>
+        </div>
+      </Card>
+    );
+  }
+
+  // Show error if invitation check failed
+  if (invitationToken && invitationCheckError) {
+    return (
+      <Card className="min-w-100 min-h-96 rounded-[5px] md:outline-2 md:outline-offset-[-2px] md:outline-zinc-800/20 flex flex-col items-center justify-center mx-auto p-8">
+        <div className="flex flex-col items-center gap-4 text-center">
+          <div className="w-14 h-14 rounded-full bg-red-50 flex items-center justify-center">
+            <X className="w-7 h-7 text-red-600" />
+          </div>
+          <h3 className="text-lg font-bold text-zinc-900">Invitación inválida</h3>
+          <p className="text-sm text-slate-500 max-w-xs">{invitationCheckError}</p>
+          <Button onClick={() => navigate('/register')} variant="outline" className="mt-2">
+            Registro normal
+          </Button>
+        </div>
+      </Card>
+    );
+  }
+
+  const isLoading = loading || invitationLoading;
+  const submitError = error || invitationError;
+
   return (
     <Card className=" min-w-100 min-h-96 rounded-[5px] md:outline-2 md:outline-offset-[-2px] md:outline-zinc-800/20 flex flex-col items-center justify-between mx-auto">
       <CardHeader>
         <CardTitle className="justify-center text-black text-3xl font-bold mb-1 text-center">
-          Registro de Usuario
+          {invitationValid ? "Completa tu Registro" : "Registro de Usuario"}
         </CardTitle>
         <CardDescription className="justify-center text-slate-500 text-sm font-normal text-center">
-          Ingresa tus datos para crear una cuenta
+          {invitationValid
+            ? `Has sido invitado como ${invitationData?.tipo_usuario}. Completa tus datos para activar tu cuenta.`
+            : "Ingresa tus datos para crear una cuenta"}
         </CardDescription>
       </CardHeader>
       <CardContent className="w-full">
@@ -134,10 +227,16 @@ export const RegisterForm = () => {
                     placeholder="tu@ejemplo.com"
                     id="correo-form-field"
                     aria-invalid={fieldState.invalid}
-                    className="rounded outline-1 outline-offset-[-1px] outline-neutral-400 px-2 py-1"
+                    disabled={invitationValid}
+                    className={`rounded outline-1 outline-offset-[-1px] outline-neutral-400 px-2 py-1 ${invitationValid ? 'bg-zinc-50 text-zinc-400 cursor-not-allowed' : ''}`}
                   />
                   {fieldState.invalid && (
                     <FieldError errors={[fieldState.error]} />
+                  )}
+                  {invitationValid && (
+                    <FieldDescription>
+                      Correo vinculado a la invitación. No editable.
+                    </FieldDescription>
                   )}
                 </Field>
               )}
@@ -230,9 +329,9 @@ export const RegisterForm = () => {
                     <FieldError errors={[fieldState.error]} />
                   )}
                   {/* Mostrar error del servidor si existe */}
-                  {error && (
+                  {submitError && (
                     <p className="text-[0.8rem] font-medium text-destructive">
-                      {error}
+                      {submitError}
                     </p>
                   )}
                 </Field>
@@ -246,9 +345,9 @@ export const RegisterForm = () => {
           type="submit"
           form="register-form"
           size={"lg"}
-          disabled={loading || form.formState.isSubmitting || !isUsernameVerified}
+          disabled={isLoading || form.formState.isSubmitting || !isUsernameVerified}
         >
-          {loading || form.formState.isSubmitting ? "Registrando..." : "Regístrate"}
+          {isLoading || form.formState.isSubmitting ? "Registrando..." : (invitationValid ? "Completar Registro" : "Regístrate")}
         </Button>
       </CardFooter>
     </Card>

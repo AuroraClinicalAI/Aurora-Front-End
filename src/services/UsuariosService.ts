@@ -3,6 +3,8 @@ import type {
   PaginatedResponse,
   UserProfile,
   ActivityStatistics,
+  InvitationResponse,
+  InvitationCheckResponse,
 } from "@/types/BackendTypes";
 import type { IUsuariosService } from "./serviceInterfaces";
 
@@ -43,6 +45,33 @@ export class UsuariosService implements IUsuariosService {
     const response = await api.get<ActivityStatistics>(
       "/me/activity-statistics/",
     );
+    return response.data;
+  }
+
+  async invitarUsuario(correo: string, tipo_usuario: string): Promise<InvitationResponse> {
+    const response = await api.post<InvitationResponse>("/usuarios/invitar/", {
+      correo,
+      tipo_usuario,
+    });
+    return response.data;
+  }
+
+  async renovarInvitacion(correo: string): Promise<InvitationResponse> {
+    const response = await api.post<InvitationResponse>("/usuarios/invitar-renovar/", {
+      correo,
+    });
+    return response.data;
+  }
+
+  async checkInvitationToken(token: string): Promise<InvitationCheckResponse> {
+    const response = await api.get<InvitationCheckResponse>("/invitation-check/", {
+      params: { token },
+    });
+    return response.data;
+  }
+
+  async registerWithInvitation(data: Record<string, string>): Promise<{ message: string; usuario: UserProfile }> {
+    const response = await api.post<{ message: string; usuario: UserProfile }>("/register-invitation/", data);
     return response.data;
   }
 }

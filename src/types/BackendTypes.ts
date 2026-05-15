@@ -213,6 +213,20 @@ export interface Solicitud {
   nota_resolucion: string;
 }
 
+export interface InvitationResponse {
+  detail: string;
+  usuario: UserProfile;
+  existente: boolean;
+}
+
+export interface InvitationCheckResponse {
+  valid: boolean;
+  correo?: string;
+  tipo_usuario?: string;
+  expires_at?: string;
+  error?: string;
+}
+
 export interface PaginatedResponse<T> {
   count: number;
   next: string | null;

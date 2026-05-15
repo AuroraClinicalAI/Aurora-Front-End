@@ -16,6 +16,9 @@ import {
   X,
   Save,
   AlertTriangle,
+  UserPlus,
+  Send,
+  RefreshCw,
 } from "lucide-react";
 import {
   Card,
@@ -31,9 +34,9 @@ import {
 } from "@/components/ui";
 import { useAdminUsuarios } from "@/hooks/useAdminUsuarios";
 import type { UserProfile } from "@/types/BackendTypes";
-import { UserRole } from "@/types/Roles";
+import { UserRole, ALL_ROLES } from "@/types/Roles";
 
-const ESTADO_OPTIONS = ["ACTIVO", "INACTIVO", "SUSPENDIDO", "EN REVISION", "ELIMINADO"];
+const ESTADO_OPTIONS = ["ACTIVO", "PENDIENTE", "INACTIVO", "SUSPENDIDO", "EN REVISION", "ELIMINADO"];
 
 export const UserDirectory = () => {
   const {
@@ -42,7 +45,10 @@ export const UserDirectory = () => {
     getUsuariosPaginated,
     updateUsuario,
     desactivarUsuario,
+    invitarUsuario,
+    renovarInvitacion,
     loading,
+    error: hookError,
   } = useAdminUsuarios();
 
   const [searchTerm, setSearchTerm] = useState("");
@@ -57,6 +63,15 @@ export const UserDirectory = () => {
 
   // Deactivate confirm state
   const [confirmDeactivate, setConfirmDeactivate] = useState<number | null>(null);
+
+  // Invitation modal state
+  const [isInviteModalOpen, setIsInviteModalOpen] = useState(false);
+  const [inviteEmail, setInviteEmail] = useState("");
+  const [inviteRole, setInviteRole] = useState<UserRole>(UserRole.PRACTICANTE);
+  const [inviteError, setInviteError] = useState<string | null>(null);
+  const [inviteSuccess, setInviteSuccess] = useState<string | null>(null);
+  const [existingPendingUser, setExistingPendingUser] = useState<UserProfile | null>(null);
+  const [isInviting, setIsInviting] = useState(false);
 
   const apiUrl = import.meta.env.VITE_BASE_URL;
 
@@ -106,6 +121,56 @@ export const UserDirectory = () => {
     }
   };
 
+  const handleOpenInvite = () => {
+    setIsInviteModalOpen(true);
+    setInviteEmail("");
+    setInviteRole(UserRole.PRACTICANTE);
+    setInviteError(null);
+    setInviteSuccess(null);
+    setExistingPendingUser(null);
+  };
+
+  const handleSendInvitation = async () => {
+    setInviteError(null);
+    setInviteSuccess(null);
+    setExistingPendingUser(null);
+    setIsInviting(true);
+
+    const result = await invitarUsuario(inviteEmail, inviteRole);
+    if (result) {
+      if (result.existente) {
+        setInviteSuccess(`Invitación reenviada correctamente. El usuario ya existía con estado ${result.usuario.estado}.`);
+      } else {
+        setInviteSuccess("Invitación enviada correctamente.");
+      }
+      setInviteEmail("");
+      setInviteRole(UserRole.PRACTICANTE);
+      fetchUsers();
+    } else {
+      // Manejar error específico de correo existente no pendiente
+      if (hookError?.includes("ya está registrado")) {
+        setInviteError(hookError);
+      } else {
+        setInviteError(hookError || "Error al enviar la invitación.");
+      }
+    }
+    setIsInviting(false);
+  };
+
+  const handleRenewInvitation = async (correo: string) => {
+    setInviteError(null);
+    setInviteSuccess(null);
+    setIsInviting(true);
+    const result = await renovarInvitacion(correo);
+    if (result) {
+      setInviteSuccess("Invitación renovada y reenviada correctamente.");
+      fetchUsers();
+    } else {
+      setInviteError(hookError || "Error al renovar la invitación.");
+    }
+    setIsInviting(false);
+  };
+
   const totalPages = Math.ceil(pagination.count / 10);
 
   const getRoleBadge = (role: string) => {
@@ -126,6 +191,7 @@ export const UserDirectory = () => {
   const getEstadoBadge = (estado?: string) => {
     const estadoStyles: Record<string, string> = {
       ACTIVO: "bg-emerald-50 text-emerald-700 border-emerald-100",
+      PENDIENTE: "bg-violet-50 text-violet-700 border-violet-100",
       INACTIVO: "bg-amber-50 text-amber-700 border-amber-100",
       SUSPENDIDO: "bg-red-50 text-red-700 border-red-100",
       "EN REVISION": "bg-blue-50 text-blue-700 border-blue-100",
@@ -149,6 +215,13 @@ export const UserDirectory = () => {
               <h1 className="text-3xl font-bold text-zinc-900">Directorio de Usuarios</h1>
               <p className="text-[11px] font-bold text-slate-400 tracking-wide uppercase">Gestión Administrativa de Accesos y Roles</p>
             </div>
+            <button
+              onClick={handleOpenInvite}
+              className="inline-flex items-center gap-2 px-5 py-2.5 bg-zinc-900 text-white text-sm font-bold rounded-xl hover:bg-zinc-800 transition-all shadow-sm"
+            >
+              <UserPlus className="w-4 h-4" />
+              Invitar Usuario
+            </button>
           </div>
 
           {/* Search and Filters */}
@@ -299,6 +372,111 @@ export const UserDirectory = () => {
           </div>
         </div>
       </div>
+
+      {/* Invite Modal */}
+      {isInviteModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
+          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-lg mx-4 p-8">
+            <div className="flex items-center justify-between mb-6">
+              <div>
+                <h3 className="text-lg font-bold text-zinc-900">Invitar Usuario</h3>
+                <p className="text-xs text-slate-400 mt-1">Envía una invitación por correo para que el usuario se registre con un rol específico.</p>
+              </div>
+              <button
+                onClick={() => setIsInviteModalOpen(false)}
+                className="p-1.5 hover:bg-zinc-100 rounded-lg transition-colors"
+              >
+                <X className="w-5 h-5 text-zinc-500" />
+              </button>
+            </div>
+
+            <div className="space-y-5">
+              <div>
+                <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5">Correo electrónico</label>
+                <input
+                  type="email"
+                  value={inviteEmail}
+                  onChange={(e) => {
+                    setInviteEmail(e.target.value);
+                    setInviteError(null);
+                    setInviteSuccess(null);
+                    setExistingPendingUser(null);
+                  }}
+                  placeholder="usuario@ejemplo.com"
+                  className="w-full px-4 py-2.5 rounded-xl border border-zinc-200 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-zinc-900/5 bg-white"
+                />
+              </div>
+
+              <div>
+                <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5">Rol asignado</label>
+                <select
+                  value={inviteRole}
+                  onChange={(e) => {
+                    setInviteRole(e.target.value as UserRole);
+                    setInviteError(null);
+                  }}
+                  className="w-full px-4 py-2.5 rounded-xl border border-zinc-200 text-sm font-medium bg-white focus:outline-none focus:ring-2 focus:ring-zinc-900/5"
+                >
+                  {ALL_ROLES.map(role => (
+                    <option key={role} value={role}>{role}</option>
+                  ))}
+                </select>
+              </div>
+
+              {inviteError && (
+                <div className="p-3 rounded-xl bg-red-50 border border-red-100">
+                  <p className="text-sm text-red-600 font-medium">{inviteError}</p>
+                </div>
+              )}
+
+              {inviteSuccess && (
+                <div className="p-3 rounded-xl bg-emerald-50 border border-emerald-100">
+                  <p className="text-sm text-emerald-700 font-medium">{inviteSuccess}</p>
+                </div>
+              )}
+
+              {existingPendingUser && (
+                <div className="p-4 rounded-xl bg-amber-50 border border-amber-100">
+                  <p className="text-sm text-amber-800 font-medium mb-2">
+                    Este correo ya tiene una invitación pendiente.
+                  </p>
+                  <div className="flex items-center gap-2 text-xs text-amber-700 mb-3">
+                    <span>Rol actual: <strong>{existingPendingUser.tipo_usuario}</strong></span>
+                  </div>
+                  <button
+                    onClick={() => handleRenewInvitation(existingPendingUser.correo)}
+                    disabled={isInviting}
+                    className="text-xs font-bold text-amber-800 hover:text-amber-900 underline flex items-center gap-1"
+                  >
+                    <RefreshCw className="w-3 h-3" /> Renovar y reenviar invitación
+                  </button>
+                </div>
+              )}
+            </div>
+
+            <div className="flex gap-3 mt-8">
+              <button
+                onClick={() => setIsInviteModalOpen(false)}
+                className="flex-1 py-2.5 rounded-xl border border-zinc-200 text-sm font-bold text-zinc-600 hover:bg-zinc-50 transition-all"
+              >
+                Cerrar
+              </button>
+              <button
+                onClick={handleSendInvitation}
+                disabled={isInviting || !inviteEmail || !inviteEmail.includes('@')}
+                className="flex-1 py-2.5 rounded-xl bg-zinc-900 text-white text-sm font-bold hover:bg-zinc-800 transition-all disabled:opacity-50 flex items-center justify-center gap-2"
+              >
+                {isInviting ? (
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                ) : (
+                  <Send className="w-4 h-4" />
+                )}
+                {isInviting ? "Enviando..." : "Enviar Invitación"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Edit Modal */}
       {editingUser && (

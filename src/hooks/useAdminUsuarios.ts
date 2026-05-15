@@ -1,5 +1,5 @@
 import { useServices } from "@/context/useServices";
-import type { UserProfile, PaginatedResponse } from "@/types/BackendTypes";
+import type { UserProfile, PaginatedResponse, InvitationResponse } from "@/types/BackendTypes";
 import { useState, useCallback } from "react";
 
 export const useAdminUsuarios = () => {
@@ -77,12 +77,50 @@ export const useAdminUsuarios = () => {
     [usuariosService],
   );
 
+  const invitarUsuario = useCallback(
+    async (correo: string, tipo_usuario: string) => {
+      setLoading(true);
+      setError(null);
+      try {
+        const result: InvitationResponse = await usuariosService.invitarUsuario(correo, tipo_usuario);
+        return result;
+      } catch (err: unknown) {
+        const message = err instanceof Error ? err.message : "Error al enviar invitación";
+        setError(message);
+        return null;
+      } finally {
+        setLoading(false);
+      }
+    },
+    [usuariosService],
+  );
+
+  const renovarInvitacion = useCallback(
+    async (correo: string) => {
+      setLoading(true);
+      setError(null);
+      try {
+        const result: InvitationResponse = await usuariosService.renovarInvitacion(correo);
+        return result;
+      } catch (err: unknown) {
+        const message = err instanceof Error ? err.message : "Error al renovar invitación";
+        setError(message);
+        return null;
+      } finally {
+        setLoading(false);
+      }
+    },
+    [usuariosService],
+  );
+
   return {
     usuarios,
     pagination,
     getUsuariosPaginated,
     updateUsuario,
     desactivarUsuario,
+    invitarUsuario,
+    renovarInvitacion,
     loading,
     error,
   };

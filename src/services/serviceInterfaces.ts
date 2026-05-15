@@ -34,6 +34,8 @@ import type {
   ExportParams,
   SystemHealth,
   ValidationMetrics,
+  InvitationResponse,
+  InvitationCheckResponse,
 } from "@/types/BackendTypes";
 
 export interface IAuthService {
@@ -154,6 +156,10 @@ export interface IUsuariosService {
   ): Promise<PaginatedResponse<UserProfile>>;
   desactivarUsuario(id: number): Promise<void>;
   getSelfActivityStatistics(): Promise<ActivityStatistics>;
+  invitarUsuario(correo: string, tipo_usuario: string): Promise<InvitationResponse>;
+  renovarInvitacion(correo: string): Promise<InvitationResponse>;
+  checkInvitationToken(token: string): Promise<InvitationCheckResponse>;
+  registerWithInvitation(data: Record<string, string>): Promise<{ message: string; usuario: UserProfile }>;
 }
 
 export interface IAnalyticsService {

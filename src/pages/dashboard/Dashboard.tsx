@@ -86,7 +86,7 @@ export const Dashboard = () => {
       description: "Métricas y estadísticas del sistema",
       icon: <BarChart3 className="w-6 h-6 text-blue-500" />,
       path: "/reports",
-      roles: [UserRole.ADMIN, UserRole.MODERADOR, UserRole.PSICOLOGO, UserRole.EVALUADOR],
+      roles: [UserRole.ADMIN, UserRole.MODERADOR, UserRole.PSICOLOGO],
       color: "bg-blue-50"
     },
     {
